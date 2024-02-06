@@ -1,8 +1,34 @@
 #include "mbed.h"
 #include "C12832.h"
+#include "mbed2/299/drivers/AnalogIn.h"
+#include "mbed2/299/drivers/Ticker.h"
 
 typedef enum {starting,straightline,curve,stop,turnaround} pstate;
 pstate ProgramState;
+
+class TCRT {
+    private:
+        AnalogIn sensorPin;
+        float VDD,senseNorm;
+        float senseNormRolled[5];
+        int rIndex;
+    public:
+        TCRT(PinName Pin, float v): sensorPin(Pin), VDD(v){
+            rIndex = 0;
+            senseNorm = 0;
+            for(int i = 0;i<5;i++){senseNormRolled[i] = 0;};
+        }
+        float ampNorm(void){return (sensorPin.read());};
+        void rollingPollAverage(void)
+        {
+            senseNormRolled[rIndex%5] = ampNorm();
+            rIndex++;
+            senseNorm = 0;
+            for(int i = 0;i<5;i++){senseNorm += senseNormRolled[i];};
+            senseNorm /= 5;
+        };
+        float getSensorNorm(void){return senseNorm;};
+};
 
 void toScreen(char* line1, char*  line2, char* line3,C12832* lcd){
     static char lastLine1[21] = "";
