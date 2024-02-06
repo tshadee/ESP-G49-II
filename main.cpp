@@ -71,7 +71,14 @@ class PWMGen {
 
 };
 
-//LCD display buffer. Pass string pointers to display in lines 1-3 on the LCD screen. Keep the strings under 20 bytes if possible
+class BatteryMonitor {
+    private:
+        AnalogIn BatteryPin;
+    public:
+        BatteryMonitor(PinName P1): BatteryPin(P1) {};
+};
+
+//LCD display buffer. Pass string pointers to display in lines 1-3 on the LCD screen. Keep the strings under 23 bytes if possible
 // call toScreen with the appropriate arguments to push anything to the LCD display - refresh rate sensitive (dont go above 15 Hz)
 void toScreen(char* line1, char*  line2, char* line3,C12832* lcd){
     static char lastLine1[21] = "";
@@ -104,8 +111,35 @@ int main (void)
     Ticker sensorPollTicker;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
 
+
+    Timer screenUpdateTimer;
+    screenUpdateTimer.start();
+    int refreshrate = 15; //Hz
+    int timedelay = (static_cast<int>(1000/refreshrate)); //in ms
     while(1)
     {
+        switch (ProgramState){
+            case (starting):{
+                if(screenUpdateTimer.read_ms() >= timedelay){
+                    screenUpdateTimer.reset();
+                    toScreen("Battery Voltage:       ", "                       ", "                       ", &lcd);
+                };
+            };
+            case (straightline):{
+                
+            };
+            case (curve):{
+                
+            };
+            case (stop):{
+                
+            };
+            case (turnaround):{
+                
+            };
 
+
+        
+        };
     };
 };
