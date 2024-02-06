@@ -1,10 +1,8 @@
-### University of Manchester ESP Buggy Project Group 49
+### University of Manchester ESP Buggy Project Group 49 - Version 2
 
 We aim to make a buggy that:
 1. Works.
 2. Wins (optional).
-
-Jokes aside, here are some resources for you to read up on the buggy's components and design.
 
 - Git and Mbed integration for [source control](https://os.mbed.com/docs/mbed-studio/current/source-control/index.html).
 - Painful [Lower Layer Library and HAL documentation](https://www.st.com/en/embedded-software/stm32cubef4.html) by ST Electronics for those who want to change the Cortex M4's operation.
