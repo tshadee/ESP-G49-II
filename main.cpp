@@ -10,19 +10,17 @@
 #define SENSOR_BUFFER 5 //Buffer Size
 #define SENSOR_POLL_FREQ 1000 //Hz
 
-#define SUBSYS_POLL_FREQ 100 //Hz
-#define SUBSYS_BUFFER 5 //Buffer Size
-
 #define GAIN_PROPORTIONAL 0.1
 #define GAIN_INTEGRAL 0.1
 #define GAIN_DERIVATIVE 0.1
 
-#define SCREEN_REFRESH_RATE 15 //Hz
+#define SYS_OUTPUT_RATE 50 //Hz
 
 #define WHEEL_DIAMETER 0.08//m
 #define GEAR_RATIO 1/12
 #define PI 3.14
 #define CPR 256
+#define TCRT_MAX_VDD 3.3 //V
 
 //seerial 6 RX TX PA_11/12
 //ANALOG IN PC_2/3/4/5 PB_1
@@ -49,11 +47,8 @@ class TCRT {
         {
             rIndex = 0;
             senseNorm = 0;
-            for(int i = 0;i<SENSOR_BUFFER;i++){senseNormRolled[i] = 0;};
-            if(sensorCount < SENSOR_AMOUNT)
-            {
-                sensors[sensorCount++] = this; //appending individual sensor object pointers into the TCRT* pointer array to be used in static function pollSensors() later
-            };
+            for(int i = 0;i<SENSOR_BUFFER;i++){ senseNormRolled[i] = 0; };
+            if(sensorCount < SENSOR_AMOUNT){ sensors[sensorCount++] = this; };
         };
         void rollingPollAverage()
         {
@@ -63,12 +58,8 @@ class TCRT {
             for(int i = 0;i < SENSOR_BUFFER;i++){senseNorm += senseNormRolled[i];};
             senseNorm /= SENSOR_BUFFER;
         };
-        static void pollSensors(void) //runs through all the polling once called. This is for synchronous polling between sensors since static is shared between all objects derived from TCRT
-        {
-            for(int i = 0; i < sensorCount; i++) {
-                sensors[i]->rollingPollAverage();
-            };
-        };
+        //runs through all the polling once called. This is for synchronous polling between sensors since static is shared between all objects derived from TCRT
+        static void pollSensors(void) { for(int i = 0; i < sensorCount; i++) {sensors[i]->rollingPollAverage(); }; }; 
         float ampNorm(void){return (sensorPin.read());};
         float getSensorNorm(bool Volt){return (Volt? senseNorm*VDD : senseNorm);}; 
 };
@@ -76,49 +67,36 @@ class TCRT {
 TCRT* TCRT::sensors[SENSOR_AMOUNT]; //static member declaration (must be outside class)
 int TCRT::sensorCount = 0;  //static member declaration (must be outside class)
 
+
+//class is being revamped
+/*
+            angleVelocity = (rightSpeed - leftSpeed)/0.1864;
+            transVelocity = (rightSpeed + leftSpeed)/2;
+*/
 class Encoder {
     private:
-        QEI LeftEncoder, RightEncoder;
-        uint32_t LeftCount, RightCount, LeftCountPrev, RightCountPrev;
-        float leftDistance, rightDistance, leftSpeed, rightSpeed,transVelocity, angleVelocity;
+        QEI encode;
+        uint32_t count, countPrev;
+        float distance, speed;
     public:
-        Encoder(PinName leftCH1, PinName leftCH2, PinName rightCH1, PinName rightCH2): LeftEncoder(leftCH1,leftCH2,NC,CPR), RightEncoder(rightCH1,rightCH2,NC,CPR){
-            LeftEncoder.reset();
-            RightEncoder.reset();
-        };
-        void accumulateCount(void)
+        Encoder(PinName channel1, PinName channel2): encode(channel1,channel2,NC,CPR){ resetAllValues(); };
+        void updateValues(void)
         {
-            LeftCountPrev = LeftCount;
-            RightCountPrev = RightCount;
-            LeftCount += LeftEncoder.getPulses();
-            RightCount += RightEncoder.getPulses();
+            countPrev = count;
+            count += encode.getPulses();
+            distance = encode.getRevolutions()*WHEEL_DIAMETER*PI;
+            speed = (((count - countPrev)/CPR)*SYS_OUTPUT_RATE)*WHEEL_DIAMETER*PI*GEAR_RATIO;
         };
-        void calDistance(void)
+        void resetAllValues(void)
         {
-            leftDistance = LeftEncoder.getRevolutions()*WHEEL_DIAMETER*PI;
-            rightDistance = RightEncoder.getRevolutions()*WHEEL_DIAMETER*PI;
+            encode.reset();
+            distance = 0;
+            speed = 0;
+            count = 0;
+            countPrev = 0;
         };
-        void wheelVelocity(void)
-        {
-            leftSpeed = (((LeftCount - LeftCountPrev)/CPR)*SUBSYS_POLL_FREQ)*WHEEL_DIAMETER*PI*GEAR_RATIO;
-            rightSpeed = (((RightCount - RightCountPrev)/CPR)*SUBSYS_POLL_FREQ)*WHEEL_DIAMETER*PI*GEAR_RATIO;
-        };
-        void translationalVelocity(void){transVelocity = (rightSpeed + leftSpeed)/2;};
-        void angularVelocity(void){angleVelocity = (rightSpeed - leftSpeed)/0.1864;};
-        void updateAllValues(void)
-        {
-            accumulateCount();
-            calDistance();
-            wheelVelocity();
-            translationalVelocity();
-            angularVelocity();
-        };
-        float getLeftDist(void){return leftDistance;};
-        float getRightDist(void){return rightDistance;};
-        float getLeftSpeed(void){return leftSpeed;};
-        float getRightSpeed(void){return rightSpeed;};
-        float getTranslational(void){return transVelocity;};
-        float getAngular(void){return angleVelocity;};
+        float getDist(void){return distance;};  //returns distance from last reset() call
+        float getSpeed(void){return speed;};    //returns speed in m/s
 };
 
 //THIS CLASS INCLUDES PID AND PWM OUTPUT. Output rate will be tied to another Ticker. DO NOT MODIFY THIS YET.
@@ -205,10 +183,7 @@ char* sensorVoltageLowerBuffer(TCRT* S3)
     sprintf(dspBuffer, "%.02f               ", S3->getSensorNorm(true));
 };
 
-Encoder AEAT(PC_14,PC_15,PH_0,PH_1);
-
 void SubSystemPoll(void){
-    AEAT.updateAllValues();
 };
 
 int main (void)
@@ -216,23 +191,22 @@ int main (void)
     C12832 lcd(D11, D13, D12, D7, D10);
     BatteryMonitor Battery(PC_12);
     Ticker sensorPollTicker;
-    Ticker encoderPollTicker;
+    Encoder leftWheel(PB_14,PB_15);
+    TCRT S1(PC_2,TCRT_MAX_VDD) , S2(PC_3,TCRT_MAX_VDD) , S3(PC_4,TCRT_MAX_VDD) , S4(PC_5,TCRT_MAX_VDD), S5(PB_1,TCRT_MAX_VDD);
 
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
-    float encoderPollRate = 1.0/SUBSYS_POLL_FREQ;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
-    encoderPollTicker.attach(&SubSystemPoll, encoderPollRate);
     
-    Timer screenUpdateTimer;
-    screenUpdateTimer.start();
-    int refreshrate = 15; //Hz
-    int timedelay = (static_cast<int>(1000/refreshrate)); //in ms
+    Timer outputUpdateTimer;
+    outputUpdateTimer.start();
+    int timedelay = (static_cast<int>(1000/SYS_OUTPUT_RATE)); //in ms
     while(1)
     {
         switch (ProgramState){
             case (starting):{
-                if(screenUpdateTimer.read_ms() >= timedelay){
-                    screenUpdateTimer.reset();
+                if(outputUpdateTimer.read_ms() >= timedelay){
+                    outputUpdateTimer.reset();
+
                     toScreen("Battery Voltage:       ", screenLine2Buffer(&Battery), "                       ", &lcd);
                 };
             };
