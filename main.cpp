@@ -187,16 +187,16 @@ char* screenLine2Buffer(BatteryMonitor* Batt){
     return dspBuffer;
 };
 
-void SubSystemPoll(Encoder* Enc){
-    Enc->updateAllValues();
+Encoder AEAT(PC_14,PC_15,PH_0,PH_1);
+
+void SubSystemPoll(void){
+    AEAT.updateAllValues();
 };
 
 int main (void)
 {
     C12832 lcd(D11, D13, D12, D7, D10);
     BatteryMonitor Battery(PC_12);
-    Encoder AEAT(PC_14,PC_15,PH_0,PH_1);
-    
     Ticker sensorPollTicker;
     Ticker encoderPollTicker;
 
