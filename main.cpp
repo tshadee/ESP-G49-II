@@ -183,8 +183,26 @@ void toScreen(char* line1, char*  line2, char* line3,C12832* lcd){
 
 char* screenLine2Buffer(BatteryMonitor* Batt){
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%02f           ", Batt->getBatteryVoltage());
+    sprintf(dspBuffer, "%.02f           ", Batt->getBatteryVoltage());
     return dspBuffer;
+};
+
+char* sensorVoltageTopBuffer(TCRT* S1,TCRT* S5)
+{
+    static char dspBuffer[20];
+    sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorNorm(true),S5->getSensorNorm(true));
+};
+
+char* sensorVoltageMiddleBuffer(TCRT* S2,TCRT* S4)
+{
+    static char dspBuffer[20];
+    sprintf(dspBuffer, "%.02f      %.02f     ", S2->getSensorNorm(true),S4->getSensorNorm(true));
+};
+
+char* sensorVoltageLowerBuffer(TCRT* S3)
+{
+    static char dspBuffer[20];
+    sprintf(dspBuffer, "%.02f               ", S3->getSensorNorm(true));
 };
 
 Encoder AEAT(PC_14,PC_15,PH_0,PH_1);
