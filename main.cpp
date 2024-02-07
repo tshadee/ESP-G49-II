@@ -28,12 +28,12 @@
 //encoder PB_15/14
 
 
-typedef enum {starting,straightline,curve,stop,turnaround} pstate;
+typedef enum {starting,straightline,stop,turnaround} pstate;
 pstate ProgramState;
 
 //TCRT class. Creates an object for individual sensors on the sensor array with rolling average (size 5) built in. 
 //Provide the Pin (ADC) for the sensor and the voltage levels expected (if you want to scale to voltage instead of from 0.0 - 1.0)
-//Use getSensorNorm() to get value of voltage (rolled average). 
+//Use getSensorVoltage() to get value of voltage (rolled average). 
 class TCRT {
     private:
         AnalogIn sensorPin;
@@ -61,7 +61,7 @@ class TCRT {
         //runs through all the polling once called. This is for synchronous polling between sensors since static is shared between all objects derived from TCRT
         static void pollSensors(void) { for(int i = 0; i < sensorCount; i++) {sensors[i]->rollingPollAverage(); }; }; 
         float ampNorm(void){return (sensorPin.read());};
-        float getSensorNorm(bool Volt){return (Volt? senseNorm*VDD : senseNorm);}; 
+        float getSensorVoltage(bool Volt){return (Volt? senseNorm*VDD : senseNorm);}; 
 };
 
 TCRT* TCRT::sensors[SENSOR_AMOUNT]; //static member declaration (must be outside class)
@@ -99,14 +99,28 @@ class Encoder {
         float getSpeed(void){return speed;};    //returns speed in m/s
 };
 
-//THIS CLASS INCLUDES PID AND PWM OUTPUT. Output rate will be tied to another Ticker. DO NOT MODIFY THIS YET.
 class PWMGen {
     private:
-        float PWM_Internal_1, PWM_Internal_2;
-        DigitalOut PWM_OUT_CHANNEL_1, PWM_OUT_CHANNEL_2;
-        float IntegralBuffer[2], DerivativeBuffer[2];
+        PwmOut PWM_LEFT, PWM_RIGHT;
     public:
-        PWMGen(PinName P1, PinName P2): PWM_OUT_CHANNEL_1(P1),PWM_OUT_CHANNEL_2(P2){};
+        PWMGen(PinName P1, PinName P2): PWM_LEFT(P1),PWM_RIGHT(P2) { reset();};
+        void reset()
+        {
+            PWM_LEFT.period(0.0f);
+            PWM_RIGHT.period(0.0f);
+            PWM_LEFT.write(0.5f);
+            PWM_RIGHT.write(0.5f);
+        };
+        void begin()
+        {
+            PWM_LEFT.period(1.0/SYS_OUTPUT_RATE);
+            PWM_RIGHT.period(1.0/SYS_OUTPUT_RATE);
+        };
+        void setPWMDuty(float leftPWM, float rightPWM)
+        {
+            PWM_LEFT.write(leftPWM);
+            PWM_RIGHT.write(rightPWM);
+        };
 };
 
 //use the one-wire-pin PC_12
@@ -165,41 +179,62 @@ char* screenLine2Buffer(BatteryMonitor* Batt){
     return dspBuffer;
 };
 
-char* sensorVoltageTopBuffer(TCRT* S1,TCRT* S5)
+char* sensorVoltage2Buffer(TCRT* S1,TCRT* S2)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorNorm(true),S5->getSensorNorm(true));
+    sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorVoltage(true),S2->getSensorVoltage(true));
 };
 
-char* sensorVoltageMiddleBuffer(TCRT* S2,TCRT* S4)
-{
-    static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f      %.02f     ", S2->getSensorNorm(true),S4->getSensorNorm(true));
-};
-
-char* sensorVoltageLowerBuffer(TCRT* S3)
-{
-    static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f               ", S3->getSensorNorm(true));
-};
-
-void SubSystemPoll(void){
+class JoystickISR {
+    private:
+        InterruptIn centreJoy;
+        Timeout joyDebounce;
+        bool toggleState;
+    public:
+    JoystickISR(PinName centre) : centreJoy(centre){
+        toggleState = false;
+        centreJoy.rise(callback(this,&JoystickISR::centreISR));
+    };
+    void toggleInput(){
+        toggleState = !toggleState;
+        if(toggleState){
+            centreJoy.disable_irq();
+        } else {
+            centreJoy.enable_irq();
+        };
+    };
+    void timerDebounce(){joyDebounce.attach(callback(this,&JoystickISR::toggleInput),0.3);};
+    void centreISR(){
+        toggleInput();
+        timerDebounce();
+        switch(ProgramState){
+            case(starting)      : ProgramState = straightline;  break;
+            case(straightline)  : ProgramState = stop;         break;
+            case(stop)          : ProgramState = turnaround;    break;
+            case(turnaround)    : ProgramState = starting;      break;
+            default:break;
+        };
+    };
 };
 
 int main (void)
 {
-    C12832 lcd(D11, D13, D12, D7, D10);
+    JoystickISR joy(D4);
+    PWMGen toMDB(PC_8,PC_6);
     BatteryMonitor Battery(PC_12);
-    Ticker sensorPollTicker;
     Encoder leftWheel(PB_14,PB_15);
-    TCRT S1(PC_2,TCRT_MAX_VDD) , S2(PC_3,TCRT_MAX_VDD) , S3(PC_4,TCRT_MAX_VDD) , S4(PC_5,TCRT_MAX_VDD), S5(PB_1,TCRT_MAX_VDD);
+    C12832 lcd(D11, D13, D12, D7, D10);
+    TCRT S1(PA_0,TCRT_MAX_VDD) , S2(PA_1,TCRT_MAX_VDD) , S3(PA_4,TCRT_MAX_VDD) , S4(PB_0,TCRT_MAX_VDD), S5(PC_1,TCRT_MAX_VDD);
 
+    Ticker sensorPollTicker;
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
     
     Timer outputUpdateTimer;
     outputUpdateTimer.start();
     int timedelay = (static_cast<int>(1000/SYS_OUTPUT_RATE)); //in ms
+
+    bool straightLineStart = true;
     while(1)
     {
         switch (ProgramState){
@@ -207,17 +242,31 @@ int main (void)
                 if(outputUpdateTimer.read_ms() >= timedelay){
                     outputUpdateTimer.reset();
 
-                    toScreen("Battery Voltage:       ", screenLine2Buffer(&Battery), "                       ", &lcd);
+
+
+                    toScreen("START STATE        ", "                       ", "                       ", &lcd);
                 };
             };
             case (straightline):{
-                
-            };
-            case (curve):{
-                
+                if(outputUpdateTimer.read_ms() >= timedelay){
+                    outputUpdateTimer.reset();
+                    toMDB.setPWMDuty(1.0f, 1.0f); //test
+
+                    toScreen("STRAIGHT LINE       ", "                       ", "                       ", &lcd);
+                    if(straightLineStart)
+                    {
+                        toMDB.begin();
+                        straightLineStart = false;
+                    };
+                };
             };
             case (stop):{
-                
+                if(outputUpdateTimer.read_ms() >= timedelay){
+                    outputUpdateTimer.reset();
+                    toMDB.setPWMDuty(0.0f, 0.0f); //test
+
+                    toScreen("STRAIGHT LINE       ", "                       ", "                       ", &lcd);
+                };
             };
             case (turnaround):{
                 
