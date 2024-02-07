@@ -1,16 +1,22 @@
 #include "mbed.h"
 #include "C12832.h"
+#include "ds2781.h"
+#include "mbed2/299/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_STM32F4/TARGET_NUCLEO_F401RE/PinNames.h"
 #include "mbed2/299/drivers/AnalogIn.h"
 #include "mbed2/299/drivers/Ticker.h"
 
 #define SENSOR_AMOUNT 5
-#define SENSOR_BUFFER 5
-#define SENSOR_POLL_FREQ 1000
-#define SUBSYS_POLL_FREQ 200
-#define SUBSYS_BUFFER 5
+#define SENSOR_BUFFER 5 //Buffer Size
+#define SENSOR_POLL_FREQ 1000 //Hz
+
+#define SUBSYS_POLL_FREQ 200 //Hz
+#define SUBSYS_BUFFER 5 //Buffer Size
+
 #define GAIN_PROPORTIONAL 0.1
 #define GAIN_INTEGRAL 0.1
 #define GAIN_DERIVATIVE 0.1
+
+#define SCREEN_REFRESH_RATE 15 //Buffer Size
 
 
 typedef enum {starting,straightline,curve,stop,turnaround} pstate;
@@ -67,15 +73,30 @@ class PWMGen {
         float IntegralBuffer[2], DerivativeBuffer[2];
     public:
         PWMGen(PinName P1, PinName P2): PWM_OUT_CHANNEL_1(P1),PWM_OUT_CHANNEL_2(P2){};
-
-
 };
 
+//use the one-wire-pin PC_12
 class BatteryMonitor {
     private:
-        AnalogIn BatteryPin;
+        DigitalInOut BatteryPin;
+        int VoltageReading, CurrentReading;
+        float Voltage, Current;
     public:
-        BatteryMonitor(PinName P1): BatteryPin(P1) {};
+        BatteryMonitor(PinName P1): BatteryPin(P1) {
+            VoltageReading = 0;
+            CurrentReading = 0;
+            Voltage = 0.0;
+            Current = 0.0;
+        };
+        void pollBattery(void){
+            VoltageReading = ReadVoltage();
+            Voltage = VoltageReading*0.00967;
+            CurrentReading = ReadCurrent();
+            Current = CurrentReading/6400.0;
+        };
+
+        float getBatteryVoltage(void){return Voltage;};
+        float getBatteryCurrent(void){return Current;};
 };
 
 //LCD display buffer. Pass string pointers to display in lines 1-3 on the LCD screen. Keep the strings under 23 bytes if possible
@@ -104,13 +125,19 @@ void toScreen(char* line1, char*  line2, char* line3,C12832* lcd){
     };
 };
 
+char* screenLine2Buffer(BatteryMonitor* Batt){
+    static char dspBuffer[20];
+    sprintf(dspBuffer, "%02f           ", Batt->getBatteryVoltage());
+    return dspBuffer;
+};
+
 int main (void)
 {
     C12832 lcd(D11, D13, D12, D7, D10);
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
     Ticker sensorPollTicker;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
-
+    BatteryMonitor Battery(PC_12);
 
     Timer screenUpdateTimer;
     screenUpdateTimer.start();
@@ -122,7 +149,7 @@ int main (void)
             case (starting):{
                 if(screenUpdateTimer.read_ms() >= timedelay){
                     screenUpdateTimer.reset();
-                    toScreen("Battery Voltage:       ", "                       ", "                       ", &lcd);
+                    toScreen("Battery Voltage:       ", screenLine2Buffer(&Battery), "                       ", &lcd);
                 };
             };
             case (straightline):{
