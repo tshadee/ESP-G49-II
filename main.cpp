@@ -1,6 +1,8 @@
 #include "mbed.h"
 #include "C12832.h"
 #include "ds2781.h"
+#include "QEI.h"
+#include "BLE.h"
 #include "mbed2/299/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_STM32F4/TARGET_NUCLEO_F401RE/PinNames.h"
 #include "mbed2/299/drivers/AnalogIn.h"
 #include "mbed2/299/drivers/Ticker.h"
