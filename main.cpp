@@ -2,6 +2,7 @@
 #include "C12832.h"
 #include "ds2781.h"
 #include "QEI.h"
+#include <cstdint>
 
 #define SENSOR_AMOUNT 5
 #define SENSOR_BUFFER 5 //Buffer Size
@@ -14,7 +15,17 @@
 #define GAIN_INTEGRAL 0.1
 #define GAIN_DERIVATIVE 0.1
 
-#define SCREEN_REFRESH_RATE 15 //Buffer Size
+#define SCREEN_REFRESH_RATE 15 //Hz
+
+#define WHEEL_DIAMETER 0.08//m
+#define GEAR_RATIO 1/12
+#define PI 3.14
+#define CPR 256
+
+//seerial 6 RX TX PA_11/12
+//ANALOG IN PC_2/3/4/5 PB_1
+//PWM PC_8/6
+//encoder PB_15/14
 
 
 typedef enum {starting,straightline,curve,stop,turnaround} pstate;
@@ -62,6 +73,51 @@ class TCRT {
 
 TCRT* TCRT::sensors[SENSOR_AMOUNT]; //static member declaration (must be outside class)
 int TCRT::sensorCount = 0;  //static member declaration (must be outside class)
+
+class Encoder {
+    private:
+        QEI LeftEncoder, RightEncoder;
+        uint32_t LeftCount, RightCount, LeftCountPrev, RightCountPrev;
+        float leftDistance, rightDistance, leftSpeed, rightSpeed,transVelocity, angleVelocity;
+    public:
+        Encoder(PinName leftCH1, PinName leftCH2, PinName rightCH1, PinName rightCH2): LeftEncoder(leftCH1,leftCH2,NC,CPR), RightEncoder(rightCH1,rightCH2,NC,CPR){
+            LeftEncoder.reset();
+            RightEncoder.reset();
+        };
+        void accumulateCount(void)
+        {
+            LeftCountPrev = LeftCount;
+            RightCountPrev = RightCount;
+            LeftCount += LeftEncoder.getPulses();
+            RightCount += RightEncoder.getPulses();
+        };
+        void calDistance(void)
+        {
+            leftDistance = LeftEncoder.getRevolutions()*WHEEL_DIAMETER*PI;
+            rightDistance = RightEncoder.getRevolutions()*WHEEL_DIAMETER*PI;
+        };
+        void wheelVelocity(void)
+        {
+            leftSpeed = (((LeftCount - LeftCountPrev)/CPR)*SUBSYS_POLL_FREQ)*WHEEL_DIAMETER*PI*GEAR_RATIO;
+            rightSpeed = (((RightCount - RightCountPrev)/CPR)*SUBSYS_POLL_FREQ)*WHEEL_DIAMETER*PI*GEAR_RATIO;
+        };
+        void translationalVelocity(void){transVelocity = (rightSpeed + leftSpeed)/2;};
+        void angularVelocity(void){angleVelocity = (rightSpeed - leftSpeed)/0.141;};
+        void updateAllValues(void)
+        {
+            accumulateCount();
+            calDistance();
+            wheelVelocity();
+            translationalVelocity();
+            angularVelocity();
+        };
+        float getLeftDist(void){return leftDistance;};
+        float getRightDist(void){return rightDistance;};
+        float getLeftSpeed(void){return leftSpeed;};
+        float getRightSpeed(void){return rightSpeed;};
+        float getTranslational(void){return transVelocity;};
+        float getAngular(void){return angleVelocity;};
+};
 
 //THIS CLASS INCLUDES PID AND PWM OUTPUT. Output rate will be tied to another Ticker. DO NOT MODIFY THIS YET.
 class PWMGen {
