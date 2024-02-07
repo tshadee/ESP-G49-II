@@ -10,7 +10,7 @@
 #define SENSOR_BUFFER 5 //Buffer Size
 #define SENSOR_POLL_FREQ 1000 //Hz
 
-#define SUBSYS_POLL_FREQ 200 //Hz
+#define SUBSYS_POLL_FREQ 100 //Hz
 #define SUBSYS_BUFFER 5 //Buffer Size
 
 #define GAIN_PROPORTIONAL 0.1
