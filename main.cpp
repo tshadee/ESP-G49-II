@@ -1,6 +1,8 @@
+#pragma once
 #include "mbed.h"
 #include "C12832.h"
 #include "ds2781.h"
+#include "OneWire_Methods.h"
 #include "QEI.h"
 #include <cstdint>
 
@@ -102,7 +104,7 @@ class Encoder {
             rightSpeed = (((RightCount - RightCountPrev)/CPR)*SUBSYS_POLL_FREQ)*WHEEL_DIAMETER*PI*GEAR_RATIO;
         };
         void translationalVelocity(void){transVelocity = (rightSpeed + leftSpeed)/2;};
-        void angularVelocity(void){angleVelocity = (rightSpeed - leftSpeed)/0.141;};
+        void angularVelocity(void){angleVelocity = (rightSpeed - leftSpeed)/0.1864;};
         void updateAllValues(void)
         {
             accumulateCount();
@@ -185,13 +187,23 @@ char* screenLine2Buffer(BatteryMonitor* Batt){
     return dspBuffer;
 };
 
+void SubSystemPoll(Encoder* Enc){
+    Enc->updateAllValues();
+};
+
 int main (void)
 {
     C12832 lcd(D11, D13, D12, D7, D10);
-    float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
-    Ticker sensorPollTicker;
-    sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
     BatteryMonitor Battery(PC_12);
+    Encoder AEAT(PC_14,PC_15,PH_0,PH_1);
+    
+    Ticker sensorPollTicker;
+    Ticker encoderPollTicker;
+
+    float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
+    float encoderPollRate = 1.0/SUBSYS_POLL_FREQ;
+    sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
+    encoderPollTicker.attach(&SubSystemPoll, encoderPollRate);
     
     Timer screenUpdateTimer;
     screenUpdateTimer.start();
