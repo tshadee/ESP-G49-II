@@ -2,7 +2,7 @@
 #include "mbed.h"
 
 //Peripherals and typedefs
-extern DigitalInOut   one_wire_pin;
+extern DigitalInOut one_wire_pin;
 
 unsigned char OneWire_ReadByte(void)
 {

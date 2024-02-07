@@ -2,10 +2,6 @@
 #include "C12832.h"
 #include "ds2781.h"
 #include "QEI.h"
-#include "BLE.h"
-#include "mbed2/299/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_STM32F4/TARGET_NUCLEO_F401RE/PinNames.h"
-#include "mbed2/299/drivers/AnalogIn.h"
-#include "mbed2/299/drivers/Ticker.h"
 
 #define SENSOR_AMOUNT 5
 #define SENSOR_BUFFER 5 //Buffer Size
@@ -80,11 +76,11 @@ class PWMGen {
 //use the one-wire-pin PC_12
 class BatteryMonitor {
     private:
-        DigitalInOut BatteryPin;
+        DigitalInOut one_wire_pin;
         int VoltageReading, CurrentReading;
         float Voltage, Current;
     public:
-        BatteryMonitor(PinName P1): BatteryPin(P1) {
+        BatteryMonitor(PinName P1): one_wire_pin(P1) {
             VoltageReading = 0;
             CurrentReading = 0;
             Voltage = 0.0;
@@ -140,7 +136,7 @@ int main (void)
     Ticker sensorPollTicker;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
     BatteryMonitor Battery(PC_12);
-
+    
     Timer screenUpdateTimer;
     screenUpdateTimer.start();
     int refreshrate = 15; //Hz
