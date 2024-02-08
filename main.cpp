@@ -19,6 +19,8 @@
 
 #define BASE_DUTY 0.8f
 
+#define EASING_FACTOR 1.0 //natural easing. For faster PID-to-PWM output, set > 1.0. For better smoothness and easing, set < 1.0.
+
 #define SYS_OUTPUT_RATE 50 //Hz
 
 #define WHEEL_DIAMETER 0.08//m
@@ -50,8 +52,7 @@ class TCRT {
     public:
         TCRT(PinName Pin, float v): sensorPin(Pin), VDD(v)
         {
-            rIndex = 0;
-            senseNorm = 0;
+            rIndex = senseNorm = 0;
             for(int i = 0;i<SENSOR_BUFFER;i++){ senseNormRolled[i] = 0; };
             if(sensorCount < SENSOR_AMOUNT){ sensors[sensorCount++] = this; };
         };
@@ -94,10 +95,7 @@ class Encoder {
         void resetAllValues(void)
         {
             encode.reset();
-            distance = 0;
-            speed = 0;
-            count = 0;
-            countPrev = 0;
+            distance = speed = count = countPrev = 0;
         };
         float getDist(void){return distance;};  //returns distance from last reset() call
         float getSpeed(void){return speed;};    //returns speed in m/s
@@ -148,13 +146,17 @@ class BatteryMonitor {
             Voltage = VoltageReading*0.00967;
             Current = CurrentReading/6400.0;
             powerUsed += Current*Voltage/SYS_OUTPUT_RATE;
+            chargePercentLeft  = 100.0 - ((initCharge - powerUsed)/initCharge)*100;
         };
         float getBatteryVoltage(void){return Voltage;};
         float getBatteryCurrent(void){return Current;};
-        float getChargeLeft(void){return chargePercentLeft  = 100.0 - ((initCharge - powerUsed)/initCharge)*100;}
+        float getChargeLeft(void){return chargePercentLeft;};
 };
 
-//this class is for calculating PID error as two PWM outputs.
+/*
+This class is for calculating PID error as two PWM outputs. This is unfiltered output, btw, so we will have to pass this through a speed regulator that takes into account current wheel speed and other buggy params.
+The PID output value assume that the error is RIGHT - LEFT (looking from buggy top view), so a situation where right > left would be when the buggy is headed left and vice versa.
+*/
 class PIDSys {
     private:
         float error[3];
@@ -208,12 +210,39 @@ class PIDSys {
                 leftPWM = BASE_DUTY - output;
                 rightPWM = BASE_DUTY + output;
             } else {
-                leftPWM = ceil(BASE_DUTY);
-                rightPWM = ceil(BASE_DUTY);
+                leftPWM = 1.0f;
+                rightPWM = 1.0f;
             };
         };
         float getLeftPWM(void){return leftPWM;};
         float getRightPWM(void){return rightPWM;};
+};
+
+//Speed regulator. Takes the PWM output of the PIDSys class and eases actual PWM towards the target value (similar to PID). This is to prevent sudden changes to buggy trajectory.
+class speedRegulator {
+    private:
+        float translationalVelocity, angularVelocity;
+        float currentLeftPWM, currentRightPWM;
+        float targetLeftPWM, targetRightPWM;
+        Encoder* leftWheelEncoder;
+        Encoder* rightWheelEncoder;
+    public:
+        speedRegulator(Encoder* LWC, Encoder* RWC): leftWheelEncoder(LWC),rightWheelEncoder(RWC){
+            currentLeftPWM = currentRightPWM = 0.5f;
+        };
+        void updateTargetPWM(float leftPWM, float rightPWM) {
+            targetLeftPWM = leftPWM;
+            targetRightPWM = rightPWM;
+        };
+        void easePWMOutput() {
+            currentLeftPWM += (targetLeftPWM - currentLeftPWM)*EASING_FACTOR;
+            currentRightPWM += (targetRightPWM - currentRightPWM)*EASING_FACTOR;
+            currentLeftPWM = (currentLeftPWM < 0.0f)? 0.0f : ((currentLeftPWM > 1.0f)? 1.0f : currentLeftPWM);
+            currentRightPWM = (currentRightPWM < 0.0f)? 0.0f : ((currentRightPWM > 1.0f)? 1.0f : currentRightPWM);
+        };
+
+        float getCurrentLeftPWM(void){return currentLeftPWM;};
+        float getCurrentRightPWM(void){return currentRightPWM;};
 };
 
 //LCD display buffer. Pass string pointers to display in lines 1-3 on the LCD screen. Keep the strings under 23 bytes if possible
@@ -251,6 +280,7 @@ char* batteryMonitorBuffer(BatteryMonitor* Batt){
 char* sensorVoltageBuffer(TCRT* S1,TCRT* S2){
     static char dspBuffer[20];
     sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorVoltage(true),S2->getSensorVoltage(true));
+    return dspBuffer;
 };
 
 class JoystickISR {
@@ -288,12 +318,14 @@ class JoystickISR {
 int main (void)
 {
     JoystickISR joy(D4);
-    PWMGen toMDB(PC_8,PC_6);
-    BatteryMonitor Battery(PC_12);
-    Encoder leftWheel(PB_14,PB_15);
+    PWMGen toMDB(PC_8,PC_6);            //PLACEHOLDER PINS
+    BatteryMonitor Battery(PC_12);      
+    Encoder leftWheel(PB_14,PB_15);     //PLACEHOLDER PINS
+    Encoder rightWheel(PA_0,PA_1);      //PLACEHOLDER PINS
     C12832 lcd(D11, D13, D12, D7, D10);
-    TCRT S1(PA_0,TCRT_MAX_VDD) , S2(PA_1,TCRT_MAX_VDD) , S3(PA_4,TCRT_MAX_VDD) , S4(PB_0,TCRT_MAX_VDD), S5(PC_1,TCRT_MAX_VDD);
+    TCRT S1(PA_0,TCRT_MAX_VDD) , S2(PA_1,TCRT_MAX_VDD) , S3(PA_4,TCRT_MAX_VDD) , S4(PB_0,TCRT_MAX_VDD), S5(PC_1,TCRT_MAX_VDD);  //PLACEHOLDER PINS
     PIDSys PID(&S1,&S2,&S4,&S5);
+    speedRegulator speedReg(&leftWheel,&rightWheel);
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
@@ -309,17 +341,20 @@ int main (void)
     {
         switch (ProgramState){
             case (starting):{
-                if(outputUpdateTimer.read_ms() >= timedelay){
-                    outputUpdateTimer.reset();
+                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+
                     Battery.pollBattery();
+                    PID.calculatePID(false);
+                    speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
 
 
                     toScreen("START STATE        ", batteryMonitorBuffer(&Battery), sensorVoltageBuffer(&S2, &S4), &lcd);
                 };
             };
             case (straightline):{
-                if(outputUpdateTimer.read_ms() >= timedelay){
-                    outputUpdateTimer.reset();
+                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+
                     Battery.pollBattery();
                     toMDB.setPWMDuty(1.0f, 1.0f); //test
 
@@ -332,17 +367,22 @@ int main (void)
                 };
             };
             case (stop):{
-                if(outputUpdateTimer.read_ms() >= timedelay){
-                    outputUpdateTimer.reset();
+                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+
                     Battery.pollBattery();
-                    toMDB.setPWMDuty(0.0f, 0.0f); //test
+                    
 
                     toScreen("STOP!!!             ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
+                    if(!straightLineStart)
+                    {
+                        toMDB.reset();
+                        straightLineStart = true;
+                    };
                 };
             };
             case (turnaround):{
-                if(outputUpdateTimer.read_ms() >= timedelay){
-                    outputUpdateTimer.reset();
+                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+
                     Battery.pollBattery();
 
                     toScreen("TURN!!!             ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
