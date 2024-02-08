@@ -132,23 +132,26 @@ class BatteryMonitor {
     private:
         DigitalInOut one_wire_pin;
         int VoltageReading, CurrentReading;
-        float Voltage, Current;
+        float Voltage, Current, currentAccum, powerUsed, initCharge,chargePercentLeft;
     public:
         BatteryMonitor(PinName P1): one_wire_pin(P1) {
-            VoltageReading = 0;
-            CurrentReading = 0;
-            Voltage = 0.0;
-            Current = 0.0;
+            VoltageReading = ReadVoltage();
+            CurrentReading = ReadCurrent();
+            Voltage = VoltageReading*0.00967;
+            Current = CurrentReading/6400.0;
+            powerUsed = 0.0;
+            initCharge = Voltage*0.00967*2.8*3600;
         };
         void pollBattery(void){
             VoltageReading = ReadVoltage();
-            Voltage = VoltageReading*0.00967;
             CurrentReading = ReadCurrent();
+            Voltage = VoltageReading*0.00967;
             Current = CurrentReading/6400.0;
+            powerUsed += Current*Voltage/SYS_OUTPUT_RATE;
         };
-
         float getBatteryVoltage(void){return Voltage;};
         float getBatteryCurrent(void){return Current;};
+        float getChargeLeft(void){return chargePercentLeft  = 100.0 - ((initCharge - powerUsed)/initCharge)*100;}
 };
 
 //this class is for calculating PID error as two PWM outputs.
@@ -166,8 +169,10 @@ class PIDSys {
     public:
         PIDSys(TCRT* s1, TCRT* s2, TCRT* s4, TCRT* s5): S1(s1),S2(s2),S4(s4),S5(s5)
         {
+            A0 = GAIN_PROPORTIONAL + GAIN_INTEGRAL/SYS_OUTPUT_RATE + GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
+            A1 = -GAIN_PROPORTIONAL - 2*GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
+            A2 = GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
             reset();
-            COEF();
         };
         void reset()
         {
@@ -177,15 +182,6 @@ class PIDSys {
             output = 0;
             leftPWM = 0.5f;
             rightPWM = 0.5f;
-            A0 = 0;
-            A1 = 0;
-            A2 = 0;
-        };
-        void COEF(void)
-        {
-            A0 = GAIN_PROPORTIONAL + GAIN_INTEGRAL/SYS_OUTPUT_RATE + GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
-            A1 = -GAIN_PROPORTIONAL - 2*GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
-            A2 = GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
         };
         void calculatePID(bool toggleAggressive)
         {
@@ -216,7 +212,6 @@ class PIDSys {
                 rightPWM = ceil(BASE_DUTY);
             };
         };
-
         float getLeftPWM(void){return leftPWM;};
         float getRightPWM(void){return rightPWM;};
 };
@@ -316,7 +311,7 @@ int main (void)
             case (starting):{
                 if(outputUpdateTimer.read_ms() >= timedelay){
                     outputUpdateTimer.reset();
-
+                    Battery.pollBattery();
 
 
                     toScreen("START STATE        ", batteryMonitorBuffer(&Battery), sensorVoltageBuffer(&S2, &S4), &lcd);
@@ -325,6 +320,7 @@ int main (void)
             case (straightline):{
                 if(outputUpdateTimer.read_ms() >= timedelay){
                     outputUpdateTimer.reset();
+                    Battery.pollBattery();
                     toMDB.setPWMDuty(1.0f, 1.0f); //test
 
                     toScreen("STRAIGHT LINE       ", sensorVoltageBuffer(&S3, &S4), sensorVoltageBuffer(&S1, &S5), &lcd);
@@ -338,17 +334,20 @@ int main (void)
             case (stop):{
                 if(outputUpdateTimer.read_ms() >= timedelay){
                     outputUpdateTimer.reset();
+                    Battery.pollBattery();
                     toMDB.setPWMDuty(0.0f, 0.0f); //test
 
-                    toScreen("STRAIGHT LINE       ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
+                    toScreen("STOP!!!             ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
                 };
             };
             case (turnaround):{
-                
+                if(outputUpdateTimer.read_ms() >= timedelay){
+                    outputUpdateTimer.reset();
+                    Battery.pollBattery();
+
+                    toScreen("TURN!!!             ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
+                };
             };
-
-
-        
         };
     };
 };
