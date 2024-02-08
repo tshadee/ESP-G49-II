@@ -1,12 +1,6 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-#define CPR 256
-#define WHEEL_DIAMETER 0.08//m
-#define GEAR_RATIO 1/12
-#define PI 3.14
-#define CPR 256
-#define SYS_OUTPUT_RATE 50 //Hz
 
 #include "mbed.h"
 #include "QEI.h"

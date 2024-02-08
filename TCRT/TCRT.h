@@ -1,10 +1,9 @@
 #ifndef TCRT_H
 #define TCRT_H
+
 #include "mbed.h"
 #include <cstdint>
-
-#define SENSOR_AMOUNT 5 //dont change this pls
-#define SENSOR_BUFFER 5 //Buffer Size. Ideally should be SENSOR_POLL_FREQ / SYS_OUTPUT_RATE
+#include "CommonDefs.h"
 
 //TCRT class. Creates an object for individual sensors on the sensor array with rolling average (size 5) built in. 
 //Provide the Pin (ADC) for the sensor and the voltage levels expected (if you want to scale to voltage instead of from 0.0 - 1.0)

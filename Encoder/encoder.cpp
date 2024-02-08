@@ -1,4 +1,5 @@
 #include "encoder.h"
+#include "CommonDefs.h"
 
 Encoder::Encoder(PinName channel1, PinName channel2): encode(channel1,channel2,NC,CPR), count(0), countPrev(0), distance(0.0f), speed(0.0f){ resetAllValues(); };
 void Encoder::updateValues(void)
