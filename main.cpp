@@ -6,13 +6,18 @@
 #include "QEI.h"
 #include <cstdint>
 
-#define SENSOR_AMOUNT 5
-#define SENSOR_BUFFER 5 //Buffer Size
+
+#define SENSOR_AMOUNT 5 //dont change this pls
+#define SENSOR_BUFFER 5 //Buffer Size. Ideally should be SENSOR_POLL_FREQ / SYS_OUTPUT_RATE
 #define SENSOR_POLL_FREQ 1000 //Hz
 
-#define GAIN_PROPORTIONAL 0.1
+//need tuning
+#define GAIN_PROPORTIONAL 0.1 
 #define GAIN_INTEGRAL 0.1
 #define GAIN_DERIVATIVE 0.1
+#define GAIN_AGGRESSIVE 1.2
+
+#define BASE_DUTY 0.8f
 
 #define SYS_OUTPUT_RATE 50 //Hz
 
@@ -147,6 +152,76 @@ class BatteryMonitor {
         float getBatteryCurrent(void){return Current;};
 };
 
+//this class is for calculating PID error as two PWM outputs.
+class PIDSys {
+    private:
+        float error[3];
+        float errorOuter[3];
+        float output;
+        float leftPWM, rightPWM;
+        float A0,A1,A2;
+        TCRT* S1;
+        TCRT* S2;
+        TCRT* S4;
+        TCRT* S5;
+    public:
+        PIDSys(TCRT* s1, TCRT* s2, TCRT* s4, TCRT* s5): S1(s1),S2(s2),S4(s4),S5(s5)
+        {
+            reset();
+            COEF();
+        };
+        void reset()
+        {
+            error[2] = 0;
+            error[1] = 0;
+            error[0] = 0;
+            output = 0;
+            leftPWM = 0.5f;
+            rightPWM = 0.5f;
+            A0 = 0;
+            A1 = 0;
+            A2 = 0;
+        };
+        void COEF(void)
+        {
+            A0 = GAIN_PROPORTIONAL + GAIN_INTEGRAL/SYS_OUTPUT_RATE + GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
+            A1 = -GAIN_PROPORTIONAL - 2*GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
+            A2 = GAIN_DERIVATIVE*SYS_OUTPUT_RATE;
+        };
+        void calculatePID(bool toggleAggressive)
+        {
+            if(toggleAggressive){
+                errorOuter[2] = errorOuter[1];
+                errorOuter[1] = errorOuter[0];
+                errorOuter[0] = (S5->getSensorVoltage(false) - S1->getSensorVoltage(false));
+                output = (output + A0*errorOuter[0] + A1*errorOuter[1] + A2*errorOuter[2])*GAIN_AGGRESSIVE;
+            } else {
+                error[2] = error[1];
+                error[1] = error[0];
+                error[0] = (S4->getSensorVoltage(false) - S2->getSensorVoltage(false));
+                output = output + A0*error[0] + A1*error[1] + A2*error[2];
+            };
+            outputPWM();
+        };
+        void outputPWM(void)
+        {
+            if(output > 0)
+            {
+                leftPWM = BASE_DUTY + output; 
+                rightPWM = BASE_DUTY - output;
+            } else if (output < 0) {
+                leftPWM = BASE_DUTY - output;
+                rightPWM = BASE_DUTY + output;
+            } else {
+                leftPWM = ceil(BASE_DUTY);
+                rightPWM = ceil(BASE_DUTY);
+            };
+        };
+
+        float getLeftPWM(void){return leftPWM;};
+        float getRightPWM(void){return rightPWM;};
+};
+
 //LCD display buffer. Pass string pointers to display in lines 1-3 on the LCD screen. Keep the strings under 23 bytes if possible
 // call toScreen with the appropriate arguments to push anything to the LCD display - refresh rate sensitive (dont go above 15 Hz)
 void toScreen(char* line1, char*  line2, char* line3,C12832* lcd){
@@ -179,8 +254,7 @@ char* screenLine2Buffer(BatteryMonitor* Batt){
     return dspBuffer;
 };
 
-char* sensorVoltage2Buffer(TCRT* S1,TCRT* S2)
-{
+char* sensorVoltage2Buffer(TCRT* S1,TCRT* S2){
     static char dspBuffer[20];
     sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorVoltage(true),S2->getSensorVoltage(true));
 };
@@ -225,6 +299,7 @@ int main (void)
     Encoder leftWheel(PB_14,PB_15);
     C12832 lcd(D11, D13, D12, D7, D10);
     TCRT S1(PA_0,TCRT_MAX_VDD) , S2(PA_1,TCRT_MAX_VDD) , S3(PA_4,TCRT_MAX_VDD) , S4(PB_0,TCRT_MAX_VDD), S5(PC_1,TCRT_MAX_VDD);
+    PIDSys PID(&S1,&S2,&S4,&S5);
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
