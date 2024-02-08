@@ -73,10 +73,9 @@ TCRT* TCRT::sensors[SENSOR_AMOUNT]; //static member declaration (must be outside
 int TCRT::sensorCount = 0;  //static member declaration (must be outside class)
 
 
-//class is being revamped
+
 /*
-            angleVelocity = (rightSpeed - leftSpeed)/0.1864;
-            transVelocity = (rightSpeed + leftSpeed)/2;
+Records QEI inputs and returns speed and distance for wheel. Use getDist() and getSpeed().
 */
 class Encoder {
     private:
@@ -248,13 +247,13 @@ void toScreen(char* line1, char*  line2, char* line3,C12832* lcd){
     };
 };
 
-char* screenLine2Buffer(BatteryMonitor* Batt){
+char* batteryMonitorBuffer(BatteryMonitor* Batt){
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f           ", Batt->getBatteryVoltage());
+    sprintf(dspBuffer, "%.02f V          ", Batt->getBatteryVoltage());
     return dspBuffer;
 };
 
-char* sensorVoltage2Buffer(TCRT* S1,TCRT* S2){
+char* sensorVoltageBuffer(TCRT* S1,TCRT* S2){
     static char dspBuffer[20];
     sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorVoltage(true),S2->getSensorVoltage(true));
 };
@@ -310,6 +309,7 @@ int main (void)
     int timedelay = (static_cast<int>(1000/SYS_OUTPUT_RATE)); //in ms
 
     bool straightLineStart = true;
+
     while(1)
     {
         switch (ProgramState){
@@ -319,7 +319,7 @@ int main (void)
 
 
 
-                    toScreen("START STATE        ", "                       ", "                       ", &lcd);
+                    toScreen("START STATE        ", batteryMonitorBuffer(&Battery), sensorVoltageBuffer(&S2, &S4), &lcd);
                 };
             };
             case (straightline):{
@@ -327,7 +327,7 @@ int main (void)
                     outputUpdateTimer.reset();
                     toMDB.setPWMDuty(1.0f, 1.0f); //test
 
-                    toScreen("STRAIGHT LINE       ", "                       ", "                       ", &lcd);
+                    toScreen("STRAIGHT LINE       ", sensorVoltageBuffer(&S3, &S4), sensorVoltageBuffer(&S1, &S5), &lcd);
                     if(straightLineStart)
                     {
                         toMDB.begin();
@@ -340,7 +340,7 @@ int main (void)
                     outputUpdateTimer.reset();
                     toMDB.setPWMDuty(0.0f, 0.0f); //test
 
-                    toScreen("STRAIGHT LINE       ", "                       ", "                       ", &lcd);
+                    toScreen("STRAIGHT LINE       ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
                 };
             };
             case (turnaround):{
