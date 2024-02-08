@@ -1,4 +1,3 @@
-#pragma once
 #include "mbed.h"
 #include "C12832.h"
 #include "ds2781.h"
@@ -28,6 +27,7 @@
 #define PI 3.14
 #define CPR 256
 #define TCRT_MAX_VDD 3.3 //V
+#define DEFAULT_PWM 0.5f
 
 //seerial 6 RX TX PA_11/12
 //ANALOG IN PC_2/3/4/5 PB_1
@@ -108,10 +108,10 @@ class PWMGen {
         PWMGen(PinName P1, PinName P2): PWM_LEFT(P1),PWM_RIGHT(P2) { reset();};
         void reset()
         {
-            PWM_LEFT.period(0.0f);
-            PWM_RIGHT.period(0.0f);
-            PWM_LEFT.write(0.5f);
-            PWM_RIGHT.write(0.5f);
+            //PWM_LEFT.period(0.0f);
+            //PWM_RIGHT.period(0.0f);
+            PWM_LEFT.write(DEFAULT_PWM);
+            PWM_RIGHT.write(DEFAULT_PWM);
         };
         void begin()
         {
@@ -178,12 +178,9 @@ class PIDSys {
         };
         void reset()
         {
-            error[2] = 0;
-            error[1] = 0;
-            error[0] = 0;
-            output = 0;
-            leftPWM = 0.5f;
-            rightPWM = 0.5f;
+            error[2] = error[1] = error[0] = output = 0;
+            leftPWM = DEFAULT_PWM;
+            rightPWM = DEFAULT_PWM;
         };
         void calculatePID(bool toggleAggressive)
         {
@@ -221,18 +218,18 @@ class PIDSys {
 //Speed regulator. Takes the PWM output of the PIDSys class and eases actual PWM towards the target value (similar to PID). This is to prevent sudden changes to buggy trajectory.
 class speedRegulator {
     private:
-        float translationalVelocity, angularVelocity;
         float currentLeftPWM, currentRightPWM;
         float targetLeftPWM, targetRightPWM;
         Encoder* leftWheelEncoder;
         Encoder* rightWheelEncoder;
     public:
         speedRegulator(Encoder* LWC, Encoder* RWC): leftWheelEncoder(LWC),rightWheelEncoder(RWC){
-            currentLeftPWM = currentRightPWM = 0.5f;
+            currentLeftPWM = currentRightPWM = DEFAULT_PWM;
         };
         void updateTargetPWM(float leftPWM, float rightPWM) {
             targetLeftPWM = leftPWM;
             targetRightPWM = rightPWM;
+            easePWMOutput();
         };
         void easePWMOutput() {
             currentLeftPWM += (targetLeftPWM - currentLeftPWM)*EASING_FACTOR;
@@ -240,7 +237,6 @@ class speedRegulator {
             currentLeftPWM = (currentLeftPWM < 0.0f)? 0.0f : ((currentLeftPWM > 1.0f)? 1.0f : currentLeftPWM);
             currentRightPWM = (currentRightPWM < 0.0f)? 0.0f : ((currentRightPWM > 1.0f)? 1.0f : currentRightPWM);
         };
-
         float getCurrentLeftPWM(void){return currentLeftPWM;};
         float getCurrentRightPWM(void){return currentRightPWM;};
 };
@@ -318,19 +314,28 @@ class JoystickISR {
 int main (void)
 {
     JoystickISR joy(D4);
+    C12832 lcd(D11, D13, D12, D7, D10);
     PWMGen toMDB(PC_8,PC_6);            //PLACEHOLDER PINS
-    BatteryMonitor Battery(PC_12);      
+    BatteryMonitor Battery(PC_12); 
     Encoder leftWheel(PB_14,PB_15);     //PLACEHOLDER PINS
     Encoder rightWheel(PA_0,PA_1);      //PLACEHOLDER PINS
-    C12832 lcd(D11, D13, D12, D7, D10);
     TCRT S1(PA_0,TCRT_MAX_VDD) , S2(PA_1,TCRT_MAX_VDD) , S3(PA_4,TCRT_MAX_VDD) , S4(PB_0,TCRT_MAX_VDD), S5(PC_1,TCRT_MAX_VDD);  //PLACEHOLDER PINS
     PIDSys PID(&S1,&S2,&S4,&S5);
     speedRegulator speedReg(&leftWheel,&rightWheel);
+    
+
+
+    /*
+    
+    timeout corner for stupid code
+    
+    */
+
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
-    
+
     Timer outputUpdateTimer;
     outputUpdateTimer.start();
     int timedelay = (static_cast<int>(1000/SYS_OUTPUT_RATE)); //in ms
@@ -342,52 +347,74 @@ int main (void)
         switch (ProgramState){
             case (starting):{
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-
                     Battery.pollBattery();
                     PID.calculatePID(false);
                     speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    
+                    /*
+    
+                    timeout corner for stupid code
+                    
+                    */
 
-
-                    toScreen("START STATE        ", batteryMonitorBuffer(&Battery), sensorVoltageBuffer(&S2, &S4), &lcd);
+                    toScreen("START STATE        ", batteryMonitorBuffer(&Battery), "START STATE        ", &lcd);
                 };
-            };
+            break;};
             case (straightline):{
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-
                     Battery.pollBattery();
+                    
+
+                    /*
+                    
                     toMDB.setPWMDuty(1.0f, 1.0f); //test
 
-                    toScreen("STRAIGHT LINE       ", sensorVoltageBuffer(&S3, &S4), sensorVoltageBuffer(&S1, &S5), &lcd);
+                    
                     if(straightLineStart)
                     {
                         toMDB.begin();
                         straightLineStart = false;
                     };
+                    */
+                    toScreen("STRAIGHT LINE       ", sensorVoltageBuffer(&S3, &S4), sensorVoltageBuffer(&S1, &S5), &lcd);
                 };
-            };
+            break;};
             case (stop):{
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-
+                    /*
                     Battery.pollBattery();
                     
 
-                    toScreen("STOP!!!             ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
+                    
                     if(!straightLineStart)
                     {
                         toMDB.reset();
                         straightLineStart = true;
                     };
+                    */
+                    toScreen("STOP!!!             ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
                 };
-            };
+            break;};
             case (turnaround):{
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-
                     Battery.pollBattery();
+
+                    /*
+    
+                    timeout corner for stupid code
+                    
+                    */
 
                     toScreen("TURN!!!             ", batteryMonitorBuffer(&Battery), "                       ", &lcd);
                 };
-            };
-        };
+            break;};
+            default: {
+                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+
+                    toScreen("SOMETHING BROKE","                       ","                       ", &lcd);
+                };
+            break;};
+        };  
     };
 };
