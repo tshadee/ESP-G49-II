@@ -2,12 +2,10 @@
 #include "C12832.h"
 #include "ds2781.h"
 #include "OneWire_Methods.h"
-#include "QEI.h"
+#include "TCRT.h"
+#include "encoder.h"
 #include <cstdint>
 
-
-#define SENSOR_AMOUNT 5 //dont change this pls
-#define SENSOR_BUFFER 5 //Buffer Size. Ideally should be SENSOR_POLL_FREQ / SYS_OUTPUT_RATE
 #define SENSOR_POLL_FREQ 1000 //Hz
 
 //need tuning
@@ -34,72 +32,8 @@
 //PWM PC_8/6
 //encoder PB_15/14
 
-
 typedef enum {starting,straightline,stop,turnaround} pstate;
 pstate ProgramState;
-
-//TCRT class. Creates an object for individual sensors on the sensor array with rolling average (size 5) built in. 
-//Provide the Pin (ADC) for the sensor and the voltage levels expected (if you want to scale to voltage instead of from 0.0 - 1.0)
-//Use getSensorVoltage() to get value of voltage (rolled average). 
-class TCRT {
-    private:
-        AnalogIn sensorPin;
-        float VDD,senseNorm;
-        float senseNormRolled[SENSOR_BUFFER];
-        int rIndex;
-        static TCRT* sensors[SENSOR_BUFFER]; //operating with one ticker, so we must have a pointer to all the TCRT objects (to be used for function callback)
-        static int sensorCount; //to keep count of the sensors
-    public:
-        TCRT(PinName Pin, float v): sensorPin(Pin), VDD(v)
-        {
-            rIndex = senseNorm = 0;
-            for(int i = 0;i<SENSOR_BUFFER;i++){ senseNormRolled[i] = 0; };
-            if(sensorCount < SENSOR_AMOUNT){ sensors[sensorCount++] = this; };
-        };
-        void rollingPollAverage()
-        {
-            senseNormRolled[rIndex % SENSOR_BUFFER] = ampNorm();
-            rIndex++;
-            senseNorm = 0;
-            for(int i = 0;i < SENSOR_BUFFER;i++){senseNorm += senseNormRolled[i];};
-            senseNorm /= SENSOR_BUFFER;
-        };
-        //runs through all the polling once called. This is for synchronous polling between sensors since static is shared between all objects derived from TCRT
-        static void pollSensors(void) { for(int i = 0; i < sensorCount; i++) {sensors[i]->rollingPollAverage(); }; }; 
-        float ampNorm(void){return (sensorPin.read());};
-        float getSensorVoltage(bool Volt){return (Volt? senseNorm*VDD : senseNorm);}; 
-};
-
-TCRT* TCRT::sensors[SENSOR_AMOUNT]; //static member declaration (must be outside class)
-int TCRT::sensorCount = 0;  //static member declaration (must be outside class)
-
-
-
-/*
-Records QEI inputs and returns speed and distance for wheel. Use getDist() and getSpeed().
-*/
-class Encoder {
-    private:
-        QEI encode;
-        uint32_t count, countPrev;
-        float distance, speed;
-    public:
-        Encoder(PinName channel1, PinName channel2): encode(channel1,channel2,NC,CPR){ resetAllValues(); };
-        void updateValues(void)
-        {
-            countPrev = count;
-            count += encode.getPulses();
-            distance = encode.getRevolutions()*WHEEL_DIAMETER*PI;
-            speed = (((count - countPrev)/CPR)*SYS_OUTPUT_RATE)*WHEEL_DIAMETER*PI*GEAR_RATIO;
-        };
-        void resetAllValues(void)
-        {
-            encode.reset();
-            distance = speed = count = countPrev = 0;
-        };
-        float getDist(void){return distance;};  //returns distance from last reset() call
-        float getSpeed(void){return speed;};    //returns speed in m/s
-};
 
 class PWMGen {
     private:
