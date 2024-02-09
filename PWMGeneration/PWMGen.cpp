@@ -2,7 +2,7 @@
 #include "CommonDefs.h"
 
 
-PWMGen::PWMGen(PinName P1, PinName P2): PWM_LEFT(P1),PWM_RIGHT(P2) { reset();};
+PWMGen::PWMGen(PinName leftPWMPin, PinName rightPWMPin, PinName MDBE, PinName Bipolar1E, PinName Bipolar2E): PWM_LEFT(leftPWMPin),PWM_RIGHT(rightPWMPin), MDBEnable(MDBE), BPE1(Bipolar1E),BPE2(Bipolar2E) { reset();};
 void PWMGen::reset()
 {
     //PWM_LEFT.period(0.0f);
@@ -14,6 +14,9 @@ void PWMGen::begin()
 {
     PWM_LEFT.period(1.0/SYS_OUTPUT_RATE);
     PWM_RIGHT.period(1.0/SYS_OUTPUT_RATE);
+    MDBEnable.write(1);
+    BPE1.write(1);
+    BPE2.write(1);
 };
 void PWMGen::setPWMDuty(float leftPWM, float rightPWM)
 {

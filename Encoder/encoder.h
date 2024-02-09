@@ -9,13 +9,14 @@
 /*
 Records QEI inputs and returns speed and distance for wheel. Use getDist() and getSpeed().
 */
-class QEI;
+//class QEI;
 
 class Encoder {
     private:
-        QEI encode;
+        QEI* encode;
         uint32_t count, countPrev;
         float distance, speed;
+        int countBuffer;
     public:
         Encoder(PinName channel1, PinName channel2);
         void updateValues(void);

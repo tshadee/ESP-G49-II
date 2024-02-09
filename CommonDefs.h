@@ -18,7 +18,7 @@
 #define SYS_OUTPUT_RATE 50 // Hz
 
 #define WHEEL_DIAMETER 0.08 // meters
-#define GEAR_RATIO (1.0 / 12.0) // Gear ratio
+#define GEAR_RATIO (1.0 / 18.0) // Gear ratio
 #define PI 3.1415
 #define CPR 256 // Counts per revolution for the encoder
 #define TCRT_MAX_VDD 3.3 // Max voltage for TCRT sensors

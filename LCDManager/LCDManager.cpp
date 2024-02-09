@@ -30,7 +30,7 @@ void LCDManager::toScreen(const char* line1, const char* line2, const char* line
 char* LCDManager::batteryMonitorBuffer(BatteryMonitor* Batt) 
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f V          ", Batt->getBatteryVoltage());
+    sprintf(dspBuffer, "%.02f      %.02f     ", Batt->getBatteryVoltage(), Batt->getChargeLeft());
     return dspBuffer;
 };
 
@@ -38,5 +38,12 @@ char* LCDManager::sensorVoltageBuffer(TCRT* S1, TCRT* S2)
 {
     static char dspBuffer[20];
     sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorVoltage(true),S2->getSensorVoltage(true));
+    return dspBuffer;
+};
+
+char* LCDManager::encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel)
+{
+    static char dspBuffer[20];
+    sprintf(dspBuffer, "%.02f      %.02f     ", leftWheel->getSpeed(),rightWheel->getSpeed());
     return dspBuffer;
 };
