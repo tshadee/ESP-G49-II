@@ -25,6 +25,6 @@
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
 
 typedef enum {starting,straightline,stop,turnaround} pstate;
-pstate ProgramState;
+extern pstate ProgramState;
 
 #endif // COMMON_DEFS_H
