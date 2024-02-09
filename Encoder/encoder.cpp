@@ -17,7 +17,7 @@ void Encoder::updateValues(void)
 };
 void Encoder::resetAllValues(void)
 {
-    encode.reset();
+    encode->reset();
     distance = speed = 0.0f;
     count = countPrev = 0;
 };

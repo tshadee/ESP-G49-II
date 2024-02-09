@@ -18,7 +18,7 @@ class Encoder {
         float distance, speed;
         int countBuffer;
     public:
-        Encoder(PinName channel1, PinName channel2);
+        Encoder(QEI* q);
         void updateValues(void);
         void resetAllValues(void);
         float getDist(void);  //returns distance from last reset() call

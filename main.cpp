@@ -68,8 +68,8 @@ int main (void)
     LCDManager LCD(&lcd);
     PWMGen toMDB(PA_15,PB_7,PA_14,PC_2,PC_3);  //pwm1, pwm2, mdbe, be1, be2
     BatteryMonitor Battery(PC_12);      // one wire pin, MUST BE PC_12
-    Encoder leftWheel(PB_14,PB_15);     //encoder channel 1, enc channel2 
-    Encoder rightWheel(PB_1,PB_2);      //encoder channel 1, enc channel 2
+    Encoder leftWheel(&leftEnc);     //encoder channel 1, enc channel2 
+    Encoder rightWheel(&rightEnc);      //encoder channel 1, enc channel 2
     TCRT S1(PA_0,TCRT_MAX_VDD) , S2(PA_1,TCRT_MAX_VDD) , S3(PA_4,TCRT_MAX_VDD) , S4(PB_0,TCRT_MAX_VDD), S5(PC_1,TCRT_MAX_VDD);  //ANALOUGE array bottom left
     PIDSys PID(&S1,&S2,&S4,&S5);
     speedRegulator speedReg(&leftWheel,&rightWheel);
@@ -106,6 +106,7 @@ int main (void)
                     
 
                     LCD.toScreen("                    ", "START STATE        ", "                    ");
+                    //LCD.batteryMonitorBuffer(&Battery);
                 }; 
                 
             break;};
@@ -151,6 +152,7 @@ int main (void)
                 };
             break;};
         }; 
+        
 
         /*
         toMDB.setPWMDuty(1.0f, 1.0f);
