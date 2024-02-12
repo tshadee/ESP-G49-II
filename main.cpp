@@ -14,47 +14,8 @@
 #include "UserInputInterrupts.h"
 #include "LCDManager.h"
 
-//serial 6 RX TX PA_11/12
-//ANALOG IN PC_2/3/4/5 PB_1
-//PWM PC_8/6
-//encoder PB_15/14
-
 pstate ProgramState = starting; //yippee!!!
 
-/* 
-TESTING OUT FUNCTION DECOMPOSITION
-
-void handleStartingState(Timer &outputUpdateTimer, BatteryMonitor &Battery, PIDSys &PID, speedRegulator &speedReg,PWMGen &toMDB, LCDManager &LCD, int timedelay)
-{
-    if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-        Battery.pollBattery();
-        PID.calculatePID(false);
-        speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
-        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    
-        
-    
-        timeout corner for stupid code
-                    
-        
-
-        LCD.toScreen("START STATE        ", LCD.batteryMonitorBuffer(&Battery), "START STATE        ");
-    };
-};
-
-void handleStraightLineState(Timer &outputUpdateTimer, BatteryMonitor &Battery, PIDSys &PID, speedRegulator &speedReg,PWMGen &toMDB, LCDManager &LCD, int timedelay, TCRT &S1, TCRT &S2, TCRT &S3, TCRT &S4, TCRT &S5)
-{
-    if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-        Battery.pollBattery();
-
-        LCD.toScreen("STRAIGHT LINE       ", LCD.sensorVoltageBuffer(&S3, &S4), LCD.sensorVoltageBuffer(&S1, &S5));
-    };
-};
-*/
-
-//joystick centre button D4
-// lcd D11,D13,D12,D7,D10
-// PWMOutput PA_15, PB_7, PA_14, PC_2, PC_3
 // Battery One-Wire PC_12
 // EncoderLeft PB_14, PB_15
 // EncoderRight PB_1, PB_2
@@ -62,18 +23,23 @@ void handleStraightLineState(Timer &outputUpdateTimer, BatteryMonitor &Battery, 
 
 int main (void)
 {
-    QEI leftEnc(PB_14,PB_15,NC,CPR,QEI::X4_ENCODING);
-    QEI rightEnc(PB_1,PB_2,NC,CPR,QEI::X4_ENCODING);
-    UserInputInterrupts joy(D4);
-    C12832 lcd(D11, D13, D12, D7, D10);
-    LCDManager LCD(&lcd);
-    PWMGen toMDB(PA_15,PB_7,PA_14,PC_2,PC_3);       //pwm1, pwm2, mdbe, be1, be2 
-    BatteryMonitor Battery(PC_12);                  //one wire pin, MUST BE PC_12
-    Encoder leftWheel(&leftEnc);                    //encoder channel 1, enc channel 2 
-    Encoder rightWheel(&rightEnc);                  //encoder channel 1, enc channel 2
-    TCRT S1(PA_0,TCRT_MAX_VDD) , S2(PA_1,TCRT_MAX_VDD) , S3(PA_4,TCRT_MAX_VDD) , S4(PB_0,TCRT_MAX_VDD), S5(PC_1,TCRT_MAX_VDD);  //ANALOUGE array bottom left
-    PIDSys PID(&S1,&S2,&S4,&S5);
-    speedRegulator speedReg(&leftWheel,&rightWheel);
+    QEI                 leftEnc (PB_14,PB_15,NC,CPR,QEI::X4_ENCODING);  //left encoder left channel, right channel
+    QEI                 rightEnc(PB_1,PB_2,NC,CPR,QEI::X4_ENCODING);    //right encoder left channel, right channel
+    UserInputInterrupts UII     (D4,PA_11,PA_12);                       //joystick centre, TX, RX
+    C12832              lcd     (D11, D13, D12, D7, D10);               //LCD screen arduino pins
+    PWMGen              toMDB   (PA_15,PB_7,PA_14,PC_2,PC_3);           //pwm1, pwm2, mdbe, be1, be2 
+    BatteryMonitor      Battery (PC_12);                                //one wire pin, MUST BE PC_12
+    TCRT                S1      (PA_0,TCRT_MAX_VDD);                    //Leftmost GUARD sensor
+    TCRT                S2      (PA_1,TCRT_MAX_VDD);                    //Left-middle EDGE sensor
+    TCRT                S3      (PA_4,TCRT_MAX_VDD);                    //CENTRE sensor
+    TCRT                S4      (PB_0,TCRT_MAX_VDD);                    //Right-middle EDGE sensor
+    TCRT                S5      (PC_1,TCRT_MAX_VDD);                    //Rightmost GUARD sensor
+/*--------------------------------------------------------------------- */
+    LCDManager          LCD(&lcd);                                      //from above
+    Encoder             leftWheel(&leftEnc);                            //from QEI above
+    Encoder             rightWheel(&rightEnc);                          //from QEI above
+    PIDSys              PID(&S1,&S2,&S4,&S5);                           //from sensor array above
+    speedRegulator      speedReg(&leftWheel,&rightWheel);               //from Encoder class above
     
     /*
     
@@ -151,7 +117,6 @@ int main (void)
             break;};
         }; 
         
-
         /*
         toMDB.setPWMDuty(1.0f, 1.0f);
         wait(2.0f);

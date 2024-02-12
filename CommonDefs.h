@@ -15,13 +15,13 @@
 
 #define EASING_FACTOR 1.0 // For PID-to-PWM output smoothing
 
-#define PWM_FREQUENCY 1000 //Hz
+#define PWM_FREQUENCY 1000 // Hz
 #define SYS_OUTPUT_RATE 50 // Hz
 
 #define WHEEL_DIAMETER 0.08 // meters
 #define GEAR_RATIO (1.0 / 18.0) // Gear ratio
 #define PI 3.1415
-#define CPR 256 // Counts per revolution for the encoder
+#define CPR 1024 // Counts per revolution for the encoder
 #define TCRT_MAX_VDD 3.3 // Max voltage for TCRT sensors
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
 
