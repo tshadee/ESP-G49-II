@@ -9,7 +9,9 @@
 /*
 Records QEI inputs and returns speed and distance for wheel. Use getDist() and getSpeed().
 */
-//class QEI;
+
+//forward declaration of QEI class
+class QEI;
 
 class Encoder {
     private:
