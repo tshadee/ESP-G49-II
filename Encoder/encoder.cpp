@@ -11,7 +11,7 @@ void Encoder::updateValues(void)
 {
     countPrev = count;
     count += encode->getPulses();
-    distance = encode->getRevolutions()*WHEEL_DIAMETER*PI;
+    distance = static_cast<float>(encode->getRevolutions()*WHEEL_DIAMETER*PI);
     countBuffer = count - countPrev;
     speed = ((static_cast<float>(countBuffer)/CPR)*SYS_OUTPUT_RATE)*WHEEL_DIAMETER*PI*GEAR_RATIO;
 };
