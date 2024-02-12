@@ -12,8 +12,8 @@ void PWMGen::reset()
 };
 void PWMGen::begin()
 {
-    PWM_LEFT.period(1.0/SYS_OUTPUT_RATE);
-    PWM_RIGHT.period(1.0/SYS_OUTPUT_RATE);
+    PWM_LEFT.period(1.0/PWM_FREQUENCY);
+    PWM_RIGHT.period(1.0/PWM_FREQUENCY);
     MDBEnable.write(1);
     BPE1.write(1);
     BPE2.write(1);

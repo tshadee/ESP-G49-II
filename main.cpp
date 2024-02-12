@@ -92,10 +92,8 @@ int main (void)
     bool straightLineStart = true;
 
     toMDB.begin();
-    toMDB.setPWMDuty(0.5f,0.5f);
     while(1)
     {
-        
         switch (ProgramState){
             case (starting):{ 
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
@@ -123,7 +121,7 @@ int main (void)
                     toMDB.setPWMDuty(1.0f,1.0f);
                     leftWheel.updateValues();
                     rightWheel.updateValues();
-                   
+
 
                     LCD.toScreen("                    ", LCD.encoderOutputTest(&leftWheel, &rightWheel), "PWM Testing                ");
                 };
@@ -131,7 +129,6 @@ int main (void)
 
             case (stop):{
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-
                     toMDB.setPWMDuty(0.5f,0.5f);
 
                     LCD.toScreen("STOP!!!             ", LCD.batteryMonitorBuffer(&Battery), "                       ");

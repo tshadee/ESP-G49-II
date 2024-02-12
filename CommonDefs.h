@@ -15,7 +15,8 @@
 
 #define EASING_FACTOR 1.0 // For PID-to-PWM output smoothing
 
-#define SYS_OUTPUT_RATE 1000 // Hz
+#define PWM_FREQUENCY 1000 //Hz
+#define SYS_OUTPUT_RATE 50 // Hz
 
 #define WHEEL_DIAMETER 0.08 // meters
 #define GEAR_RATIO (1.0 / 18.0) // Gear ratio

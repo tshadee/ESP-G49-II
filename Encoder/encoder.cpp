@@ -23,3 +23,4 @@ void Encoder::resetAllValues(void)
 };
 float Encoder::getDist(void){return distance;};  //returns distance from last reset() call
 float Encoder::getSpeed(void){return speed;};    //returns speed in m/s
+int Encoder::getCount(void){return count;};
