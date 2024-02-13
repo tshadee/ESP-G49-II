@@ -16,12 +16,7 @@
 //UNIVERSITY LIBRARIES
 //#include "ds2781.h"
 
-pstate ProgramState = starting; //yippee!!!
-
-// Battery One-Wire PC_12
-// EncoderLeft PB_14, PB_15
-// EncoderRight PB_1, PB_2
-// TCRT PA_0,PA_1,PA_4,PB_0,PC_1,PC_0
+pstate ProgramState = starting; //yippee!!! test 
 
 int main (void)
 {
@@ -37,7 +32,11 @@ int main (void)
     PWMGen              toMDB   (PA_15,PB_7,PA_14,PC_2,PC_3);           //pwm1, pwm2, mdbe, be1, be2 
     C12832              lcd     (D11, D13, D12, D7, D10);               //LCD screen arduino pins
 
+<<<<<<< HEAD
 /* ---------------------------------------------------------------------------------------------------------------------------------------------- */
+=======
+ /* ---------------------------------------------------------------------------------------------------------------------------------------------- */
+>>>>>>> 52c8bea387875f8a3769ddd5b690d95c759a1843
     
     Encoder             leftWheel(&leftEnc);                            //from QEI above
     Encoder             rightWheel(&rightEnc);                          //from QEI above
@@ -56,8 +55,13 @@ int main (void)
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
     
+<<<<<<< HEAD
     bool straightLineStart = true;
     bool loop1enter = true;
+=======
+    //bool straightLineStart = true;
+    //bool loop1enter = true;
+>>>>>>> 52c8bea387875f8a3769ddd5b690d95c759a1843
 
     Timer outputUpdateTimer;
     outputUpdateTimer.start();
@@ -70,9 +74,31 @@ int main (void)
 
     while(1)
     {
+        ExStim.pullHM10();
+        if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+            speedReg.updateTargetPWM(1.0f, 1.0f);
+            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    
+            RCstate = ExStim.getIntRC();
+            switch(RCstate)
+            {
+                case(9): LCD.toScreen("9  ", " ", " ");break;
+                case(8): LCD.toScreen("8  ", " ", " ");break;
+                case(4): LCD.toScreen("4  ", " ", " ");break;
+                case(2): LCD.toScreen("2  ", " ", " ");break;
+                case(1): LCD.toScreen("1  ", " ", " ");break;
+                case(0): LCD.toScreen("0  ", " ", " ");break;
+                default: LCD.toScreen("?  ", " ", " ");break;
+            };
+        };
+    };
+    };
+
+        /*
         switch (ProgramState){
             case (starting):
             { 
+<<<<<<< HEAD
                 ExStim.pullHM10();
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
                     speedReg.updateTargetPWM(1.0f, 1.0f);
@@ -89,11 +115,13 @@ int main (void)
                         case(0): LCD.toScreen("0  ", " ", " ");break;
                         default: LCD.toScreen("?  ", " ", " ");break;
                     };
+=======
+
+>>>>>>> 52c8bea387875f8a3769ddd5b690d95c759a1843
                 };
                 break;
             };
 
-            /*
             case (straightline):{
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
                     if(straightLineStart)
@@ -134,7 +162,6 @@ int main (void)
                 };
             break;};
 
-            */
+            
         }; 
-    };
-};
+        */
