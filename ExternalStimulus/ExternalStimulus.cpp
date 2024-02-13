@@ -4,13 +4,13 @@
 ExternalStim::ExternalStim(PinName TX, PinName RX) : HM10(TX,RX)
 { 
     intRC = prevRC = 0;
-    HM10.baud(9600); 
     i = 0;
-};
+}; 
 
 bool ExternalStim::serialConfigReady()
 {
     while(!HM10.writeable()){};
+    HM10.baud(9600);
     return true;
 };
 
@@ -19,36 +19,34 @@ void ExternalStim::pullHM10()
     if(HM10.readable())
     {
         intRC = 1;
-        while(HM10.readable() && i < BLE_BUFFER_DEPTH - 1){ bleBuffer[i++] = HM10.getc(); }; 
+        cache = HM10.getc();
+        if(cache == 'A'){intRC = 8;} else
+        if(cache == 'B'){intRC = 9;} else { intRC = 0; };
+
+        /* 
+        char bleBuffer[] = {0};
+        while(i < BLE_BUFFER_DEPTH - 1){ bleBuffer[i++] = HM10.getc(); }; 
         bleBuffer[i] = '\0';
         i = 0;
         intRC = 2;
+
+
+
+
         if(strncmp(bleBuffer,"49100",BLE_BUFFER_DEPTH) == 0){intRC = 8;} else
         if(strncmp(bleBuffer,"49010",BLE_BUFFER_DEPTH) == 0){intRC = 9;} else { intRC = 0; };
         memset(bleBuffer,0,BLE_BUFFER_DEPTH);
-    } else {
+        */
+    } 
+    else 
+    {
         intRC = 4;
     };
 };
 
 int ExternalStim::getIntRC()
 {
-
     return intRC;
-    /*
-    if(intRC == prevRC)
-    {
-        return prevRC;
-    } else {
-        prevRC = intRC;
-        return intRC;
-    };
-    */
-};
-
-char ExternalStim::getBLEc()
-{
-    return bleBuffer[1];
 };
 
 void ExternalStim::centreISR() 
