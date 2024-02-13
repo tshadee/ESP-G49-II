@@ -5,11 +5,11 @@
 //use the one-wire-pin PC_12
 class BatteryMonitor {
     private:
-        DigitalInOut one_wire_pin;
+        DigitalInOut* one_wire_pin;
         int VoltageReading, CurrentReading;
         float Voltage, Current, currentAccum, powerUsed, initCharge,chargePercentLeft;
     public:
-        BatteryMonitor(PinName P1);
+        BatteryMonitor(DigitalInOut* OWP);
         void pollBattery(void);
         float getBatteryVoltage(void);
         float getBatteryCurrent(void);

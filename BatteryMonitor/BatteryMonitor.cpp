@@ -4,7 +4,7 @@
 #include "OneWire_Methods.h"
 
 //use the one-wire-pin PC_12
-BatteryMonitor::BatteryMonitor(PinName P1): one_wire_pin(P1),powerUsed(0.0f) 
+BatteryMonitor::BatteryMonitor(DigitalInOut* OWP): one_wire_pin(OWP),powerUsed(0.0f) 
 {
     VoltageReading = ReadVoltage();
     CurrentReading = ReadCurrent();

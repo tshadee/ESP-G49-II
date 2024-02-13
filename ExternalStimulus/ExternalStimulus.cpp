@@ -1,7 +1,12 @@
 #include "ExternalStimulus.h"
 
 //UserInputInterrupts::UserInputInterrupts(PinName centre, PinName TX, PinName RX, PinName USBTX, PinName USBRX) : centreJoy(centre), toggleState(false), HM10(TX,RX), PC(USBTX,USBRX)
-ExternalStim::ExternalStim(PinName TX, PinName RX) : HM10(TX,RX), intRC(0) { HM10.baud(9600); };
+ExternalStim::ExternalStim(PinName TX, PinName RX) : HM10(TX,RX)
+{ 
+    intRC = prevRC = 0;
+    HM10.baud(9600); 
+    i = 0;
+};
 
 bool ExternalStim::serialConfigReady()
 {
@@ -11,22 +16,40 @@ bool ExternalStim::serialConfigReady()
 
 void ExternalStim::pullHM10()
 {
-    uint8_t i = 0;
     if(HM10.readable())
     {
-        while(i < BLE_BUFFER_DEPTH){ bleBuffer[i++] = HM10.getc(); }; 
+        intRC = 1;
+        while(HM10.readable() && i < BLE_BUFFER_DEPTH - 1){ bleBuffer[i++] = HM10.getc(); }; 
+        bleBuffer[i] = '\0';
         i = 0;
-        if(strncmp(bleBuffer,"491000",6) == 0){intRC = 8;memset(bleBuffer,0,BLE_BUFFER_DEPTH);} else //F
-        if(strncmp(bleBuffer,"490100",6) == 0){intRC = 4;memset(bleBuffer,0,BLE_BUFFER_DEPTH);} else //B
-        if(strncmp(bleBuffer,"490010",6) == 0){intRC = 2;memset(bleBuffer,0,BLE_BUFFER_DEPTH);} else //L
-        if(strncmp(bleBuffer,"490001",6) == 0){intRC = 1;memset(bleBuffer,0,BLE_BUFFER_DEPTH);} else //R
-                                              {intRC = 0;memset(bleBuffer,0,BLE_BUFFER_DEPTH);};
+        intRC = 2;
+        if(strncmp(bleBuffer,"49100",BLE_BUFFER_DEPTH) == 0){intRC = 8;} else
+        if(strncmp(bleBuffer,"49010",BLE_BUFFER_DEPTH) == 0){intRC = 9;} else { intRC = 0; };
+        memset(bleBuffer,0,BLE_BUFFER_DEPTH);
     } else {
-        intRC = 9;
+        intRC = 4;
     };
 };
 
-int ExternalStim::getIntRC(){return intRC;};
+int ExternalStim::getIntRC()
+{
+
+    return intRC;
+    /*
+    if(intRC == prevRC)
+    {
+        return prevRC;
+    } else {
+        prevRC = intRC;
+        return intRC;
+    };
+    */
+};
+
+char ExternalStim::getBLEc()
+{
+    return bleBuffer[1];
+};
 
 void ExternalStim::centreISR() 
 {

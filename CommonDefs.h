@@ -5,7 +5,7 @@
 #define SENSOR_AMOUNT 5
 #define SENSOR_BUFFER 5
 #define SENSOR_POLL_FREQ 1000   // Hz
-#define BLE_BUFFER_DEPTH 6     // bytes
+#define BLE_BUFFER_DEPTH 5     // bytes
 
 #define GAIN_PROPORTIONAL 0.1
 #define GAIN_INTEGRAL 0.1
