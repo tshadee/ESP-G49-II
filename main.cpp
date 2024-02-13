@@ -20,8 +20,8 @@ pstate ProgramState = starting; //yippee!!! test
 
 int main (void)
 {
-    QEI                 leftEnc (PB_14,PB_15,NC,CPR,QEI::X4_ENCODING);  //left encoder left channel, right channel
-    QEI                 rightEnc(PB_1,PB_2,NC,CPR,QEI::X4_ENCODING);    //right encoder left channel, right channel
+    QEI                 leftEnc (PB_14,PB_15,NC,CPR,QEI::X2_ENCODING);  //left encoder left channel, right channel
+    QEI                 rightEnc(PB_1,PB_2,NC,CPR,QEI::X2_ENCODING);    //right encoder left channel, right channel
     ExternalStim        ExStim  (PA_11,PA_12);                          //RXD -> TX (PIN), TXD -> RX (PIN)
     DigitalInOut        one_wire_pin(PC_12);                            //one wire pin, MUST BE PC_12
     TCRT                S1      (PA_0,TCRT_MAX_VDD);                    //Leftmost GUARD sensor
@@ -78,7 +78,7 @@ int main (void)
             {
                 case(9): LCD.toScreen("9  ", " ", " ");break;
                 case(8): LCD.toScreen("8  ", " ", " ");break;
-                case(4): LCD.toScreen("4  ", " ", " ");break;
+                case(4): LCD.toScreen("4  ", " ", " ");break; //this is when you get error
                 case(2): LCD.toScreen("2  ", " ", " ");break;
                 case(1): LCD.toScreen("1  ", " ", " ");break;
                 case(0): LCD.toScreen("0  ", " ", " ");break;

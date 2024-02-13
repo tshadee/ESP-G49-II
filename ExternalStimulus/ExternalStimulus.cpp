@@ -40,7 +40,7 @@ void ExternalStim::pullHM10()
     } 
     else 
     {
-        intRC = 4;
+        intRC = 4; //error code
     };
 };
 

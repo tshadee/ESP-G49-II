@@ -24,7 +24,7 @@
 #define WHEEL_DIAMETER 0.08 // meters
 #define GEAR_RATIO (1.0 / 18.0) // Gear ratio
 #define PI 3.1415
-#define CPR 1024 // Counts per revolution for the encoder
+#define CPR 512 // Counts per revolution for the encoder
 #define TCRT_MAX_VDD 3.3 // Max voltage for TCRT sensors
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
 

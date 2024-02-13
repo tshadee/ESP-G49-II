@@ -23,7 +23,7 @@ void speedRegulator::adjustPWMOutputOnSpeed()
     currentLeftSpeed = leftWheelEncoder->getSpeed();
     currentRightSpeed = rightWheelEncoder->getSpeed();
     easePWM();
-    if(abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR)
+    if(abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR) //if PWM similar enough
     {
         (currentLeftSpeed > currentRightSpeed) ? (currentLeftPWM += (currentLeftSpeed - currentRightSpeed)*S_EASING_FACTOR) : (currentRightPWM += (currentRightSpeed - currentLeftSpeed)*S_EASING_FACTOR);
     };
