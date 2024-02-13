@@ -1,14 +1,11 @@
 #include "UserInputInterrupts.h"
-#include "CommonDefs.h"
+
 
 //UserInputInterrupts::UserInputInterrupts(PinName centre, PinName TX, PinName RX, PinName USBTX, PinName USBRX) : centreJoy(centre), toggleState(false), HM10(TX,RX), PC(USBTX,USBRX)
-UserInputInterrupts::UserInputInterrupts(PinName centre, PinName TX, PinName RX) : centreJoy(centre), toggleState(false), HM10(TX,RX)
-
+UserInputInterrupts::UserInputInterrupts(PinName TX, PinName RX) : toggleState(false), HM10(TX,RX)
 {
-    centreJoy.rise(callback(this, &UserInputInterrupts::centreISR));
     HM10.baud(9600);
     //PC.baud(9600);
-    up = down = left = right = false;
 };
 
 bool UserInputInterrupts::serialConfigReady()
@@ -19,41 +16,27 @@ bool UserInputInterrupts::serialConfigReady()
 
 void UserInputInterrupts::pullHM10()
 {
+    int i = 0;
+    errorBLE = false;
     if(HM10.readable())
     {
-        s = HM10.getc();
-        s[0] == 1 ? up = true       : up = false;
-        s[1] == 1 ? down = true     : down = false;
-        s[2] == 1 ? left = true     : left = false;
-        s[3] == 1 ? right = true    : right = false;
-    };
-};
-
-bool UserInputInterrupts::getUp(){return up;};
-bool UserInputInterrupts::getDown(){return down;};
-bool UserInputInterrupts::getLeft(){return left;};
-bool UserInputInterrupts::getRight(){return right;};
-
-void UserInputInterrupts::toggleInput() 
-{
-    toggleState = !toggleState;
-    if(toggleState) 
-    {
-        centreJoy.disable_irq();
+        while(i < BLE_BUFFER_DEPTH){ s[i++] = HM10.getc(); }; 
+        i = 0;
+        if(strncmp(s,"491000")){intRC = 8;} else //F
+        if(strncmp(s,"490100")){intRC = 4;} else //B
+        if(strncmp(s,"490010")){intRC = 2;} else //L
+        if(strncmp(s,"490001")){intRC = 1;};     //R
+        memset(s,0,BLE_BUFFER_DEPTH);
     } else {
-        centreJoy.enable_irq();
+        errorBLE = true;
     };
 };
 
-void UserInputInterrupts::timerDebounce() 
-{
-    joyDebounce.attach(callback(this, &UserInputInterrupts::toggleInput), 0.3);
-};
+int UserInputInterrupts::getIntRC(){return intRC;};
+bool UserInputInterrupts::getErrorBLE(){return errorBLE;};
 
 void UserInputInterrupts::centreISR() 
 {
-    toggleInput();
-    timerDebounce();
     extern pstate ProgramState; //accessing global variable
     switch(ProgramState) 
     {

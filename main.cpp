@@ -1,7 +1,6 @@
 //external libraries
 #include "mbed.h"
 #include "C12832.h"
-#include "BLE.h"
 
 //Our own libraries
 #include "CommonDefs.h" //contains parameters for the buggy and the main state 
@@ -25,7 +24,7 @@ int main (void)
 {
     QEI                 leftEnc (PB_14,PB_15,NC,CPR,QEI::X4_ENCODING);  //left encoder left channel, right channel
     QEI                 rightEnc(PB_1,PB_2,NC,CPR,QEI::X4_ENCODING);    //right encoder left channel, right channel
-    UserInputInterrupts UII     (D4,PA_11,PA_12);                       //joystick centre, TX, RX
+    UserInputInterrupts UII     (PA_11,PA_12);                          //TX, RX
     C12832              lcd     (D11, D13, D12, D7, D10);               //LCD screen arduino pins
     PWMGen              toMDB   (PA_15,PB_7,PA_14,PC_2,PC_3);           //pwm1, pwm2, mdbe, be1, be2 
     BatteryMonitor      Battery (PC_12);                                //one wire pin, MUST BE PC_12
@@ -34,7 +33,7 @@ int main (void)
     TCRT                S3      (PA_4,TCRT_MAX_VDD);                    //CENTRE sensor
     TCRT                S4      (PB_0,TCRT_MAX_VDD);                    //Right-middle EDGE sensor
     TCRT                S5      (PC_1,TCRT_MAX_VDD);                    //Rightmost GUARD sensor
-/*--------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------------------------------------- */
     LCDManager          LCD(&lcd);                                      //from above
     Encoder             leftWheel(&leftEnc);                            //from QEI above
     Encoder             rightWheel(&rightEnc);                          //from QEI above
@@ -46,6 +45,7 @@ int main (void)
     timeout corner for stupid code
     
     */
+    DigitalOut led(LED2);
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
@@ -56,25 +56,39 @@ int main (void)
     int timedelay = (static_cast<int>(1000/SYS_OUTPUT_RATE)); //in ms
 
     bool straightLineStart = true;
+    bool loop1enter = true;
 
     toMDB.begin();
+    led = 0;
+    int RCstate = 0;
+
     while(1)
     {
         switch (ProgramState){
-            case (starting):{ 
+            case (starting):
+            { 
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
                     Battery.pollBattery();
+
                     //PID.calculatePID(false);
                     //speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
                     //toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                                
                     
-
-                    LCD.toScreen("                    ", "START STATE        ", "                    ");
-                    //LCD.batteryMonitorBuffer(&Battery);
-                }; 
-                
-            break;};
+                    if(UII.serialConfigReady()){UII.pullHM10();
+                        RCstate = UII.getIntRC();
+                        switch(RCstate)
+                        {
+                            case(8):toMDB.setPWMDuty(1.0f, 1.0f);break;
+                            case(4):toMDB.setPWMDuty(0.0f, 0.0f);break;
+                            case(2):toMDB.setPWMDuty(0.0f, 1.0f);break;
+                            case(1):toMDB.setPWMDuty(1.0f, 0.0f);break;
+                            default:toMDB.setPWMDuty(0.5f, 0.5f);break;
+                        };
+                    } else { led = 1; };  
+                    led = 0;   
+                };
+                break;
+            };
 
             case (straightline):{
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
