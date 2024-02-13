@@ -32,11 +32,8 @@ int main (void)
     PWMGen              toMDB   (PA_15,PB_7,PA_14,PC_2,PC_3);           //pwm1, pwm2, mdbe, be1, be2 
     C12832              lcd     (D11, D13, D12, D7, D10);               //LCD screen arduino pins
 
-<<<<<<< HEAD
-/* ---------------------------------------------------------------------------------------------------------------------------------------------- */
-=======
+
  /* ---------------------------------------------------------------------------------------------------------------------------------------------- */
->>>>>>> 52c8bea387875f8a3769ddd5b690d95c759a1843
     
     Encoder             leftWheel(&leftEnc);                            //from QEI above
     Encoder             rightWheel(&rightEnc);                          //from QEI above
@@ -55,13 +52,10 @@ int main (void)
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
     
-<<<<<<< HEAD
     bool straightLineStart = true;
     bool loop1enter = true;
-=======
     //bool straightLineStart = true;
     //bool loop1enter = true;
->>>>>>> 52c8bea387875f8a3769ddd5b690d95c759a1843
 
     Timer outputUpdateTimer;
     outputUpdateTimer.start();
@@ -98,7 +92,6 @@ int main (void)
         switch (ProgramState){
             case (starting):
             { 
-<<<<<<< HEAD
                 ExStim.pullHM10();
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
                     speedReg.updateTargetPWM(1.0f, 1.0f);
@@ -115,9 +108,7 @@ int main (void)
                         case(0): LCD.toScreen("0  ", " ", " ");break;
                         default: LCD.toScreen("?  ", " ", " ");break;
                     };
-=======
 
->>>>>>> 52c8bea387875f8a3769ddd5b690d95c759a1843
                 };
                 break;
             };
