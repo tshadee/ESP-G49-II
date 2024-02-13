@@ -8,6 +8,7 @@ class ExternalStim {
 private:
     Serial HM10;
     char bleBuffer[BLE_BUFFER_DEPTH];
+    char cache;
     int intRC, prevRC;
     uint8_t i;
 
@@ -17,7 +18,6 @@ public:
     bool serialConfigReady();
     void pullHM10();
     int getIntRC();
-    char getBLEc();
 };
 
 #endif // EXTERNAL_STIMULUS_H

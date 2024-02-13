@@ -5,7 +5,7 @@
 #define SENSOR_AMOUNT 5
 #define SENSOR_BUFFER 5
 #define SENSOR_POLL_FREQ 1000   // Hz
-#define BLE_BUFFER_DEPTH 5     // bytes
+#define BLE_BUFFER_DEPTH 20     // bytes
 
 #define GAIN_PROPORTIONAL 0.1
 #define GAIN_INTEGRAL 0.1
@@ -14,7 +14,9 @@
 
 #define BASE_DUTY 0.8f
 
-#define EASING_FACTOR 1.0 // For PID-to-PWM output smoothing
+#define EASING_FACTOR 1.0 // For initial PWM ease between PID output and internal PWM output
+#define S_EASING_FACTOR 1.0 // For seconady correction between internal PWM (takes into account wheel speed)
+#define PWM_DIFFERENTIAL_FACTOR 0.05 //difference between the two PWM duty cycles (used for determining condition to enforce straight line logic)
 
 #define PWM_FREQUENCY 1000 // Hz
 #define SYS_OUTPUT_RATE 50 // Hz
