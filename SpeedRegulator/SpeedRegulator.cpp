@@ -1,7 +1,6 @@
 #include "SpeedRegulator.h"
 #include "CommonDefs.h"
 
-
 speedRegulator::speedRegulator(Encoder* LWC, Encoder* RWC): leftWheelEncoder(LWC),rightWheelEncoder(RWC)
 {
     currentLeftPWM = currentRightPWM = DEFAULT_PWM;
@@ -19,6 +18,8 @@ void speedRegulator::updateTargetPWM(float leftPWM, float rightPWM)
 
 void speedRegulator::adjustPWMOutputOnSpeed() 
 {
+    leftWheelEncoder->updateValues();
+    rightWheelEncoder->updateValues();
     currentLeftSpeed = leftWheelEncoder->getSpeed();
     currentRightSpeed = rightWheelEncoder->getSpeed();
     easePWM();
@@ -37,5 +38,4 @@ void speedRegulator::easePWM()
 };
 
 float speedRegulator::getCurrentLeftPWM(void){return currentLeftPWM;};
-
 float speedRegulator::getCurrentRightPWM(void){return currentRightPWM;};
