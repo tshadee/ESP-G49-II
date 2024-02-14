@@ -16,8 +16,9 @@ class QEI;
 class Encoder {
     private:
         QEI* encode;
-        uint64_t count, countPrev;
-        float distance, speed;
+        int count, countPrev;
+        float distance;
+        float speed;
         int countBuffer;
     public:
         Encoder(QEI* q);

@@ -70,10 +70,14 @@ int main (void)
     {
         ExStim.pullHM10();
         if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-            speedReg.updateTargetPWM(1.0f, 1.0f);
+
+
+            speedReg.updateTargetPWM(0.0f, 0.0f);
             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    
+            LCD.toScreen("",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+
             RCstate = ExStim.getIntRC();
+            /*
             switch(RCstate)
             {
                 case(9): LCD.toScreen("9  ", " ", " ");break;
@@ -84,6 +88,7 @@ int main (void)
                 case(0): LCD.toScreen("0  ", " ", " ");break;
                 default: LCD.toScreen("?  ", " ", " ");break;
             };
+            */
         };
     };
     };

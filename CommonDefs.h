@@ -14,8 +14,8 @@
 
 #define BASE_DUTY 0.8f
 
-#define EASING_FACTOR 1.0 // For initial PWM ease between PID output and internal PWM output
-#define S_EASING_FACTOR 1.0 // For seconady correction between internal PWM (takes into account wheel speed)
+#define EASING_FACTOR 0.15 // For initial PWM ease between PID output and internal PWM output
+#define S_EASING_FACTOR 0.1 // For seconady correction between internal PWM (takes into account wheel speed)
 #define PWM_DIFFERENTIAL_FACTOR 0.05 //difference between the two PWM duty cycles (used for determining condition to enforce straight line logic)
 
 #define PWM_FREQUENCY 1000 // Hz
