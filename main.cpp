@@ -86,10 +86,10 @@ int main (void)
             break;};
 
             case (straightline):{  //THIS IS TURN LEFT STATE
-                if((leftWheel.getDist() > -0.15) && (rightWheel.getDist() < 0.15))
+                if((leftWheel.getDist() > -0.15) && (rightWheel.getDist() < 0.215))
                 {
                     if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-                        speedReg.updateTargetPWM(0.35f, 0.65f); //turn left
+                        speedReg.updateTargetPWM(0.5f, 0.7f); //turn right
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                         LCD.toScreen("TL   ", LCD.encoderOutputTest(&leftWheel, &rightWheel),"");
                     };

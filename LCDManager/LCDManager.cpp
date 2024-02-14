@@ -44,8 +44,8 @@ char* LCDManager::sensorVoltageBuffer(TCRT* S1, TCRT* S2)
 char* LCDManager::encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f    %.02f   ", leftWheel->getSpeed(),rightWheel->getSpeed());
-    //sprintf(dspBuffer, "%.02f    %.02f   ", leftWheel->getDist(),rightWheel->getDist());
+    //sprintf(dspBuffer, "%.02f    %.02f   ", leftWheel->getSpeed(),rightWheel->getSpeed());
+    sprintf(dspBuffer, "%.03f    %.03f ", leftWheel->getDist(),rightWheel->getDist());
     //sprintf(dspBuffer, "%02d      %02d     ", leftWheel->getCount(),rightWheel->getCount());
     return dspBuffer;
 };
