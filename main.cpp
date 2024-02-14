@@ -74,7 +74,7 @@ int main (void)
             case (starting):{ //THIS IS THE STRAIGHT LINE STATE
 
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-                    speedReg.updateTargetPWM(0.7f,0.7f);
+                    speedReg.updateTargetPWM(1.0f,1.0f);
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     LCD.toScreen("SS   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                 };
@@ -89,7 +89,7 @@ int main (void)
                 if((leftWheel.getDist() > -0.15) && (rightWheel.getDist() < 0.15))
                 {
                     if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-                        speedReg.updateTargetPWM(0.3f, 0.7f); //turn left
+                        speedReg.updateTargetPWM(0.35f, 0.65f); //turn left
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                         LCD.toScreen("TL   ", LCD.encoderOutputTest(&leftWheel, &rightWheel),"");
                     };
@@ -109,8 +109,9 @@ int main (void)
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     LCD.toScreen("STOP ", LCD.encoderOutputTest(&leftWheel, &rightWheel),"");
 
-                    if(count50 >= 50)
+                    if(count50 >= 100)
                     {
+                        count50 = 0;
                         if(prevState == starting)
                         {
                             ProgramState = straightline;
