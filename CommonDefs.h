@@ -18,7 +18,7 @@
 #define S_EASING_FACTOR 0.08 // For seconady correction between internal PWM (takes into account wheel speed)
 #define PWM_DIFFERENTIAL_FACTOR 0.05 //difference between the two PWM duty cycles (used for determining condition to enforce straight line logic)
 
-#define PWM_FREQUENCY 1000 // Hz
+#define PWM_FREQUENCY 20000 // Hz
 #define SYS_OUTPUT_RATE 50 // Hz
 
 #define WHEEL_DIAMETER 0.08 // meters
