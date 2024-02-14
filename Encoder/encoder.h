@@ -27,6 +27,7 @@ class Encoder {
         float getDist(void);  //returns distance from last reset() call
         float getSpeed(void);    //returns speed in m/s
         int getCount(void); //returns count of encoder 
+        void resetDistance(void);
 };
 
 #endif

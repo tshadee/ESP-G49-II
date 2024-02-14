@@ -24,6 +24,13 @@ void Encoder::resetAllValues(void)
     distance = speed = 0.0f;
     count = countPrev = 0;
 };
+
+void Encoder::resetDistance(void)
+{
+    encode->reset();
+    distance = count = 0.0f;
+};
+
 float Encoder::getDist(void){return distance;};  //returns distance from last reset() call
 float Encoder::getSpeed(void){return speed;};    //returns speed in m/s
 int Encoder::getCount(void){return count;};

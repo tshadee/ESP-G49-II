@@ -65,37 +65,61 @@ int main (void)
     volatile int RCstate = 0;
     ExStim.serialConfigReady();
 
-    float Ldistcache = 0.0f;
-    float Rdistcache = 0.0f;
+    volatile int count50 = 0;
+    pstate prevState;
 
     while(1)
     {
-        
-
-
-
         switch (ProgramState){
             case (starting):{ //THIS IS THE STRAIGHT LINE STATE
+
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
                     speedReg.updateTargetPWM(0.7f,0.7f);
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     LCD.toScreen("SS   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                 };
-            break;};
 
-            case (straightline):{  //THIS IS TURN LEFT STATE
-                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-                    speedReg.updateTargetPWM(0.3f, 0.7f); //turn left
-                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    LCD.toScreen("TL   ", LCD.encoderOutputTest(&leftWheel, &rightWheel),"");
+                if((leftWheel.getDist() < 1.0) && (rightWheel.getDist() < 1.0))
+                { prevState = ProgramState; } else {
+                    ProgramState = stop;
                 };
             break;};
 
+            case (straightline):{  //THIS IS TURN LEFT STATE
+                if((leftWheel.getDist() > -0.15) && (rightWheel.getDist() < 0.15))
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+                        speedReg.updateTargetPWM(0.3f, 0.7f); //turn left
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                        LCD.toScreen("TL   ", LCD.encoderOutputTest(&leftWheel, &rightWheel),"");
+                    };
+                } else {
+                    prevState = ProgramState;
+                    ProgramState = stop;
+                };
+                
+            break;};
+
             case (stop):{ //THIS STOPS THE BUGGY (HOPEFULLY)
+
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
                     speedReg.updateTargetPWM(0.5f, 0.5f); //turn left
+                    leftWheel.resetDistance();
+                    rightWheel.resetDistance();
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     LCD.toScreen("STOP ", LCD.encoderOutputTest(&leftWheel, &rightWheel),"");
+
+                    if(count50 >= 50)
+                    {
+                        if(prevState == starting)
+                        {
+                            ProgramState = straightline;
+                        } else {
+                            ProgramState = starting;
+                        };
+                    } else {
+                        count50++;
+                    };
                 };
             break;};
         
