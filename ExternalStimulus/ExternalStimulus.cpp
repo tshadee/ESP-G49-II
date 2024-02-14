@@ -9,8 +9,9 @@ ExternalStim::ExternalStim(PinName TX, PinName RX) : HM10(TX,RX)
 
 bool ExternalStim::serialConfigReady()
 {
-    while(!HM10.writeable()){};
     HM10.baud(9600);
+    while(!HM10.writeable()){};
+
     return true;
 };
 
@@ -18,12 +19,11 @@ void ExternalStim::pullHM10()
 {
     if(HM10.readable())
     {
-        intRC = 1;
         cache = HM10.getc();
         if(cache == 'A'){intRC = 8;} else
         if(cache == 'B'){intRC = 9;} else { intRC = 0; };
 
-        /* 
+        /*
         char bleBuffer[] = {0};
         while(i < BLE_BUFFER_DEPTH - 1){ bleBuffer[i++] = HM10.getc(); }; 
         bleBuffer[i] = '\0';

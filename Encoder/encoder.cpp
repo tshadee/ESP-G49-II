@@ -17,6 +17,7 @@ void Encoder::updateValues(void)
     speed = ((static_cast<float>(countBuffer)/CPR)*SYS_OUTPUT_RATE)*WHEEL_DIAMETER*PI;
     encode->reset();
 };
+
 void Encoder::resetAllValues(void)
 {
     encode->reset();

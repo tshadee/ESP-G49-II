@@ -63,85 +63,56 @@ int main (void)
 
     toMDB.begin();
     volatile int RCstate = 0;
-
     ExStim.serialConfigReady();
+
+    float Ldistcache = 0.0f;
+    float Rdistcache = 0.0f;
 
     while(1)
     {
-        ExStim.pullHM10();
-        if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+        
 
 
-            speedReg.updateTargetPWM(0.0f, 0.0f);
-            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-            LCD.toScreen("",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
 
-            RCstate = ExStim.getIntRC();
-            /*
-            switch(RCstate)
-            {
-                case(9): LCD.toScreen("9  ", " ", " ");break;
-                case(8): LCD.toScreen("8  ", " ", " ");break;
-                case(4): LCD.toScreen("4  ", " ", " ");break; //this is when you get error
-                case(2): LCD.toScreen("2  ", " ", " ");break;
-                case(1): LCD.toScreen("1  ", " ", " ");break;
-                case(0): LCD.toScreen("0  ", " ", " ");break;
-                default: LCD.toScreen("?  ", " ", " ");break;
-            };
-            */
+        switch (ProgramState){
+            case (starting):{ //THIS IS THE STRAIGHT LINE STATE
+                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+                    speedReg.updateTargetPWM(0.7f,0.7f);
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    LCD.toScreen("SS   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                };
+            break;};
+
+            case (straightline):{  //THIS IS TURN LEFT STATE
+                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+                    speedReg.updateTargetPWM(0.3f, 0.7f); //turn left
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    LCD.toScreen("TL   ", LCD.encoderOutputTest(&leftWheel, &rightWheel),"");
+                };
+            break;};
+
+            case (stop):{ //THIS STOPS THE BUGGY (HOPEFULLY)
+                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
+                    speedReg.updateTargetPWM(0.5f, 0.5f); //turn left
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    LCD.toScreen("STOP ", LCD.encoderOutputTest(&leftWheel, &rightWheel),"");
+                };
+            break;};
+        
         };
-    };
     };
 
         /*
         switch (ProgramState){
             case (starting):
             { 
-                ExStim.pullHM10();
-                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-                    speedReg.updateTargetPWM(1.0f, 1.0f);
-                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    
-                    RCstate = ExStim.getIntRC();
-                    switch(RCstate)
-                    {
-                        case(9): LCD.toScreen("9  ", " ", " ");break;
-                        case(8): LCD.toScreen("8  ", " ", " ");break;
-                        case(4): LCD.toScreen("4  ", " ", " ");break;
-                        case(2): LCD.toScreen("2  ", " ", " ");break;
-                        case(1): LCD.toScreen("1  ", " ", " ");break;
-                        case(0): LCD.toScreen("0  ", " ", " ");break;
-                        default: LCD.toScreen("?  ", " ", " ");break;
-                    };
-
-                };
-                break;
-            };
-
-            case (straightline):{
-                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-                    if(straightLineStart)
-                    {
-                        leftWheel.resetAllValues();
-                        rightWheel.resetAllValues();
-                        straightLineStart = false;
-                    };
-                    toMDB.setPWMDuty(1.0f,1.0f);
-                    leftWheel.updateValues();
-                    rightWheel.updateValues();
-
-
-                    //LCD.toScreen("                    ", LCD.encoderOutputTest(&leftWheel, &rightWheel), "PWM Testing                ");
-                };
+                
+            
+            
             break;};
 
-            case (stop):{
-                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-                    toMDB.setPWMDuty(0.5f,0.5f);
-
-                    //LCD.toScreen("STOP!!!             ", LCD.batteryMonitorBuffer(&Battery), "                       ");
-                };
-            break;};
+            
+            
 
             case (turnaround):{
                 if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
@@ -161,3 +132,4 @@ int main (void)
             
         }; 
         */
+};
