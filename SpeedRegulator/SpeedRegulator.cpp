@@ -35,13 +35,40 @@ void speedRegulator::adjustPWMOutputOnSpeed()
             (currentLeftPWM += (currentRightSpeed - currentLeftSpeed)*S_EASING_FACTOR);
             (currentRightPWM -= (currentRightSpeed - currentLeftSpeed)*S_EASING_FACTOR);
         }
-    } else if (abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR && targetLeftPWM < 0.5f && targetRightPWM > 0.5f) //turning LEFT
+    } 
+    else if(abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR && targetLeftPWM < 0.5f && targetRightPWM < 0.5f) //GOING BACK
     {
-        abs(currentLeftPWM);
-        abs(currentRightPWM);
-        (currentRightPWM += (currentLeftSpeed - currentRightSpeed)*S_EASING_FACTOR);
-        (currentLeftPWM -= (currentLeftSpeed - currentRightSpeed)*S_EASING_FACTOR);
-        currentLeftPWM = -1*currentLeftPWM;
+        if(currentLeftSpeed < currentRightSpeed) //left faster
+        {
+            (currentRightPWM -= (currentRightSpeed - currentLeftSpeed)*S_EASING_FACTOR);
+            (currentLeftPWM += (currentRightSpeed - currentLeftSpeed)*S_EASING_FACTOR);
+        } else //right faster
+        {
+            (currentLeftPWM -= (currentLeftSpeed - currentRightSpeed)*S_EASING_FACTOR);
+            (currentRightPWM += (currentLeftSpeed - currentRightSpeed)*S_EASING_FACTOR);
+        }
+    }
+    else if (abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR && targetLeftPWM < 0.5f && targetRightPWM > 0.5f) //turning LEFT
+    {
+        if(abs(currentLeftSpeed) < abs(currentRightSpeed))//right faster
+        {
+        (currentRightPWM -= (currentLeftSpeed + currentRightSpeed)*S_EASING_FACTOR);
+        (currentLeftPWM -= (currentLeftSpeed + currentRightSpeed)*S_EASING_FACTOR);
+        } else{ //left faster
+        (currentLeftPWM += (currentLeftSpeed + currentRightSpeed)*S_EASING_FACTOR);
+        (currentRightPWM += (currentLeftSpeed + currentRightSpeed)*S_EASING_FACTOR);
+        }
+    }
+    else if (abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR && targetLeftPWM > 0.5f && targetRightPWM < 0.5f) //turning RIGHT
+    {
+        if(abs(currentLeftSpeed) > abs(currentRightSpeed))//left faster
+        {
+        (currentRightPWM -= (currentLeftSpeed + currentRightSpeed)*S_EASING_FACTOR);
+        (currentLeftPWM -= (currentLeftSpeed + currentRightSpeed)*S_EASING_FACTOR);
+        } else{ //right faster
+        (currentLeftPWM += (currentLeftSpeed + currentRightSpeed)*S_EASING_FACTOR);
+        (currentRightPWM += (currentLeftSpeed + currentRightSpeed)*S_EASING_FACTOR);
+        }
     };
 
     
