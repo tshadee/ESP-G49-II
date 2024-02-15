@@ -1,4 +1,5 @@
 #include "LCDManager.h"
+#include <cstdlib>
 
 LCDManager::LCDManager(C12832* c):lcd(c){};
 
@@ -45,7 +46,7 @@ char* LCDManager::encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel)
 {
     static char dspBuffer[20];
     //sprintf(dspBuffer, "%.02f    %.02f   ", leftWheel->getSpeed(),rightWheel->getSpeed());
-    sprintf(dspBuffer, "%.03f    %.03f ", leftWheel->getDist(),rightWheel->getDist());
     //sprintf(dspBuffer, "%02d      %02d     ", leftWheel->getCount(),rightWheel->getCount());
+    sprintf(dspBuffer, "%.03f    %.03f ", leftWheel->getDist(),rightWheel->getDist());
     return dspBuffer;
 };

@@ -79,7 +79,7 @@ void speedRegulator::adjustPWMOutputOnSpeed()
 void speedRegulator::easePWM()
 {
     currentLeftPWM += (targetLeftPWM - currentLeftPWM)*EASING_FACTOR;
-    currentRightPWM += (targetRightPWM - currentRightPWM)*EASING_FACTOR;
+    currentRightPWM += (targetRightPWM - currentRightPWM)*EASING_FACTOR; //easing curve, never reaches target value
 };
 
 float speedRegulator::getCurrentLeftPWM(void){return currentLeftPWM;};

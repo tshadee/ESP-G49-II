@@ -13,10 +13,7 @@
 #include "ExternalStimulus.h"
 #include "LCDManager.h"
 
-//UNIVERSITY LIBRARIES
-//#include "ds2781.h"
-
-pstate ProgramState = starting; //yippee!!! test 
+pstate ProgramState = starting; 
 
 int main (void)
 {
@@ -41,21 +38,10 @@ int main (void)
     speedRegulator      speedReg(&leftWheel,&rightWheel);               //from Encoder class above
     BatteryMonitor      Battery (&one_wire_pin);                        //from above
     PIDSys              PID(&S1,&S2,&S4,&S5);                           //from sensor array above
-    
-    /*
-    
-    timeout corner
-
-    */
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0/SENSOR_POLL_FREQ;
     sensorPollTicker.attach(callback(&TCRT::pollSensors),sensorPollRate);
-    
-    bool straightLineStart = true;
-    bool loop1enter = true;
-    //bool straightLineStart = true;
-    //bool loop1enter = true;
 
     Timer outputUpdateTimer;
     outputUpdateTimer.start();
@@ -68,7 +54,7 @@ int main (void)
     volatile int count50 = 0;
     pstate prevState;
 
-    while(1)
+    while(true)
     {
         switch (ProgramState){
             case (starting):{ //THIS IS THE STRAIGHT LINE STATE
@@ -125,38 +111,12 @@ int main (void)
                     };
                 };
             break;};
-        
+
+            case (shutdown):
+            default: 
+            {
+                
+            }
         };
     };
-
-        /*
-        switch (ProgramState){
-            case (starting):
-            { 
-                
-            
-            
-            break;};
-
-            
-            
-
-            case (turnaround):{
-                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-                    Battery.pollBattery();
-
-                    //LCD.toScreen("TURN!!!             ", LCD.batteryMonitorBuffer(&Battery), "                       ");
-                };
-            break;};
-
-            default: {
-                if(outputUpdateTimer.read_ms() >= timedelay){outputUpdateTimer.reset();
-
-                    //LCD.toScreen("SOMETHING BROKE","                       ","                       ");
-                };
-            break;};
-
-            
-        }; 
-        */
 };

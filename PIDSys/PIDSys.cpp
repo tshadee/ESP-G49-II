@@ -41,8 +41,8 @@ void PIDSys::outputPWM()
         leftPWM = BASE_DUTY - output;
         rightPWM = BASE_DUTY + output;
     } else {
-        leftPWM = rightPWM = 1.0f; // Ensuring both are set to 1.0f for clarity
-    }
+        leftPWM = rightPWM = 0.5f; // stop in case anything goes wrong
+    };
 };
 
 float PIDSys::getLeftPWM() const 
