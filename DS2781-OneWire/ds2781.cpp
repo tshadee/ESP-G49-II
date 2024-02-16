@@ -12,7 +12,7 @@
 ----------------------
    NOTE_1: The functions that return parameters, do so in the units reported
    in the description of each function. The user should implement the scaling
-   on his/her own.  
+   on his/her own.
    -------------------------------------------------------------------------- */
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -24,16 +24,16 @@
  * Time : < 4.3ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-int ReadVoltage (void)
+int ReadVoltage(void)
 {
     uint16_t result = 0;
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( READ_DATA );
-        OneWire_WriteByte( 0x0C );                      //Register Address
-        result  = OneWire_ReadByte()  << 8;     //MSB   
-        result |= OneWire_ReadByte() ;          //LSB
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(READ_DATA);
+        OneWire_WriteByte(0x0C);          // Register Address
+        result = OneWire_ReadByte() << 8; // MSB
+        result |= OneWire_ReadByte();     // LSB
     }
     return (result >> 5);
 }
@@ -47,16 +47,16 @@ int ReadVoltage (void)
  * Time : < 4.3ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-uint16_t ReadCurrent (void)
+uint16_t ReadCurrent(void)
 {
     uint16_t result = 0;
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( READ_DATA );
-        OneWire_WriteByte( 0x0E );                      //Register Address
-        result  = ((uint16_t)OneWire_ReadByte() ) << 8;     //MSB   
-        result |= ((uint16_t)OneWire_ReadByte() );          //LSB
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(READ_DATA);
+        OneWire_WriteByte(0x0E);                      // Register Address
+        result = ((uint16_t)OneWire_ReadByte()) << 8; // MSB
+        result |= ((uint16_t)OneWire_ReadByte());     // LSB
     }
     return result;
 }
@@ -70,20 +70,20 @@ uint16_t ReadCurrent (void)
  * Time : < 5.8ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-uint32_t ReadAccumulatedCurrent (void)
+uint32_t ReadAccumulatedCurrent(void)
 {
     unsigned long result = 0;
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( READ_DATA );
-        OneWire_WriteByte( 0x10 );                      //Register Address
-        result  = ((unsigned long)OneWire_ReadByte() ) << 24;       //MSB
-        result |= ((unsigned long)OneWire_ReadByte() ) << 16;
-        result |= ((unsigned long)OneWire_ReadByte() ) << 8;    
-        result |= ((unsigned long)OneWire_ReadByte() );         //LSB
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(READ_DATA);
+        OneWire_WriteByte(0x10);                            // Register Address
+        result = ((unsigned long)OneWire_ReadByte()) << 24; // MSB
+        result |= ((unsigned long)OneWire_ReadByte()) << 16;
+        result |= ((unsigned long)OneWire_ReadByte()) << 8;
+        result |= ((unsigned long)OneWire_ReadByte()); // LSB
     }
-    return (result >>  4);
+    return (result >> 4);
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -94,15 +94,15 @@ uint32_t ReadAccumulatedCurrent (void)
  * Time : < 4.2ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-void ResetAccumulatedCurrent (void)
+void ResetAccumulatedCurrent(void)
 {
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( WRITE_DATA );
-        OneWire_WriteByte( 0x10 );                      //Register Address
-        OneWire_WriteByte( 0x00 );                      //MSB
-        OneWire_WriteByte( 0x00 );                      //LSB
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(WRITE_DATA);
+        OneWire_WriteByte(0x10); // Register Address
+        OneWire_WriteByte(0x00); // MSB
+        OneWire_WriteByte(0x00); // LSB
     }
 }
 
@@ -114,20 +114,20 @@ void ResetAccumulatedCurrent (void)
  * Time : < 7.3ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-uint32_t ReadNetAddress (void)
+uint32_t ReadNetAddress(void)
 {
     uint16_t result = 0;
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( READ_NETADDRESS );
-        //result  = ((Quint16_t)OneWire_ReadByte() );       //MSB
-        //result |= ((Quint16_t)OneWire_ReadByte() ) << 8;
-        //result |= ((Quint16_t)OneWire_ReadByte() ) << 16;
-        //result |= ((Quint16_t)OneWire_ReadByte() ) << 24;
-        //result |= ((Quint16_t)OneWire_ReadByte() ) << 32;
-        //result |= ((Quint16_t)OneWire_ReadByte() ) << 40;
-        //result |= ((Quint16_t)OneWire_ReadByte() ) << 48; 
-        //result |= ((Quint16_t)OneWire_ReadByte() ) <<56;          //LSB
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(READ_NETADDRESS);
+        // result  = ((Quint16_t)OneWire_ReadByte() );       //MSB
+        // result |= ((Quint16_t)OneWire_ReadByte() ) << 8;
+        // result |= ((Quint16_t)OneWire_ReadByte() ) << 16;
+        // result |= ((Quint16_t)OneWire_ReadByte() ) << 24;
+        // result |= ((Quint16_t)OneWire_ReadByte() ) << 32;
+        // result |= ((Quint16_t)OneWire_ReadByte() ) << 40;
+        // result |= ((Quint16_t)OneWire_ReadByte() ) << 48;
+        // result |= ((Quint16_t)OneWire_ReadByte() ) <<56;          //LSB
     }
     return result;
 }
@@ -141,16 +141,16 @@ uint32_t ReadNetAddress (void)
  * Time : < 4.3ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-uint16_t ReadTemperature (void)
+uint16_t ReadTemperature(void)
 {
     uint16_t result = 0;
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( READ_DATA );
-        OneWire_WriteByte( 0x0A );                      //Register Address
-        result  = ((uint16_t)OneWire_ReadByte() ) << 8;     //MSB   
-        result |= ((uint16_t)OneWire_ReadByte() );          //LSB
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(READ_DATA);
+        OneWire_WriteByte(0x0A);                      // Register Address
+        result = ((uint16_t)OneWire_ReadByte()) << 8; // MSB
+        result |= ((uint16_t)OneWire_ReadByte());     // LSB
     }
     return (result >> 5);
 }
@@ -164,15 +164,15 @@ uint16_t ReadTemperature (void)
  * Time : < 3.6ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-uint8_t ReadCurrentOffset (void)
+uint8_t ReadCurrentOffset(void)
 {
     uint8_t result = 0;
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( READ_DATA );
-        OneWire_WriteByte( 0x7B );                      //Register Address
-        result  = OneWire_ReadByte();
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(READ_DATA);
+        OneWire_WriteByte(0x7B); // Register Address
+        result = OneWire_ReadByte();
     }
     return result;
 }
@@ -186,14 +186,14 @@ uint8_t ReadCurrentOffset (void)
  * Time : < 3.6ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-void  WriteCurrentOffset (uint8_t offset)
+void WriteCurrentOffset(uint8_t offset)
 {
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( WRITE_DATA );
-        OneWire_WriteByte( 0x7B );                      //Register Address
-        OneWire_WriteByte( offset );
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(WRITE_DATA);
+        OneWire_WriteByte(0x7B); // Register Address
+        OneWire_WriteByte(offset);
     }
 }
 
@@ -207,30 +207,30 @@ void  WriteCurrentOffset (uint8_t offset)
  * Time : < 3.62s                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-void AdjustCurrentOffset (void)
+void AdjustCurrentOffset(void)
 {
     char offset = 0;
-    
-    WriteCurrentOffset ( 0x0 );                     //Reset Current Offset Register
 
-    //Delay100MSx(36);                                //Wait 3.6s for current register to update
+    WriteCurrentOffset(0x0); // Reset Current Offset Register
 
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( READ_DATA );
-        OneWire_WriteByte( 0x0F );                      //Current Register LSB
-        offset  = OneWire_ReadByte();   
+    // Delay100MSx(36);                                //Wait 3.6s for current register to update
+
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(READ_DATA);
+        OneWire_WriteByte(0x0F); // Current Register LSB
+        offset = OneWire_ReadByte();
     }
 
-    offset = 256 - offset;                          //2's complement Negating
+    offset = 256 - offset; // 2's complement Negating
 
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( WRITE_DATA );
-        OneWire_WriteByte( 0x7B );                      //Current Offset Register
-        OneWire_WriteByte( offset );    
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(WRITE_DATA);
+        OneWire_WriteByte(0x7B); // Current Offset Register
+        OneWire_WriteByte(offset);
     }
 }
 
@@ -244,21 +244,21 @@ void AdjustCurrentOffset (void)
  * Time : < 6.4ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-void UpdateControlRegister (uint8_t control)
+void UpdateControlRegister(uint8_t control)
 {
-    if( OneWire_Reset() == true )
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( WRITE_DATA );
-        OneWire_WriteByte( 0x60 );                      //Register Address
-        OneWire_WriteByte( control );
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(WRITE_DATA);
+        OneWire_WriteByte(0x60); // Register Address
+        OneWire_WriteByte(control);
     }
 
-    if( OneWire_Reset() == true )
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( COPY_DATA );
-        OneWire_WriteByte( 0x60 );                      //Register Address
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(COPY_DATA);
+        OneWire_WriteByte(0x60); // Register Address
     }
 }
 
@@ -271,15 +271,15 @@ void UpdateControlRegister (uint8_t control)
  * Time : < 3.6ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-uint8_t ReadRAM (uint8_t addr)
+uint8_t ReadRAM(uint8_t addr)
 {
     uint8_t result = 0;
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( READ_DATA );
-        OneWire_WriteByte( addr );                      //Register Address
-        result  = OneWire_ReadByte();
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(READ_DATA);
+        OneWire_WriteByte(addr); // Register Address
+        result = OneWire_ReadByte();
     }
     return result;
 }
@@ -293,14 +293,14 @@ uint8_t ReadRAM (uint8_t addr)
  * Time : < 3.6ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-void WriteRAM (uint8_t byte, uint8_t addr)
+void WriteRAM(uint8_t byte, uint8_t addr)
 {
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( WRITE_DATA );
-        OneWire_WriteByte( addr );                      //Register Address
-        OneWire_WriteByte( byte );
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(WRITE_DATA);
+        OneWire_WriteByte(addr); // Register Address
+        OneWire_WriteByte(byte);
     }
 }
 
@@ -315,13 +315,13 @@ void WriteRAM (uint8_t byte, uint8_t addr)
  * Time : < 2.9ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-void CopyEEPROM (uint8_t addr)
+void CopyEEPROM(uint8_t addr)
 {
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( COPY_DATA );
-        OneWire_WriteByte( addr );
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(COPY_DATA);
+        OneWire_WriteByte(addr);
     }
 }
 
@@ -334,13 +334,13 @@ void CopyEEPROM (uint8_t addr)
  * Time : < 2.9ms                                                              *
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-void RecallEEPROM (uint8_t addr)
+void RecallEEPROM(uint8_t addr)
 {
-    if( OneWire_Reset() == true)
-    {       
-        OneWire_WriteByte( SKIP_NETADDRESS );
-        OneWire_WriteByte( RECALL_DATA );
-        OneWire_WriteByte( addr );
+    if (OneWire_Reset() == true)
+    {
+        OneWire_WriteByte(SKIP_NETADDRESS);
+        OneWire_WriteByte(RECALL_DATA);
+        OneWire_WriteByte(addr);
     }
 }
 /* EOF */

@@ -4,7 +4,8 @@
 #include "mbed.h"
 #include "CommonDefs.h"
 
-class ExternalStim {
+class ExternalStim
+{
 private:
     Serial HM10;
     char bleBuffer[BLE_BUFFER_DEPTH];
@@ -16,7 +17,7 @@ public:
     ExternalStim(PinName TX, PinName RX);
     void centreISR();
     bool serialConfigReady();
-    void pullHM10();
+    bool pullHM10();
     int getIntRC();
 };
 
