@@ -18,8 +18,10 @@ public:
     LCDManager(C12832 *c); // Constructor might not be necessary if no initialization is needed
     void toScreen(const char *line1, const char *line2, const char *line3);
     char *batteryMonitorBuffer(BatteryMonitor *Batt);
-    char *sensorVoltageBuffer(TCRT *S1, TCRT *S2);
     char *encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel);
+    char *SVB1(TCRT *S3);
+    char *SVB2(TCRT *S2, TCRT *S4);
+    char *SVB3(TCRT* S1, TCRT *S5);
 };
 
 #endif // LCD_MANAGER_H

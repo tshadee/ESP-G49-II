@@ -38,18 +38,30 @@ char *LCDManager::batteryMonitorBuffer(BatteryMonitor *Batt)
     return dspBuffer;
 };
 
-char *LCDManager::sensorVoltageBuffer(TCRT *S1, TCRT *S2)
+char *LCDManager::SVB1(TCRT *S3)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorVoltage(true), S2->getSensorVoltage(true));
+    sprintf(dspBuffer, "%.02f      ", S3->getSensorVoltage(true));
+    return dspBuffer;
+};
+
+char *LCDManager::SVB2(TCRT *S2, TCRT *S4)
+{
+    static char dspBuffer[20];
+    sprintf(dspBuffer, "%.02f      %.02f     ", S2->getSensorVoltage(true), S4->getSensorVoltage(true));
+    return dspBuffer;
+};
+
+char *LCDManager::SVB3(TCRT *S1, TCRT *S5)
+{
+    static char dspBuffer[20];
+    sprintf(dspBuffer, "%.02f      %.02f     ", S1->getSensorVoltage(true), S5->getSensorVoltage(true));
     return dspBuffer;
 };
 
 char *LCDManager::encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel)
 {
     static char dspBuffer[20];
-    // sprintf(dspBuffer, "%.02f    %.02f   ", leftWheel->getSpeed(),rightWheel->getSpeed());
-    // sprintf(dspBuffer, "%02d      %02d     ", leftWheel->getCount(),rightWheel->getCount());
     sprintf(dspBuffer, "%.03f    %.03f ", leftWheel->getDist(), rightWheel->getDist());
     return dspBuffer;
 };
