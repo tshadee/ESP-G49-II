@@ -56,24 +56,34 @@ int main(void)
 
     while (true)
     {
-        autoMode = false;
+        
         if(ExStim.pullHM10())
         {
             RCstate = ExStim.getIntRC(); //read a single character
             if(RCstate == 1){
                 ProgramState = RCstop;
+                autoMode = false;
+
             }
             else if(RCstate == 2){
                 ProgramState = RCforward;
+                autoMode = false;
+
             }
             else if(RCstate == 3){
                 ProgramState = RCbackwards;
+                autoMode = false;
+
             }
             else if(RCstate == 4){
                 ProgramState = RCturnleft;
+                autoMode = false;
+
             }
             else if(RCstate == 5){
                 ProgramState = RCturnright;
+                autoMode = false;
+
             }
             else if(RCstate == 6)
             {
@@ -82,7 +92,7 @@ int main(void)
         };
 
 
-        if(autoMode)
+        if(autoMode == true)
         {
             switch (ProgramState)
             {
@@ -92,12 +102,12 @@ int main(void)
                     {
                         outputUpdateTimer.reset();
                         Battery.pollBattery();
-                        speedReg.updateTargetPWM(0.85f, 0.85f);
+                        speedReg.updateTargetPWM(0.75f, 0.75f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                         LCD.toScreen("SS   ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
                     };
 
-                    if ((leftWheel.getDist() < 10.0) && (rightWheel.getDist() < 10.0))
+                    if ((leftWheel.getDist() < 1.0) && (rightWheel.getDist() < 1.0))
                     {
                         prevState = ProgramState;
                     }
@@ -137,7 +147,7 @@ int main(void)
                     {
                         outputUpdateTimer.reset();
                         Battery.pollBattery();
-                        speedReg.updateTargetPWM(0.5f, 0.5f); // turn left
+                        speedReg.updateTargetPWM(0.5f, 0.5f); 
                         leftWheel.resetDistance();
                         rightWheel.resetDistance();
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
@@ -173,7 +183,9 @@ int main(void)
                         rightWheel.resetDistance();
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                         LCD.toScreen("crash1 ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
+                        
                     };
+                    ProgramState = starting;
                 };
             };
         }
@@ -189,7 +201,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(1.0f,1.0f);
+                            speedReg.updateTargetPWM(0.75f,0.75f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("forward   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };
@@ -201,7 +213,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.0f,0.0f);
+                            speedReg.updateTargetPWM(0.25f,0.25f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("back   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };
@@ -213,7 +225,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.5f,0.7f);
+                            speedReg.updateTargetPWM(0.3f,0.7f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("left   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };
@@ -225,7 +237,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.7f,0.5f);
+                            speedReg.updateTargetPWM(0.7f,0.3f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("right   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };

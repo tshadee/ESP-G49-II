@@ -14,7 +14,7 @@
 
 #define BASE_DUTY 0.8f
 
-#define EASING_FACTOR 0.20           // For initial PWM ease between PID output and internal PWM output
+#define EASING_FACTOR 0.12           // For initial PWM ease between PID output and internal PWM output
 #define S_EASING_FACTOR 0.08         // For seconady correction between internal PWM (takes into account wheel speed)
 #define PWM_DIFFERENTIAL_FACTOR 0.05 // difference between the two PWM duty cycles (used for determining condition to enforce straight line logic)
 
@@ -22,7 +22,7 @@
 #define SYS_OUTPUT_RATE 50  // Hz
 
 #define WHEEL_DIAMETER 0.08     // meters
-#define GEAR_RATIO (1.0 / 18.0) // Gear ratio
+#define GEAR_RATIO (1.0 / 15.0) // Gear ratio
 #define PI 3.1415
 #define CPR 512          // Counts per revolution for the encoder
 #define TCRT_MAX_VDD 3.3 // Max voltage for TCRT sensors
