@@ -75,8 +75,31 @@ void speedRegulator::adjustPWMOutputOnSpeed()
             (currentLeftPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
             (currentRightPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
         }
-    };
+    }
 
+    else if (targetLeftPWM == 0.5f && targetRightPWM == 0.5f) // Brake
+    {
+       if (currentLeftSpeed > 0 && currentRightSpeed > 0)//forward
+       {
+            currentLeftPWM = abs(0.5-currentLeftSpeed * BRAKING_FACTOR);
+            currentRightPWM = abs(0.5-currentRightSpeed * BRAKING_FACTOR);
+       }
+       else if (currentLeftSpeed < 0 && currentRightSpeed < 0)//backward
+       {
+            currentLeftPWM = abs(0.5-currentLeftSpeed * BRAKING_FACTOR);
+            currentRightPWM = abs(0.5-currentRightSpeed * BRAKING_FACTOR);
+       }
+       else if (currentLeftSpeed < 0 && currentRightSpeed > 0)//left
+       {
+            currentLeftPWM = abs(0.5-currentLeftSpeed * BRAKING_FACTOR);
+            currentRightPWM = abs(0.5-currentRightSpeed * BRAKING_FACTOR);
+       }
+       else if (currentLeftSpeed > 0 && currentRightSpeed < 0)//left
+       {
+            currentLeftPWM = abs(0.5-currentLeftSpeed * BRAKING_FACTOR);
+            currentRightPWM = abs(0.5-currentRightSpeed * BRAKING_FACTOR);
+       }
+    };
     currentLeftPWM = (currentLeftPWM < 0.0f) ? 0.0f : ((currentLeftPWM > 1.0f) ? 1.0f : currentLeftPWM);
     currentRightPWM = (currentRightPWM < 0.0f) ? 0.0f : ((currentRightPWM > 1.0f) ? 1.0f : currentRightPWM);
 };

@@ -120,13 +120,13 @@ int main(void)
 
                 case (straightline):
                 { // THIS IS TURN LEFT STATE
-                    if ((leftWheel.getDist() > -0.15) && (rightWheel.getDist() < 0.215))
+                    if ((leftWheel.getDist() > -0.15) && (rightWheel.getDist() < 0.15))
                     {
                         if (outputUpdateTimer.read_ms() >= timedelay)
                         {
                             outputUpdateTimer.reset();
                             Battery.pollBattery();
-                            speedReg.updateTargetPWM(0.5f, 0.85f); // turn right
+                            speedReg.updateTargetPWM(0.25f, 0.75f); // turn right
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("TL   ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
                         };
@@ -201,7 +201,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.75f,0.75f);
+                            speedReg.updateTargetPWM(1.0f,1.0f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("forward   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };
@@ -213,7 +213,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.25f,0.25f);
+                            speedReg.updateTargetPWM(0.0f,0.0f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("back   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };
