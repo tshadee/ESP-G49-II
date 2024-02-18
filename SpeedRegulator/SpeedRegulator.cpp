@@ -22,86 +22,73 @@ void speedRegulator::adjustPWMOutputOnSpeed()
     rightWheelEncoder->updateValues();
     currentLeftSpeed = leftWheelEncoder->getSpeed();
     currentRightSpeed = rightWheelEncoder->getSpeed();
+    float targetDiff = abs(targetLeftPWM - targetRightPWM);
     easePWM();
 
-    if (abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR && targetLeftPWM > 0.5f && targetRightPWM > 0.5f) // GOING STRAIGHT
+    if(targetDiff <= PWM_DIFFERENTIAL_FACTOR)
     {
-        if (currentLeftSpeed > currentRightSpeed)
+        if (targetLeftPWM > 0.5f && targetRightPWM > 0.5f) // GOING STRAIGHT
         {
-            (currentRightPWM += (currentLeftSpeed - currentRightSpeed) * S_EASING_FACTOR);
-            (currentLeftPWM -= (currentLeftSpeed - currentRightSpeed) * S_EASING_FACTOR);
+            if (currentLeftSpeed > currentRightSpeed)
+            {
+                (currentRightPWM += (currentLeftSpeed - currentRightSpeed) * S_EASING_FACTOR);
+                (currentLeftPWM -= (currentLeftSpeed - currentRightSpeed) * S_EASING_FACTOR);
+            }
+            else
+            {
+                (currentLeftPWM += (currentRightSpeed - currentLeftSpeed) * S_EASING_FACTOR);
+                (currentRightPWM -= (currentRightSpeed - currentLeftSpeed) * S_EASING_FACTOR);
+            }
         }
-        else
+        else if (targetLeftPWM < 0.5f && targetRightPWM < 0.5f) // GOING BACK
         {
-            (currentLeftPWM += (currentRightSpeed - currentLeftSpeed) * S_EASING_FACTOR);
-            (currentRightPWM -= (currentRightSpeed - currentLeftSpeed) * S_EASING_FACTOR);
+            if (currentLeftSpeed < currentRightSpeed) // left faster
+            {
+                (currentRightPWM -= (currentRightSpeed - currentLeftSpeed) * S_EASING_FACTOR);
+                (currentLeftPWM += (currentRightSpeed - currentLeftSpeed) * S_EASING_FACTOR);
+            }
+            else // right faster
+            {
+                (currentLeftPWM -= (currentLeftSpeed - currentRightSpeed) * S_EASING_FACTOR);
+                (currentRightPWM += (currentLeftSpeed - currentRightSpeed) * S_EASING_FACTOR);
+            }
         }
-    }
-    else if (abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR && targetLeftPWM < 0.5f && targetRightPWM < 0.5f) // GOING BACK
-    {
-        if (currentLeftSpeed < currentRightSpeed) // left faster
+        else if (targetLeftPWM < 0.5f && targetRightPWM > 0.5f) // turning LEFT
         {
-            (currentRightPWM -= (currentRightSpeed - currentLeftSpeed) * S_EASING_FACTOR);
-            (currentLeftPWM += (currentRightSpeed - currentLeftSpeed) * S_EASING_FACTOR);
+            if (abs(currentLeftSpeed) < abs(currentRightSpeed)) // right faster
+            {
+                (currentRightPWM -= (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
+                (currentLeftPWM -= (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
+            }
+            else
+            { // left faster
+                (currentLeftPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
+                (currentRightPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
+            }
         }
-        else // right faster
+        else if (targetLeftPWM > 0.5f && targetRightPWM < 0.5f) // turning RIGHT
         {
-            (currentLeftPWM -= (currentLeftSpeed - currentRightSpeed) * S_EASING_FACTOR);
-            (currentRightPWM += (currentLeftSpeed - currentRightSpeed) * S_EASING_FACTOR);
+            if (abs(currentLeftSpeed) > abs(currentRightSpeed)) // left faster
+            {
+                (currentRightPWM -= (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
+                (currentLeftPWM -= (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
+            }
+            else
+            { // right faster
+                (currentLeftPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
+                (currentRightPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
+            }
         }
-    }
-    else if (abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR && targetLeftPWM < 0.5f && targetRightPWM > 0.5f) // turning LEFT
-    {
-        if (abs(currentLeftSpeed) < abs(currentRightSpeed)) // right faster
+        else if (targetLeftPWM == 0.5f && targetRightPWM == 0.5f) // Brake
         {
-            (currentRightPWM -= (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
-            (currentLeftPWM -= (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
-        }
-        else
-        { // left faster
-            (currentLeftPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
-            (currentRightPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
-        }
-    }
-    else if (abs(targetLeftPWM - targetRightPWM) <= PWM_DIFFERENTIAL_FACTOR && targetLeftPWM > 0.5f && targetRightPWM < 0.5f) // turning RIGHT
-    {
-        if (abs(currentLeftSpeed) > abs(currentRightSpeed)) // left faster
-        {
-            (currentRightPWM -= (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
-            (currentLeftPWM -= (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
-        }
-        else
-        { // right faster
-            (currentLeftPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
-            (currentRightPWM += (currentLeftSpeed + currentRightSpeed) * S_EASING_FACTOR);
-        }
-    }
-
-    else if (targetLeftPWM == 0.5f && targetRightPWM == 0.5f) // Brake
-    {
-       if (currentLeftSpeed > 0 && currentRightSpeed > 0)//forward
-       {
             currentLeftPWM = abs(0.5-currentLeftSpeed * BRAKING_FACTOR);
             currentRightPWM = abs(0.5-currentRightSpeed * BRAKING_FACTOR);
-       }
-       else if (currentLeftSpeed < 0 && currentRightSpeed < 0)//backward
-       {
-            currentLeftPWM = abs(0.5-currentLeftSpeed * BRAKING_FACTOR);
-            currentRightPWM = abs(0.5-currentRightSpeed * BRAKING_FACTOR);
-       }
-       else if (currentLeftSpeed < 0 && currentRightSpeed > 0)//left
-       {
-            currentLeftPWM = abs(0.5-currentLeftSpeed * BRAKING_FACTOR);
-            currentRightPWM = abs(0.5-currentRightSpeed * BRAKING_FACTOR);
-       }
-       else if (currentLeftSpeed > 0 && currentRightSpeed < 0)//left
-       {
-            currentLeftPWM = abs(0.5-currentLeftSpeed * BRAKING_FACTOR);
-            currentRightPWM = abs(0.5-currentRightSpeed * BRAKING_FACTOR);
-       }
+        };
     };
-    currentLeftPWM = (currentLeftPWM < 0.0f) ? 0.0f : ((currentLeftPWM > 1.0f) ? 1.0f : currentLeftPWM);
-    currentRightPWM = (currentRightPWM < 0.0f) ? 0.0f : ((currentRightPWM > 1.0f) ? 1.0f : currentRightPWM);
+    
+    //PWM clamping
+    currentLeftPWM = (currentLeftPWM < 0.05f) ? 0.0f : ((currentLeftPWM > 0.95f) ? 1.0f : currentLeftPWM);
+    currentRightPWM = (currentRightPWM < 0.05f) ? 0.0f : ((currentRightPWM > 0.95f) ? 1.0f : currentRightPWM);
 };
 
 void speedRegulator::easePWM()
