@@ -12,13 +12,16 @@ class TCRT
 {
 private:
     AnalogIn sensorPin;
+    DigitalOut DarlingtonPin;
     float VDD, senseNorm;
     float senseNormRolled[SENSOR_BUFFER];
     int rIndex;
     static TCRT *sensors[SENSOR_BUFFER]; // operating with one ticker, so we must have a pointer to all the TCRT objects (to be used for function callback)
     static int sensorCount;              // to keep count of the sensors
 public:
-    TCRT(PinName Pin, float v);
+    TCRT(PinName Pin, PinName DarlingPin, float v);
+    void turnSensorOn(void);
+    void turnSensorOff(void);
     void rollingPollAverage();
     // runs through all the polling once called. This is for synchronous polling between sensors since static is shared between all objects derived from TCRT
     static void pollSensors(void);
