@@ -79,32 +79,33 @@ int main(void)
 
     while (true)
     {
-        autoMode = true;
-        RCmode = false;
+        autoMode = false;
+        RCmode = true;
         lineFollowingMode = false;
         //uncomment this if you want to be switchable between BLE and auto (will use more memory)
-        // if(ExStim.pullHM10())
-        // {
-        //     RCstate = ExStim.getIntRC();
-        //     if     (RCstate == 1){ProgramState = RCstop;}
-        //     else if(RCstate == 2){ProgramState = RCforward;}
-        //     else if(RCstate == 3){ProgramState = RCbackwards;}
-        //     else if(RCstate == 4){ProgramState = RCturnleft;}
-        //     else if(RCstate == 5){ProgramState = RCturnright;}
-        //     else if(RCstate == 6)
-        //     {
-        //         autoMode = false;
-        //         lineFollowingMode = false;
-        //         RCmode = true;
-        //     }
-        //     else if(RCstate == 7)
-        //     {
-        //         autoMode = false;
-        //         lineFollowingMode = true;
-        //         RCmode = false;
-        //     };
-        // };
+        if(ExStim.pullHM10())
+        {
+            RCstate = ExStim.getIntRC();
+            if     (RCstate == 1){ProgramState = RCstop;}
+            else if(RCstate == 2){ProgramState = RCforward;}
+            else if(RCstate == 3){ProgramState = RCbackwards;}
+            else if(RCstate == 4){ProgramState = RCturnleft;}
+            else if(RCstate == 5){ProgramState = RCturnright;}
+            else if(RCstate == 6) //this turns on the TDA code
+            {
+                autoMode = true;
+                lineFollowingMode = false;
+                RCmode = false;
+            }
+            else if(RCstate == 7) //this turns on the TDB code
+            {
+                autoMode = false;
+                lineFollowingMode = true;
+                RCmode = false;
+            };
+        };
 
+        //TDA MODE
         if(autoMode == true && lineFollowingMode == false && RCmode == false)
 
         {
@@ -118,7 +119,7 @@ int main(void)
                         Battery.pollBattery();
                         speedReg.updateTargetPWM(0.75f, 0.75f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen(LCD.SVB1(&S3),LCD.SVB2(&S2, &S4), LCD.SVB3(&S1, &S5));
+                        LCD.toScreen("SS   ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
                         if ((leftWheel.getDist() < 1.0) && (rightWheel.getDist() < 1.0))
                         {
                             prevState = ProgramState;
@@ -203,7 +204,7 @@ int main(void)
             };
         }
 
-    
+        //RC MODE
         else if (autoMode == false && lineFollowingMode == false && RCmode == true)   
 
         {
@@ -282,12 +283,13 @@ int main(void)
             };
         }
 
+        //TDB MODE
         else if (autoMode == false && lineFollowingMode == true && RCmode == false)
 
         {
-
         }
 
+        //YOU HAVE DONE GOOFED
         else 
 
         {
