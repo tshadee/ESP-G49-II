@@ -40,7 +40,8 @@ typedef enum
     RCbackwards,
     RCturnleft,
     RCturnright,
-    RCstop
+    RCstop,
+    RCturbo
 } pstate;
 extern pstate ProgramState;
 
