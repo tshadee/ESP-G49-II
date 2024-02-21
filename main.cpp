@@ -90,6 +90,7 @@ int main(void)
             else if(RCstate == 3){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCbackwards;}
             else if(RCstate == 4){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCturnleft;}
             else if(RCstate == 5){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCturnright;}
+            else if(RCstate == 8){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCturbo;}
             else if(RCstate == 6) //this turns on the TDA code
             {
                 autoMode = true;
@@ -269,6 +270,17 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
+                            speedReg.updateTargetPWM(0.75f,0.75f);
+                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                            LCD.toScreen("forward   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                    };
+                    break;
+                };
+                case(RCturbo):
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay)
+                    {
+                        outputUpdateTimer.reset();
                             speedReg.updateTargetPWM(1.0f,1.0f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("forward   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
@@ -281,7 +293,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.0f,0.0f);
+                            speedReg.updateTargetPWM(0.25f,0.25f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("back   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };
