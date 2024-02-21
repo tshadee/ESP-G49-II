@@ -47,17 +47,13 @@ int main(void)
     PIDSys PID(&S1, &S2, &S4, &S5);                   // from sensor array above
 
 
-    // S1.turnSensorOn();
-    // S2.turnSensorOn();
-    // S3.turnSensorOn();
-    // S4.turnSensorOn();
-    // S5.turnSensorOn();
+    
 
-    // S1.turnSensorOff();
-    // S2.turnSensorOff();
-    // S3.turnSensorOff();
-    // S4.turnSensorOff();
-    // S5.turnSensorOff();
+    S1.turnSensorOff();
+    S2.turnSensorOff();
+    S3.turnSensorOff();
+    S4.turnSensorOff();
+    S5.turnSensorOff();
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0 / SENSOR_POLL_FREQ;
@@ -110,7 +106,13 @@ int main(void)
         //TDA MODE
         if(autoMode)
 
-        {
+        {   
+            S1.turnSensorOff();
+            S2.turnSensorOff();
+            S3.turnSensorOff();
+            S4.turnSensorOff();
+            S5.turnSensorOff();
+
             switch (ProgramState)
             {
                 case (starting):
@@ -263,6 +265,12 @@ int main(void)
         else if (RCmode)   
 
         {
+            S1.turnSensorOff();
+            S2.turnSensorOff();
+            S3.turnSensorOff();
+            S4.turnSensorOff();
+            S5.turnSensorOff();
+            
             switch(ProgramState)
             {
                 case(RCforward):
@@ -353,7 +361,14 @@ int main(void)
         else if (lineFollowingMode)
 
         {
-            LCD.toScreen("LFM    ","                  ", "                  ");
+            S1.turnSensorOn();
+            S2.turnSensorOn();
+            S3.turnSensorOn();
+            S4.turnSensorOn();
+            S5.turnSensorOn();
+            LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S2, &S4), LCD.SVB3(&S1, &S5));
+
+            //LCD.toScreen("LFM    ","                  ", "                  ");
         }
 
         //YOU HAVE DONE GOOFED
