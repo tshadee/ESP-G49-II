@@ -14,10 +14,10 @@
 
 #define BASE_DUTY 0.8f
 
-#define EASING_FACTOR 0.12           // For initial PWM ease between PID output and internal PWM output
+#define EASING_FACTOR 0.14           // For initial PWM ease between PID output and internal PWM output
 #define S_EASING_FACTOR 0.08         // For seconady correction between internal PWM (takes into account wheel speed)
 #define PWM_DIFFERENTIAL_FACTOR 0.05 // difference between the two PWM duty cycles (used for determining condition to enforce straight line logic)
-#define BRAKING_FACTOR 0.02
+#define BRAKING_FACTOR 0.025
 
 #define PWM_FREQUENCY 20000 // Hz
 #define SYS_OUTPUT_RATE 50  // Hz
@@ -32,7 +32,8 @@
 typedef enum
 {
     starting,
-    straightline,
+    turnleft,
+    turnright,
     stop,
     turnaround,
     RCforward,

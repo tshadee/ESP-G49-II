@@ -41,9 +41,9 @@ void ExternalStim::centreISR()
     switch (ProgramState)
     {
     case starting:
-        ProgramState = straightline;
+        ProgramState = turnleft;
         break;
-    case straightline:
+    case turnleft:
         ProgramState = stop;
         break;
     case stop:

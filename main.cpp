@@ -72,6 +72,7 @@ int main(void)
     ExStim.serialConfigReady();
 
     volatile int count50 = 0;
+    volatile int countTurn = 0;
     pstate prevState;
     bool autoMode = false;
     bool lineFollowingMode = false;
@@ -79,34 +80,34 @@ int main(void)
 
     while (true)
     {
-        autoMode = false;
-        RCmode = true;
-        lineFollowingMode = false;
         //uncomment this if you want to be switchable between BLE and auto (will use more memory)
         if(ExStim.pullHM10())
         {
+            RCmode = true;
             RCstate = ExStim.getIntRC();
-            if     (RCstate == 1){ProgramState = RCstop;}
-            else if(RCstate == 2){ProgramState = RCforward;}
-            else if(RCstate == 3){ProgramState = RCbackwards;}
-            else if(RCstate == 4){ProgramState = RCturnleft;}
-            else if(RCstate == 5){ProgramState = RCturnright;}
+            if     (RCstate == 1){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCstop;}
+            else if(RCstate == 2){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCforward;}
+            else if(RCstate == 3){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCbackwards;}
+            else if(RCstate == 4){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCturnleft;}
+            else if(RCstate == 5){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCturnright;}
             else if(RCstate == 6) //this turns on the TDA code
             {
                 autoMode = true;
-                lineFollowingMode = false;
                 RCmode = false;
+                lineFollowingMode = false;
             }
             else if(RCstate == 7) //this turns on the TDB code
             {
                 autoMode = false;
-                lineFollowingMode = true;
                 RCmode = false;
+                lineFollowingMode = true;
             };
         };
 
+        // autoMode = true;
+
         //TDA MODE
-        if(autoMode == true && lineFollowingMode == false && RCmode == false)
+        if(autoMode)
 
         {
             switch (ProgramState)
@@ -117,10 +118,11 @@ int main(void)
                     {
                         outputUpdateTimer.reset();
                         Battery.pollBattery();
-                        speedReg.updateTargetPWM(0.75f, 0.75f);
+                        speedReg.updateTargetPWM(0.8f, 0.8f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                         LCD.toScreen("SS   ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
-                        if ((leftWheel.getDist() < 1.0) && (rightWheel.getDist() < 1.0))
+                        // LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S2, &S4), LCD.SVB3(&S1, &S5));
+                        if ((leftWheel.getDist() < 0.87) && (rightWheel.getDist() < 0.87))
                         {
                             prevState = ProgramState;
                         }
@@ -132,15 +134,15 @@ int main(void)
                     break;
                 };
 
-                case (straightline):
+                case (turnleft):
                 { // THIS IS TURN LEFT STATE
-                    if ((leftWheel.getDist() > -0.15) && (rightWheel.getDist() < 0.15))
+                    if ((leftWheel.getDist() > -0.137) && (rightWheel.getDist() < 0.137))
                     {
                         if (outputUpdateTimer.read_ms() >= timedelay)
                         {
                             outputUpdateTimer.reset();
                             Battery.pollBattery();
-                            speedReg.updateTargetPWM(0.25f, 0.75f); // turn right
+                            speedReg.updateTargetPWM(0.25f, 0.75f); // turn 
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("TL   ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
                         };
@@ -149,6 +151,29 @@ int main(void)
                     {
                         prevState = ProgramState;
                         ProgramState = stop;
+                        countTurn++;
+                    };
+                    break;
+                };
+
+                case (turnright):
+                { // THIS IS TURN RIGHT STATE
+                    if ((leftWheel.getDist() < 0.137) && (rightWheel.getDist() > -0.137))
+                    {
+                        if (outputUpdateTimer.read_ms() >= timedelay)
+                        {
+                            outputUpdateTimer.reset();
+                            Battery.pollBattery();
+                            speedReg.updateTargetPWM(0.8f, 0.2f); // turn 
+                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                            LCD.toScreen("TR   ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
+                        };
+                    }
+                    else
+                    {
+                        prevState = ProgramState;
+                        ProgramState = stop;
+                        countTurn++;
                     };
                     break;
                 };
@@ -166,16 +191,45 @@ int main(void)
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                         LCD.toScreen("STOP ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
 
-                        if (count50 >= 100)
+                        if (count50 >= 10)
                         {
                             count50 = 0;
                             if (prevState == starting)
                             {
-                                ProgramState = straightline;
+                                if(countTurn <=3)
+                                {
+                                    ProgramState = turnleft;
+                                } else if (countTurn > 3 && countTurn < 5)
+                                {
+                                    ProgramState = turnleft;
+                                } else 
+                                {
+                                    ProgramState = turnright;
+                                };
+                            }
+                            else if (prevState == turnleft)
+                            {
+                                if (countTurn <= 3)
+                                {
+                                    ProgramState = starting;
+                                } 
+                                else if (countTurn > 3 && countTurn < 5)
+                                {
+                                    ProgramState = turnleft;
+                                } else {
+                                    ProgramState = starting;
+                                }
                             }
                             else
                             {
-                                ProgramState = starting;
+                                if(countTurn > 8)
+                                {
+                                    ProgramState = stop;
+                                } 
+                                else
+                                {
+                                    ProgramState = starting;
+                                };
                             };
                         }
                         else
@@ -195,7 +249,7 @@ int main(void)
                         leftWheel.resetDistance();
                         rightWheel.resetDistance();
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen("crash1 ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
+                        LCD.toScreen("Auto crash ", "                  ", "                  ");
                         
                     };
                     ProgramState = starting;
@@ -205,7 +259,7 @@ int main(void)
         }
 
         //RC MODE
-        else if (autoMode == false && lineFollowingMode == false && RCmode == true)   
+        else if (RCmode)   
 
         {
             switch(ProgramState)
@@ -239,7 +293,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.3f,0.7f);
+                            speedReg.updateTargetPWM(0.2f,0.8f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("left   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };
@@ -251,7 +305,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.7f,0.3f);
+                            speedReg.updateTargetPWM(0.8f,0.2f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("right   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
                     };
@@ -277,16 +331,17 @@ int main(void)
                         outputUpdateTimer.reset();
                         speedReg.updateTargetPWM(0.5f,0.5f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen("crash2   ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                        LCD.toScreen("BLE crash   ","                  ","                  ");    
                     };
                 };
             };
         }
 
         //TDB MODE
-        else if (autoMode == false && lineFollowingMode == true && RCmode == false)
+        else if (lineFollowingMode)
 
         {
+            LCD.toScreen("LFM    ","                  ", "                  ");
         }
 
         //YOU HAVE DONE GOOFED
