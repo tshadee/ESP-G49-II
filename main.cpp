@@ -102,7 +102,6 @@ int main(void)
                 RCmode = false;
                 lineFollowingMode = true;
             };
-        };
 
         // autoMode = true;
 
@@ -350,5 +349,6 @@ int main(void)
         {
             LCD.toScreen("E404              ", "                  ", "                  ");
         };
+    };
     };
 };
