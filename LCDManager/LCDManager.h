@@ -20,8 +20,7 @@ public:
     char *batteryMonitorBuffer(BatteryMonitor *Batt);
     char *encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel);
     char *SVB1(TCRT *S3);
-    char *SVB2(TCRT *S2, TCRT *S4);
-    char *SVB3(TCRT* S1, TCRT *S5);
+    char *SVB2(TCRT *S1, TCRT *S2, TCRT *S4, TCRT *S5);
 };
 
 #endif // LCD_MANAGER_H

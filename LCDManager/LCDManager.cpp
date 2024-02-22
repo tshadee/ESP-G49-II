@@ -41,21 +41,14 @@ char *LCDManager::batteryMonitorBuffer(BatteryMonitor *Batt)
 char *LCDManager::SVB1(TCRT *S3)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f    ", S3->getSensorVoltage(false));
+    sprintf(dspBuffer, "%.02f    ", S3->getSensorVoltage(true));
     return dspBuffer;
 };
 
-char *LCDManager::SVB2(TCRT *S2, TCRT *S4)
+char *LCDManager::SVB2(TCRT *S1, TCRT *S2, TCRT *S4, TCRT *S5)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f      %.02f    ", S2->getSensorVoltage(false), S4->getSensorVoltage(false));
-    return dspBuffer;
-};
-
-char *LCDManager::SVB3(TCRT *S1, TCRT *S5)
-{
-    static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f      %.02f    ", S1->getSensorVoltage(false), S5->getSensorVoltage(false));
+    sprintf(dspBuffer, "%.02f %.02f %.02f %.02f", S1->getSensorVoltage(true), S2->getSensorVoltage(true), S4->getSensorVoltage(true), S5->getSensorVoltage(true));
     return dspBuffer;
 };
 

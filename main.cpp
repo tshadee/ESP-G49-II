@@ -80,12 +80,12 @@ int main(void)
         if(ExStim.pullHM10())
         {
             RCstate = ExStim.getIntRC();
-            if     (RCstate == 1){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCstop;}
-            else if(RCstate == 2){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCforward;}
-            else if(RCstate == 3){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCbackwards;}
-            else if(RCstate == 4){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCturnleft;}
-            else if(RCstate == 5){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCturnright;}
-            else if(RCstate == 8){RCmode = true;autoMode = false;lineFollowingMode = false;ProgramState = RCturbo;}
+            if     (RCstate == 1){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCstop;}
+            else if(RCstate == 2){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCforward;}
+            else if(RCstate == 3){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCbackwards;}
+            else if(RCstate == 4){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCturnleft;}
+            else if(RCstate == 5){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCturnright;}
+            else if(RCstate == 8){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCturbo;}
             else if(RCstate == 6) //this turns on the TDA code
             {
                 autoMode = true;
@@ -94,6 +94,7 @@ int main(void)
             }
             else if(RCstate == 7) //this turns on the TDB code
             {
+                countTurn = 0;
                 autoMode = false;
                 RCmode = false;
                 lineFollowingMode = true;
@@ -337,7 +338,7 @@ int main(void)
                         outputUpdateTimer.reset();
                         speedReg.updateTargetPWM(0.5f,0.5f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen("stop              ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                        LCD.toScreen("stop              ",LCD.encoderOutputTest(&leftWheel, &rightWheel),LCD.batteryMonitorBuffer(&Battery));    
                     };
                     break;
                 };
@@ -349,7 +350,7 @@ int main(void)
                         outputUpdateTimer.reset();
                         speedReg.updateTargetPWM(0.5f,0.5f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen("BLE crash         ","                  ","                  ");    
+                        LCD.toScreen("BLE crash         ","                  ",LCD.batteryMonitorBuffer(&Battery));    
                     };
                 };
             };
@@ -368,7 +369,7 @@ int main(void)
                 S4.turnSensorOn();
                 S5.turnSensorOn();
 
-                LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S2, &S4), LCD.SVB3(&S1, &S5));
+                LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S1,&S2,&S4,&S5),LCD.batteryMonitorBuffer(&Battery));
             };
 
 
@@ -379,7 +380,7 @@ int main(void)
         else 
 
         {
-            LCD.toScreen("E404              ", "                  ", "                  ");
+            LCD.toScreen("E404              ", "                  ", LCD.batteryMonitorBuffer(&Battery));
         };
     };
 };
