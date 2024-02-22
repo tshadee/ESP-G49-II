@@ -15,7 +15,6 @@ public:
     BatteryMonitor(DigitalInOut *OWP);
     void pollBattery(void);
     float getBatteryVoltage(void);
-    float getChargeLeft(void);
 };
 
 #endif
