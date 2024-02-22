@@ -26,7 +26,7 @@
 #define GEAR_RATIO (1.0 / 15.0) // Gear ratio
 #define PI 3.1415
 #define CPR 512          // Counts per revolution for the encoder
-#define TCRT_MAX_VDD 3.3 // Max voltage for TCRT sensors
+#define TCRT_MAX_VDD 5.0 // Max voltage for TCRT sensors
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
 
 typedef enum

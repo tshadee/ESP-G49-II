@@ -17,7 +17,7 @@ TCRT::TCRT(PinName Pin, PinName DarlingPin, float v) : sensorPin(Pin), Darlingto
 
 void TCRT::rollingPollAverage()
 {
-    senseNormRolled[rIndex % SENSOR_BUFFER] = ampNorm();
+    senseNormRolled[rIndex % SENSOR_BUFFER] = sensorPin.read();
     rIndex++;
     senseNorm = 0;
     for (int i = 0; i < SENSOR_BUFFER; i++)
@@ -36,14 +36,9 @@ void TCRT::pollSensors(void)
     };
 };
 
-float TCRT::ampNorm(void)
-{
-    return (sensorPin.read());
-};
-
 float TCRT::getSensorVoltage(bool Volt)
 {
-    return (Volt ? senseNorm * VDD : senseNorm);
+    return (Volt ? senseNorm * VDD : sensorPin.read());
 };
 
 void TCRT::turnSensorOn(void)

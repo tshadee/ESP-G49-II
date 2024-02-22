@@ -25,7 +25,6 @@ public:
     void rollingPollAverage();
     // runs through all the polling once called. This is for synchronous polling between sensors since static is shared between all objects derived from TCRT
     static void pollSensors(void);
-    float ampNorm(void);
     float getSensorVoltage(bool Volt = false);
 };
 
