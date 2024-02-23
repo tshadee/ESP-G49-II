@@ -65,22 +65,22 @@ void speedRegulator::adjustPWMOutputOnSpeed()
         {
             if (abs(currentLeftSpeed) < abs(currentRightSpeed)) // right faster
             {
-                (currentRightPWM += BRAKING_FACTOR * absSpeedDiff); 
+                (currentRightPWM += S_EASING_FACTOR * absSpeedDiff); 
             }
             else // left faster
             { 
-                (currentLeftPWM += BRAKING_FACTOR * absSpeedDiff);
+                (currentLeftPWM += S_EASING_FACTOR * absSpeedDiff);
             }
         }
         else if (targetDiff > 0) // turning RIGHT
         {
             if (abs(currentLeftSpeed) > abs(currentRightSpeed)) // left (forward) faster
             {
-                (currentLeftPWM -= BRAKING_FACTOR * absSpeedDiff);
+                (currentLeftPWM -= S_EASING_FACTOR * absSpeedDiff);
             }
             else // right (reverse) faster
             { 
-                (currentRightPWM -= BRAKING_FACTOR * absSpeedDiff); 
+                (currentRightPWM -= S_EASING_FACTOR * absSpeedDiff); 
             }
         }
     };

@@ -160,13 +160,13 @@ int main(void)
 
                 case (turnright):
                 { // THIS IS TURN RIGHT STATE
-                    if ((leftWheel.getDist() < 0.137) && (rightWheel.getDist() > -0.137))
+                    if ((leftWheel.getDist() < 0.145) && (rightWheel.getDist() > -0.145))
                     {
                         if (outputUpdateTimer.read_ms() >= timedelay)
                         {
                             outputUpdateTimer.reset();
                             Battery.pollBattery();
-                            speedReg.updateTargetPWM(0.8f, 0.2f); // turn 
+                            speedReg.updateTargetPWM(0.75f, 0.25f); // turn 
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("TR                ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
                         };
@@ -224,7 +224,7 @@ int main(void)
                             }
                             else
                             {
-                                if(countTurn > 8)
+                                if(countTurn >= 8)
                                 {
                                     ProgramState = stop;
                                 } 
@@ -368,6 +368,13 @@ int main(void)
                 S3.turnSensorOn();
                 S4.turnSensorOn();
                 S5.turnSensorOn();
+                if(S3.getSensorVoltage(true) > 4.0f)
+                {
+                    PID.calculatePID(false);
+                    speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                }
+
 
                 LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S1,&S2,&S4,&S5),LCD.batteryMonitorBuffer(&Battery));
             };
