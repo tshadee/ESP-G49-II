@@ -346,7 +346,7 @@ int main(void)
                 default:
                 {
                     if(outputUpdateTimer.read_ms() >= timedelay)
-                    {
+                    { 
                         outputUpdateTimer.reset();
                         speedReg.updateTargetPWM(0.5f,0.5f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
