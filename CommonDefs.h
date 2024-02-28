@@ -17,7 +17,7 @@
 #define EASING_FACTOR 0.14           // For initial PWM ease between PID output and internal PWM output
 #define S_EASING_FACTOR 0.05         // For secondary correction between internal PWM (takes into account wheel speed)
 #define PWM_DIFFERENTIAL_FACTOR 0.05 // difference between the two PWM duty cycles (used for determining condition to enforce straight line logic)
-#define BRAKING_FACTOR 0.025
+#define BRAKING_FACTOR 0.028
 
 #define PWM_FREQUENCY 20000 // Hz
 #define SYS_OUTPUT_RATE 50  // Hz
