@@ -376,7 +376,7 @@ int main(void)
                 }
 
 
-                LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S1,&S2,&S4,&S5),LCD.batteryMonitorBuffer(&Battery));
+                LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S1,&S2,&S4,&S5),LCD.PIDoutput(PID.getLeftPWM(), PID.getRightPWM())); //changed battery to display PID output. If doesn't work messsage me -p
             };
 
 

@@ -58,3 +58,10 @@ char *LCDManager::encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel)
     sprintf(dspBuffer, "%.03f    %.03f ", leftWheel->getDist(), rightWheel->getDist());
     return dspBuffer;
 };
+
+char *LCDManager::PIDoutput(float PWMleft, float PWMright)
+{
+    static char dspBuffer[20];
+    sprintf(dspBuffer, "%.02f    %.02f ", PWMleft, PWMright);
+    return dspBuffer;
+};

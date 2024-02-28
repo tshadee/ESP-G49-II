@@ -21,6 +21,7 @@ public:
     char *encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel);
     char *SVB1(TCRT *S3);
     char *SVB2(TCRT *S1, TCRT *S2, TCRT *S4, TCRT *S5);
+    char *PIDoutput(float PWMLeft, float PWMRight);
 };
 
 #endif // LCD_MANAGER_H
