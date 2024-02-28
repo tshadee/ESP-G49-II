@@ -120,11 +120,11 @@ int main(void)
                     {
                         outputUpdateTimer.reset();
                         Battery.pollBattery();
-                        speedReg.updateTargetPWM(0.65f, 0.65f);
+                        speedReg.updateTargetPWM(0.7f, 0.7f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                         LCD.toScreen("SS                 ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
                         // LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S2, &S4), LCD.SVB3(&S1, &S5));
-                        if ((leftWheel.getDist() < 0.88) && (rightWheel.getDist() < 0.88))
+                        if ((leftWheel.getDist() < 0.9) && (rightWheel.getDist() < 0.9))
                         {
                             prevState = ProgramState;
                         }
@@ -138,13 +138,13 @@ int main(void)
 
                 case (turnleft):
                 { // THIS IS TURN LEFT STATE
-                    if ((leftWheel.getDist() > -0.122) && (rightWheel.getDist() < 0.122))
+                    if ((leftWheel.getDist() > -0.112) && (rightWheel.getDist() < 0.112))
                     {
                         if (outputUpdateTimer.read_ms() >= timedelay)
                         {
                             outputUpdateTimer.reset();
                             Battery.pollBattery();
-                            speedReg.updateTargetPWM(0.32f, 0.68f); // turn 
+                            speedReg.updateTargetPWM(0.3f, 0.7f); // turn 
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("TL                ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
                         };
@@ -160,13 +160,13 @@ int main(void)
 
                 case (turnright):
                 { // THIS IS TURN RIGHT STATE
-                    if ((leftWheel.getDist() < 0.12) && (rightWheel.getDist() > -0.12))
+                    if ((leftWheel.getDist() < 0.108) && (rightWheel.getDist() > -0.108))
                     {
                         if (outputUpdateTimer.read_ms() >= timedelay)
                         {
                             outputUpdateTimer.reset();
                             Battery.pollBattery();
-                            speedReg.updateTargetPWM(0.68f, 0.32f); // turn 
+                            speedReg.updateTargetPWM(0.7f, 0.3f); // turn 
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                             LCD.toScreen("TR                ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
                         };

@@ -17,7 +17,7 @@
 #define EASING_FACTOR 0.14           // For initial PWM ease between PID output and internal PWM output
 #define S_EASING_FACTOR 0.05         // For secondary correction between internal PWM (takes into account wheel speed)
 #define PWM_DIFFERENTIAL_FACTOR 0.05 // difference between the two PWM duty cycles (used for determining condition to enforce straight line logic)
-#define BRAKING_FACTOR 0.028
+#define BRAKING_FACTOR 0.035
 
 #define PWM_FREQUENCY 20000 // Hz
 #define SYS_OUTPUT_RATE 50  // Hz
@@ -28,6 +28,11 @@
 #define CPR 512          // Counts per revolution for the encoder
 #define TCRT_MAX_VDD 5.0 // Max voltage for TCRT sensors
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
+
+#define Kp 0.01
+#define Ki 0.001
+#define Kd 0.01
+
 
 typedef enum
 {
