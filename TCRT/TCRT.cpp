@@ -5,10 +5,7 @@ int TCRT::sensorCount = 0;                   // static member declaration (must 
 
 TCRT::TCRT(PinName Pin, PinName DarlingPin, float v) : sensorPin(Pin), DarlingtonPin(DarlingPin), VDD(v), rIndex(0), senseNorm(0)
 {
-    for (int i = 0; i < SENSOR_BUFFER; i++)
-    {
-        senseNormRolled[i] = 0;
-    };
+    senseNormRolled[0] = senseNormRolled[1] = senseNormRolled[2] = senseNormRolled[3] = senseNormRolled[4] = 0; 
     if (sensorCount < SENSOR_AMOUNT)
     {
         sensors[sensorCount++] = this;
@@ -19,11 +16,7 @@ void TCRT::rollingPollAverage()
 {
     senseNormRolled[rIndex % SENSOR_BUFFER] = sensorPin.read();
     rIndex++;
-    senseNorm = 0;
-    for (int i = 0; i < SENSOR_BUFFER; i++)
-    {
-        senseNorm += senseNormRolled[i];
-    };
+    senseNorm = senseNormRolled[0] + senseNormRolled[1] + senseNormRolled[2] + senseNormRolled[3] + senseNormRolled[4];
     senseNorm /= SENSOR_BUFFER;
 };
 

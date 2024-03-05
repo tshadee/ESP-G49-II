@@ -15,7 +15,6 @@ private:
 
 public:
     ExternalStim(PinName TX, PinName RX);
-    void centreISR();
     bool serialConfigReady();
     bool pullHM10();
     int getIntRC();

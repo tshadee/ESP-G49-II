@@ -25,9 +25,6 @@ void speedRegulator::adjustPWMOutputOnSpeed()
     float targetDiff = targetLeftPWM - targetRightPWM;
     float speedDiff = currentLeftSpeed - currentRightSpeed;
     float absSpeedDiff = abs(currentLeftSpeed) - abs(currentRightSpeed);
-    float speedSum = currentLeftSpeed + currentRightSpeed;
-    float pwmRatio = (targetLeftPWM-0.5) / (targetRightPWM-0.5);
-    float speedRatio = currentLeftSpeed / currentRightSpeed;
 
     easePWM();
 
@@ -81,8 +78,8 @@ void speedRegulator::adjustPWMOutputOnSpeed()
             else // right (reverse) faster
             { 
                 (currentRightPWM -= S_EASING_FACTOR * absSpeedDiff); 
-            }
-        }
+            };
+        };
     };
     
     //PWM clamping

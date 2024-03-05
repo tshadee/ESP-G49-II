@@ -34,25 +34,3 @@ int ExternalStim::getIntRC()
 {
     return intRC;
 };
-
-void ExternalStim::centreISR()
-{
-    extern pstate ProgramState; // accessing global variable
-    switch (ProgramState)
-    {
-    case starting:
-        ProgramState = turnleft;
-        break;
-    case turnleft:
-        ProgramState = stop;
-        break;
-    case stop:
-        ProgramState = turnaround;
-        break;
-    case turnaround:
-        ProgramState = starting;
-        break;
-    default:
-        break;
-    };
-};

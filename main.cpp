@@ -13,7 +13,7 @@
 #include "ExternalStimulus.h"
 #include "LCDManager.h"
 
-pstate ProgramState = starting;
+pstate ProgramState = init;
 
 /*
 
@@ -46,9 +46,6 @@ int main(void)
     BatteryMonitor Battery(&one_wire_pin);            // from above
     PIDSys PID(&S1, &S2, &S4, &S5);                   // from sensor array above
 
-
-    
-
     S1.turnSensorOff();
     S2.turnSensorOff();
     S3.turnSensorOff();
@@ -70,9 +67,9 @@ int main(void)
     volatile int count50 = 0;
     volatile int countTurn = 0;
     pstate prevState;
-    bool autoMode = false;
     bool lineFollowingMode = false;
     bool RCmode = false;
+    bool enterLineFollowing = false;
 
     while (true)
     {
@@ -80,188 +77,21 @@ int main(void)
         if(ExStim.pullHM10())
         {
             RCstate = ExStim.getIntRC();
-            if     (RCstate == 1){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCstop;}
-            else if(RCstate == 2){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCforward;}
-            else if(RCstate == 3){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCbackwards;}
-            else if(RCstate == 4){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCturnleft;}
-            else if(RCstate == 5){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCturnright;}
-            else if(RCstate == 8){RCmode = true;autoMode = false;lineFollowingMode = false;countTurn = 0;ProgramState = RCturbo;}
+            if     (RCstate == 1){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCstop;}
+            else if(RCstate == 2){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCforward;}
+            else if(RCstate == 3){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCbackwards;}
+            else if(RCstate == 4){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCturnleft;}
+            else if(RCstate == 5){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCturnright;}
+            else if(RCstate == 8){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCturbo;}
             else if(RCstate == 6) //this turns on the TDA code
             {
-                autoMode = true;
-                RCmode = false;
-                lineFollowingMode = false;
-            }
-            else if(RCstate == 7) //this turns on the TDB code
-            {
-                countTurn = 0;
-                autoMode = false;
                 RCmode = false;
                 lineFollowingMode = true;
             };
         };
-        // autoMode = true;
-
-        //TDA MODE
-        if(autoMode)
-
-        {   
-            S1.turnSensorOff();
-            S2.turnSensorOff();
-            S3.turnSensorOff();
-            S4.turnSensorOff();
-            S5.turnSensorOff();
-
-            switch (ProgramState)
-            {
-                case (starting):
-                { // THIS IS THE STRAIGHT LINE STATE
-                    if (outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        Battery.pollBattery();
-                        speedReg.updateTargetPWM(0.7f, 0.7f);
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen("SS                 ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
-                        // LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S2, &S4), LCD.SVB3(&S1, &S5));
-                        if ((leftWheel.getDist() < 0.9) && (rightWheel.getDist() < 0.9))
-                        {
-                            prevState = ProgramState;
-                        }
-                        else
-                        {
-                            ProgramState = stop;
-                        };
-                    };
-                    break;
-                };
-
-                case (turnleft):
-                { // THIS IS TURN LEFT STATE
-                    if ((leftWheel.getDist() > -0.112) && (rightWheel.getDist() < 0.112))
-                    {
-                        if (outputUpdateTimer.read_ms() >= timedelay)
-                        {
-                            outputUpdateTimer.reset();
-                            Battery.pollBattery();
-                            speedReg.updateTargetPWM(0.3f, 0.7f); // turn 
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                            LCD.toScreen("TL                ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
-                        };
-                    }
-                    else
-                    {
-                        prevState = ProgramState;
-                        ProgramState = stop;
-                        countTurn++;
-                    };
-                    break;
-                };
-
-                case (turnright):
-                { // THIS IS TURN RIGHT STATE
-                    if ((leftWheel.getDist() < 0.108) && (rightWheel.getDist() > -0.108))
-                    {
-                        if (outputUpdateTimer.read_ms() >= timedelay)
-                        {
-                            outputUpdateTimer.reset();
-                            Battery.pollBattery();
-                            speedReg.updateTargetPWM(0.7f, 0.3f); // turn 
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                            LCD.toScreen("TR                ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
-                        };
-                    }
-                    else
-                    {
-                        prevState = ProgramState;
-                        ProgramState = stop;
-                        countTurn++;
-                    };
-                    break;
-                };
-
-                case (stop):
-                { // THIS STOPS THE BUGGY (HOPEFULLY)
-
-                    if (outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        Battery.pollBattery();
-                        speedReg.updateTargetPWM(0.5f, 0.5f); 
-                        leftWheel.resetDistance();
-                        rightWheel.resetDistance();
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen("STOP              ", LCD.encoderOutputTest(&leftWheel, &rightWheel), LCD.batteryMonitorBuffer(&Battery));
-
-                        if (count50 >= 10)
-                        {
-                            count50 = 0;
-                            if (prevState == starting)
-                            {
-                                if(countTurn <=3)
-                                {
-                                    ProgramState = turnleft;
-                                } else if (countTurn > 3 && countTurn < 5)
-                                {
-                                    ProgramState = turnleft;
-                                } else 
-                                {
-                                    ProgramState = turnright;
-                                };
-                            }
-                            else if (prevState == turnleft)
-                            {
-                                if (countTurn <= 3)
-                                {
-                                    ProgramState = starting;
-                                } 
-                                else if (countTurn > 3 && countTurn < 5)
-                                {
-                                    ProgramState = turnleft;
-                                } else {
-                                    ProgramState = starting;
-                                }
-                            }
-                            else
-                            {
-                                if(countTurn > 8)
-                                {
-                                    ProgramState = stop;
-                                } 
-                                else
-                                {
-                                    ProgramState = starting;
-                                };
-                            };
-                        }
-                        else
-                        {
-                            count50++;
-                        };
-                    };
-                    break;
-                };
-
-                default:
-                {
-                    if (outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        speedReg.updateTargetPWM(0.5f, 0.5f);
-                        leftWheel.resetDistance();
-                        rightWheel.resetDistance();
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen("Auto crash        ", "                  ", "                  ");
-                        
-                    };
-                    ProgramState = starting;
-                    break;
-                };
-            };
-        }
 
         //RC MODE
-        else if (RCmode)   
+        if (RCmode)   
 
         {
             S1.turnSensorOff();
@@ -277,9 +107,8 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.75f,0.75f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                            LCD.toScreen("forward           ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                        speedReg.updateTargetPWM(0.75f,0.75f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     };
                     break;
                 };
@@ -288,9 +117,8 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(1.0f,1.0f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                            LCD.toScreen("forward           ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                        speedReg.updateTargetPWM(1.0f,1.0f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     };
                     break;
                 };
@@ -300,9 +128,8 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.25f,0.25f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                            LCD.toScreen("back              ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                        speedReg.updateTargetPWM(0.25f,0.25f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     };
                     break;
                 };
@@ -312,9 +139,8 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.2f,0.8f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                            LCD.toScreen("left               ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                        speedReg.updateTargetPWM(0.2f,0.8f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     };
                     break;
                 };
@@ -324,9 +150,8 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                            speedReg.updateTargetPWM(0.8f,0.2f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                            LCD.toScreen("right             ",LCD.encoderOutputTest(&leftWheel, &rightWheel),"");    
+                        speedReg.updateTargetPWM(0.8f,0.2f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     };
                     break;
                 };
@@ -337,8 +162,8 @@ int main(void)
                     {
                         outputUpdateTimer.reset();
                         speedReg.updateTargetPWM(0.5f,0.5f);
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                        LCD.toScreen("stop              ",LCD.encoderOutputTest(&leftWheel, &rightWheel),LCD.batteryMonitorBuffer(&Battery));    
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                        LCD.toScreen("Stop         ","                  ",LCD.batteryMonitorBuffer(&Battery));   
                     };
                     break;
                 };
@@ -374,13 +199,8 @@ int main(void)
                     speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                 }
-
-
-                LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S1,&S2,&S4,&S5),LCD.PIDoutput(PID.getLeftPWM(), PID.getRightPWM())); //changed battery to display PID output. If doesn't work messsage me -p
+                LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S1,&S2,&S4,&S5),LCD.PIDoutput(PID.getLeftPWM(), PID.getRightPWM())); 
             };
-
-
-            //LCD.toScreen("LFM    ","                  ", "                  ");
         }
 
         //YOU HAVE DONE GOOFED

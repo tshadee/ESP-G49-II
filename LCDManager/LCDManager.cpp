@@ -34,34 +34,34 @@ void LCDManager::toScreen(const char *line1, const char *line2, const char *line
 char *LCDManager::batteryMonitorBuffer(BatteryMonitor *Batt)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f V  ", Batt->getBatteryVoltage());
+    sprintf(dspBuffer, "%2.02f V  ", Batt->getBatteryVoltage());
     return dspBuffer;
 };
 
 char *LCDManager::SVB1(TCRT *S3)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f    ", S3->getSensorVoltage(true));
+    sprintf(dspBuffer, "%1.02f    ", S3->getSensorVoltage(true));
     return dspBuffer;
 };
 
 char *LCDManager::SVB2(TCRT *S1, TCRT *S2, TCRT *S4, TCRT *S5)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f %.02f %.02f %.02f", S1->getSensorVoltage(true), S2->getSensorVoltage(true), S4->getSensorVoltage(true), S5->getSensorVoltage(true));
+    sprintf(dspBuffer, "%1.02f %1.02f %1.02f %1.02f", S1->getSensorVoltage(true), S2->getSensorVoltage(true), S4->getSensorVoltage(true), S5->getSensorVoltage(true));
     return dspBuffer;
 };
 
 char *LCDManager::encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.03f    %.03f ", leftWheel->getDist(), rightWheel->getDist());
+    sprintf(dspBuffer, "%3.03f    %3.03f ", leftWheel->getDist(), rightWheel->getDist());
     return dspBuffer;
 };
 
 char *LCDManager::PIDoutput(float PWMleft, float PWMright)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%.02f    %.02f ", PWMleft, PWMright);
+    sprintf(dspBuffer, "%2.02f    %2.02f ", PWMleft, PWMright);
     return dspBuffer;
 };
