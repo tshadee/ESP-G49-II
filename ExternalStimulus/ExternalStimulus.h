@@ -10,7 +10,7 @@ private:
     Serial HM10;
     char bleBuffer[BLE_BUFFER_DEPTH];
     char cache;
-    int intRC, prevRC;
+    int intRC;
     uint8_t i;
 
 public:

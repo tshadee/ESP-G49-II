@@ -15,14 +15,6 @@
 
 pstate ProgramState = init;
 
-/*
-
-
-
-
-
-*/
-
 int main(void)
 {
     QEI leftEnc(PB_14, PB_15, NC, CPR, QEI::X2_ENCODING); // left encoder left channel, right channel
@@ -37,14 +29,14 @@ int main(void)
     PWMGen toMDB(PA_15, PB_7, PA_14, PC_2, PC_3);         // pwm1, pwm2, mdbe, be1, be2 
     C12832 lcd(D11, D13, D12, D7, D10);                   // LCD screen arduino pins
 
-/* ---------------------------------------------------------------------------------------------------------------------------------------------- */
+/* -----Underneath is subsystem. IO config should be done up here. Leave the rest alone------------------------------------- */
 
-    Encoder leftWheel(&leftEnc);                      // from QEI above
-    Encoder rightWheel(&rightEnc);                    // from QEI above
-    LCDManager LCD(&lcd);                             // from above
-    speedRegulator speedReg(&leftWheel, &rightWheel); // from Encoder class above
-    BatteryMonitor Battery(&one_wire_pin);            // from above
-    PIDSys PID(&S1, &S2, &S4, &S5);                   // from sensor array above
+    Encoder leftWheel(&leftEnc);                        // from QEI above
+    Encoder rightWheel(&rightEnc);                      // from QEI above
+    LCDManager LCD(&lcd);                               // from C12832 above
+    speedRegulator speedReg(&leftWheel, &rightWheel);   // from Encoder class above
+    BatteryMonitor Battery(&one_wire_pin);              // from one_wire_pin above
+    PIDSys PID(&S1, &S2, &S4, &S5);                     // from sensor array above
 
     S1.turnSensorOff();
     S2.turnSensorOff();
@@ -77,13 +69,13 @@ int main(void)
         if(ExStim.pullHM10())
         {
             RCstate = ExStim.getIntRC();
-            if     (RCstate == 1){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCstop;}
-            else if(RCstate == 2){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCforward;}
-            else if(RCstate == 3){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCbackwards;}
-            else if(RCstate == 4){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCturnleft;}
-            else if(RCstate == 5){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCturnright;}
-            else if(RCstate == 8){RCmode = true;lineFollowingMode = false;countTurn = 0;ProgramState = RCturbo;}
-            else if(RCstate == 6) //this turns on the TDA code
+            if     (RCstate == 1){RCmode = true;lineFollowingMode = false;ProgramState = RCstop;}
+            else if(RCstate == 2){RCmode = true;lineFollowingMode = false;ProgramState = RCforward;}
+            else if(RCstate == 3){RCmode = true;lineFollowingMode = false;ProgramState = RCbackwards;}
+            else if(RCstate == 4){RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}
+            else if(RCstate == 5){RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}
+            else if(RCstate == 8){RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}
+            else if(RCstate == 6) //this turns on the TDB code
             {
                 RCmode = false;
                 lineFollowingMode = true;
@@ -94,11 +86,15 @@ int main(void)
         if (RCmode)   
 
         {
-            S1.turnSensorOff();
-            S2.turnSensorOff();
-            S3.turnSensorOff();
-            S4.turnSensorOff();
-            S5.turnSensorOff();
+            if(enterLineFollowing == true)
+            {
+                enterLineFollowing = false;
+                S1.turnSensorOff();
+                S2.turnSensorOff();
+                S3.turnSensorOff();
+                S4.turnSensorOff();
+                S5.turnSensorOff();
+            };
             
             switch(ProgramState)
             {
@@ -185,25 +181,38 @@ int main(void)
         else if (lineFollowingMode)
 
         {
-            if(outputUpdateTimer.read_ms() >= timedelay)
+            if(enterLineFollowing == false)
             {
-                outputUpdateTimer.reset();
+                enterLineFollowing = true;
                 S1.turnSensorOn();
                 S2.turnSensorOn();
                 S3.turnSensorOn();
                 S4.turnSensorOn();
                 S5.turnSensorOn();
+            };
+            
+            if(outputUpdateTimer.read_ms() >= timedelay)
+            {
+                outputUpdateTimer.reset();
+                
+                
                 if(S3.getSensorVoltage(true) > 4.0f)
                 {
                     PID.calculatePID(false);
                     speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                }
+                } 
+                else if (S3.getSensorVoltage(true) <= 4.0f)
+                {
+                    PID.calculatePID(true);
+                    speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                };
+
                 LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S1,&S2,&S4,&S5),LCD.PIDoutput(PID.getLeftPWM(), PID.getRightPWM())); 
             };
         }
 
-        //YOU HAVE DONE GOOFED
         else 
 
         {
