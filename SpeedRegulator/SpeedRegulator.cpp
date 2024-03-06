@@ -56,31 +56,31 @@ void speedRegulator::adjustPWMOutputOnSpeed()
             };
         };
     }
-    else
-    {
-        if (targetDiff < 0) // turning LEFT
-        {
-            if (abs(currentLeftSpeed) < abs(currentRightSpeed)) // right faster
-            {
-                (currentRightPWM += S_EASING_FACTOR * absSpeedDiff); 
-            }
-            else // left faster
-            { 
-                (currentLeftPWM += S_EASING_FACTOR * absSpeedDiff);
-            }
-        }
-        else if (targetDiff > 0) // turning RIGHT
-        {
-            if (abs(currentLeftSpeed) > abs(currentRightSpeed)) // left (forward) faster
-            {
-                (currentLeftPWM -= S_EASING_FACTOR * absSpeedDiff);
-            }
-            else // right (reverse) faster
-            { 
-                (currentRightPWM -= S_EASING_FACTOR * absSpeedDiff); 
-            };
-        };
-    };
+    // else
+    // {
+    //     if (targetDiff < 0) // turning LEFT
+    //     {
+    //         if (abs(currentLeftSpeed) < abs(currentRightSpeed)) // right faster
+    //         {
+    //             (currentRightPWM += S_EASING_FACTOR * absSpeedDiff); 
+    //         }
+    //         else // left faster
+    //         { 
+    //             (currentLeftPWM += S_EASING_FACTOR * absSpeedDiff);
+    //         }
+    //     }
+    //     else if (targetDiff > 0) // turning RIGHT
+    //     {
+    //         if (abs(currentLeftSpeed) > abs(currentRightSpeed)) // left (forward) faster
+    //         {
+    //             (currentLeftPWM -= S_EASING_FACTOR * absSpeedDiff);
+    //         }
+    //         else // right (reverse) faster
+    //         { 
+    //             (currentRightPWM -= S_EASING_FACTOR * absSpeedDiff); 
+    //         };
+    //     };
+    // };
     
     //PWM clamping
     currentLeftPWM = (currentLeftPWM < 0.02f) ? 0.0f : ((currentLeftPWM > 0.98f) ? 1.0f : currentLeftPWM);
@@ -89,8 +89,8 @@ void speedRegulator::adjustPWMOutputOnSpeed()
 
 void speedRegulator::easePWM()
 {
-    currentLeftPWM += (targetLeftPWM - currentLeftPWM) * EASING_FACTOR;
-    currentRightPWM += (targetRightPWM - currentRightPWM) * EASING_FACTOR; // easing curve, never reaches target value
+    currentLeftPWM += (targetLeftPWM - currentLeftPWM) * EASING_FACTOR / SYS_OUTPUT_RATE;
+    currentRightPWM += (targetRightPWM - currentRightPWM) * EASING_FACTOR / SYS_OUTPUT_RATE; // easing curve, never reaches target value
 };
 
 float speedRegulator::getCurrentLeftPWM(void) { return currentLeftPWM; };

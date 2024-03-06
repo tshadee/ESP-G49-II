@@ -29,7 +29,7 @@ int main(void)
     PWMGen toMDB(PA_15, PB_7, PA_14, PC_2, PC_3);         // pwm1, pwm2, mdbe, be1, be2 
     C12832 lcd(D11, D13, D12, D7, D10);                   // LCD screen arduino pins
 
-/* -----Underneath is subsystem. IO config should be done up here. Leave the rest alone------------------------------------- */
+/* ----------------------Underneath are subsystems. IO config should be done up here.------------------------------------- */
 
     Encoder leftWheel(&leftEnc);                        // from QEI above
     Encoder rightWheel(&rightEnc);                      // from QEI above
@@ -194,22 +194,22 @@ int main(void)
             if(outputUpdateTimer.read_ms() >= timedelay)
             {
                 outputUpdateTimer.reset();
-                
-                
-                if(S3.getSensorVoltage(true) > 4.0f)
+                if(S5.getSensorVoltage(true) > 2.5f && S1.getSensorVoltage(true) < 2.5f)
                 {
-                    PID.calculatePID(false);
-                    speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
+                    speedReg.updateTargetPWM(0.8f, 0.7f);
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                } 
-                else if (S3.getSensorVoltage(true) <= 4.0f)
+                } else if (S1.getSensorVoltage(true) > 2.5f && S5.getSensorVoltage(true) < 2.5f)
                 {
-                    PID.calculatePID(true);
-                    speedReg.updateTargetPWM(PID.getLeftPWM(), PID.getRightPWM());
+                    speedReg.updateTargetPWM(0.7f, 0.8f);
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                } else if (S5.getSensorVoltage(true) < 2.5f && S1.getSensorVoltage(true) < 2.5f)
+                {
+                    speedReg.updateTargetPWM(0.8f, 0.8f);
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                 };
 
-                LCD.toScreen(LCD.SVB1(&S3), LCD.SVB2(&S1,&S2,&S4,&S5),LCD.PIDoutput(PID.getLeftPWM(), PID.getRightPWM())); 
+                ; 
+                LCD.toScreen(LCD.PIDoutput(speedReg.getCurrentLeftPWM(),speedReg.getCurrentRightPWM(),0.0f), "                  ", LCD.batteryMonitorBuffer(&Battery));
             };
         }
 

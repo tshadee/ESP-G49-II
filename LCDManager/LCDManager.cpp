@@ -59,9 +59,9 @@ char *LCDManager::encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel)
     return dspBuffer;
 };
 
-char *LCDManager::PIDoutput(float PWMleft, float PWMright)
+char *LCDManager::PIDoutput(float PWMleft, float PWMright, float output)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%2.02f    %2.02f ", PWMleft, PWMright);
+    sprintf(dspBuffer, "%1.02f  %1.02f  %1.02f", PWMleft, PWMright, output);
     return dspBuffer;
 };

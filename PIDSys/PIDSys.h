@@ -27,6 +27,7 @@ public:
     void calculatePID(bool toggleAggressive);
     float getLeftPWM() const;
     float getRightPWM() const;
+    float getOutput() const;
 
 private:
     void outputPWM(); // private because internal utility function
