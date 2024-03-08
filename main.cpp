@@ -90,10 +90,40 @@ int main(void)
                 };
             };
         };
-        
+
+        //TDB MODE
+        if (lineFollowingMode)
+
+        {
+            if(enterLineFollowing == false)
+            {
+                enterLineFollowing = true;
+                S1.turnSensorOn();
+                S2.turnSensorOn();
+                S3.turnSensorOn();
+                S4.turnSensorOn();
+                S5.turnSensorOn();
+            };
+            
+            if(outputUpdateTimer.read_ms() >= timedelay)
+            {
+                outputUpdateTimer.reset();
+
+                PID.calculatePID(false);
+                speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
+                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+
+                if(S5.getSensorVoltage(true) < 0.8f && S4.getSensorVoltage(true) < 0.8f && S3.getSensorVoltage(true) < 0.8f && S2.getSensorVoltage(true) < 0.8f && S1.getSensorVoltage(true) < 0.8f)
+                {
+                    speedReg.updateTargetSpeed(0.0f, 0.0f);
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                }
+                LCD.toScreen("LF                ", "                  ", "                  ");
+            };
+        }
 
         //RC MODE
-        if (RCmode)   
+        else if (RCmode)   
 
         {
             if(enterLineFollowing == true)
@@ -212,62 +242,6 @@ int main(void)
             };
         }
 
-        //TDB MODE
-        else if (lineFollowingMode)
-
-        {
-            if(enterLineFollowing == false)
-            {
-                enterLineFollowing = true;
-                S1.turnSensorOn();
-                S2.turnSensorOn();
-                S3.turnSensorOn();
-                S4.turnSensorOn();
-                S5.turnSensorOn();
-            };
-            
-            if(outputUpdateTimer.read_ms() >= timedelay)
-            {
-                outputUpdateTimer.reset();
-                // if((S5.getSensorVoltage(true) > TVG) && (S1.getSensorVoltage(true) < TVG))
-                // {
-                //     speedReg.updateTargetSpeed(0.3f, 0.1f);
-                //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                // } 
-                // else if ((S1.getSensorVoltage(true) > TVG) && (S5.getSensorVoltage(true) < TVG))
-                // {
-                //     speedReg.updateTargetSpeed(0.1f, 0.30f);
-                //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                // } 
-                // else if((S4.getSensorVoltage(true) > TVE && S2.getSensorVoltage(true) < TVE))
-                // {
-                //     speedReg.updateTargetSpeed(0.35f, 0.15f);
-                //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                // }
-                // else if((S2.getSensorVoltage(true) > TVE && S4.getSensorVoltage(true) < TVE))
-                // {
-                //     speedReg.updateTargetSpeed(0.15f, 0.35f);
-                //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                // }
-                // else if((S2.getSensorVoltage(true) < TVE && S4.getSensorVoltage(true) < TVE) && (S5.getSensorVoltage(true) < TVG) && (S1.getSensorVoltage(true) < TVG))
-                // {
-                //     speedReg.updateTargetSpeed(0.3f, 0.3f);
-                //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                // }
-                // else
-                // {
-                //     speedReg.updateTargetSpeed(0.0f, 0.0f);
-                //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                // };
-
-                PID.calculatePID(false);
-                speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
-                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-            };
-
-            LCD.toScreen("LF                ", "                  ", "                  ");
-        }
-
         else 
 
         {
@@ -275,3 +249,35 @@ int main(void)
         };
     };
 };
+
+/*-code dump-*/
+    // if((S5.getSensorVoltage(true) > TVG) && (S1.getSensorVoltage(true) < TVG))
+    // {
+    //     speedReg.updateTargetSpeed(0.3f, 0.1f);
+    //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+    // } 
+    // else if ((S1.getSensorVoltage(true) > TVG) && (S5.getSensorVoltage(true) < TVG))
+    // {
+    //     speedReg.updateTargetSpeed(0.1f, 0.30f);
+    //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+    // } 
+    // else if((S4.getSensorVoltage(true) > TVE && S2.getSensorVoltage(true) < TVE))
+    // {
+    //     speedReg.updateTargetSpeed(0.35f, 0.15f);
+    //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+    // }
+    // else if((S2.getSensorVoltage(true) > TVE && S4.getSensorVoltage(true) < TVE))
+    // {
+    //     speedReg.updateTargetSpeed(0.15f, 0.35f);
+    //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+    // }
+    // else if((S2.getSensorVoltage(true) < TVE && S4.getSensorVoltage(true) < TVE) && (S5.getSensorVoltage(true) < TVG) && (S1.getSensorVoltage(true) < TVG))
+    // {
+    //     speedReg.updateTargetSpeed(0.3f, 0.3f);
+    //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+    // }
+    // else
+    // {
+    //     speedReg.updateTargetSpeed(0.0f, 0.0f);
+    //     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+    // };
