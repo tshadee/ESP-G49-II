@@ -14,7 +14,7 @@ private:
     float error[3];
     float errorOuter[3];
     float output;
-    float leftPWM, rightPWM;
+    float leftSpeed, rightSpeed;
     float A0, A1, A2;
     TCRT *S1;
     TCRT *S2;
@@ -25,8 +25,8 @@ public:
     PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5);
     void reset();
     void calculatePID(bool toggleAggressive);
-    float getLeftPWM() const;
-    float getRightPWM() const;
+    float getLeftSpeed() const;
+    float getRightSpeed() const;
     float getOutput() const;
 
 private:

@@ -1,7 +1,7 @@
 #include "PIDSys.h"
 
 PIDSys::PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5)
-    : S1(s1), S2(s2), S4(s4), S5(s5), output(0), leftPWM(DEFAULT_PWM), rightPWM(DEFAULT_PWM)
+    : S1(s1), S2(s2), S4(s4), S5(s5), output(0), leftSpeed(0.0f), rightSpeed(0.0f)
 {
     A0 = GAIN_PROPORTIONAL + GAIN_INTEGRAL / SYS_OUTPUT_RATE + GAIN_DERIVATIVE * SYS_OUTPUT_RATE;
     A1 = -GAIN_PROPORTIONAL - 2 * GAIN_DERIVATIVE * SYS_OUTPUT_RATE;
@@ -12,26 +12,16 @@ PIDSys::PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5)
 void PIDSys::reset()
 {
     error[2] = error[1] = error[0] = output = 0;
-    leftPWM = DEFAULT_PWM;
-    rightPWM = DEFAULT_PWM;
+    leftSpeed = DEFAULT_PWM;
+    rightSpeed = DEFAULT_PWM;
 };
 
 void PIDSys::calculatePID(bool toggleAggressive)
 {
-    if (toggleAggressive)
-    {
-        errorOuter[2] = errorOuter[1];
-        errorOuter[1] = errorOuter[0];
-        errorOuter[0] = (S5->getSensorVoltage(true) - S1->getSensorVoltage(true));
-        output = (GAIN_PROPORTIONAL * errorOuter[0]);
-    }
-    else
-    {
-        error[2] = error[1];
-        error[1] = error[0];
-        error[0] = (S5->getSensorVoltage(true) - S1->getSensorVoltage(true));
-        output = (GAIN_PROPORTIONAL * error[0]);
-    }
+    error[2] = error[1];
+    error[1] = error[0];
+    error[0] = ((S5->getSensorVoltage(true)*3) + S4->getSensorVoltage(true) - S2->getSensorVoltage(true) - (S1->getSensorVoltage(true)*3));
+    output = output + ((GAIN_PROPORTIONAL * error[0]) + (GAIN_DERIVATIVE * (error[0] - error[1])*SYS_OUTPUT_RATE) / GAIN_SCALE_DOWN);
     outputPWM();
 };
 
@@ -39,28 +29,28 @@ void PIDSys::outputPWM()
 {
     if (output > 0)
     {
-        leftPWM = BASE_DUTY + output;
-        rightPWM = BASE_DUTY - output;
+        leftSpeed = BASE_SPEED + output;
+        rightSpeed = BASE_SPEED - output;
     }
     else if (output < 0)
     {
-        leftPWM = BASE_DUTY - output;
-        rightPWM = BASE_DUTY + output;
+        leftSpeed = BASE_SPEED - output;
+        rightSpeed = BASE_SPEED + output;
     }
     else
     {
-        leftPWM = rightPWM = 0.9f; // stop in case anything goes wrong
+        leftSpeed = rightSpeed = 0.0f; // stop in case anything goes wrong
     };
 };
 
-float PIDSys::getLeftPWM() const
+float PIDSys::getLeftSpeed() const
 {
-    return leftPWM;
+    return leftSpeed;
 };
 
-float PIDSys::getRightPWM() const
+float PIDSys::getRightSpeed() const
 {
-    return rightPWM;
+    return rightSpeed;
 };
 
 float PIDSys::getOutput() const

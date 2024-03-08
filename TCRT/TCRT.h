@@ -16,7 +16,7 @@ private:
     float VDD, senseNorm;
     float senseNormRolled[SENSOR_BUFFER];
     uint32_t rIndex;
-    static TCRT *sensors[SENSOR_BUFFER]; // operating with one ticker, so we must have a pointer to all the TCRT objects (to be used for function callback)
+    static TCRT *sensors[SENSOR_AMOUNT]; // operating with one ticker, so we must have a pointer to all the TCRT objects (to be used for function callback)
     static int sensorCount;              // to keep count of the sensors
 public:
     TCRT(PinName Pin, PinName DarlingPin, float v);

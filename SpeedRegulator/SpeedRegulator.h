@@ -8,7 +8,6 @@ class speedRegulator
 {
 private:
     float currentLeftPWM, currentRightPWM;
-    float targetLeftPWM, targetRightPWM;
     float currentLeftSpeed, currentRightSpeed;
     float targetLeftSpeed, targetRightSpeed;
     Encoder *leftWheelEncoder;
@@ -16,9 +15,8 @@ private:
 
 public:
     speedRegulator(Encoder *LWC, Encoder *RWC);
-    void updateTargetPWM(float leftPWM, float rightPWM);
+    void updateTargetSpeed(float leftPWM, float rightPWM);
     void adjustPWMOutputOnSpeed();
-    void easePWM();
     float getCurrentLeftPWM(void);
     float getCurrentRightPWM(void);
 };
