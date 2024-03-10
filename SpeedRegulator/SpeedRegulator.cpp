@@ -28,8 +28,8 @@ void speedRegulator::adjustPWMOutputOnSpeed()
     currentRightPWM += rightSpeedDiff * EASING_FACTOR / SYS_OUTPUT_RATE;
 
     //PWM clamping
-    currentLeftPWM = (currentLeftPWM < 0.02f) ? 0.0f : ((currentLeftPWM > 0.98f) ? 1.0f : currentLeftPWM);
-    currentRightPWM = (currentRightPWM < 0.02f) ? 0.0f : ((currentRightPWM > 0.98f) ? 1.0f : currentRightPWM);
+    // currentLeftPWM = (currentLeftPWM < 0.02f) ? 0.0f : ((currentLeftPWM > 0.98f) ? 1.0f : currentLeftPWM);
+    // currentRightPWM = (currentRightPWM < 0.02f) ? 0.0f : ((currentRightPWM > 0.98f) ? 1.0f : currentRightPWM);
 };
 
 float speedRegulator::getCurrentLeftPWM(void) { return currentLeftPWM; };

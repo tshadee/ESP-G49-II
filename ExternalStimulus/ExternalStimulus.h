@@ -8,16 +8,23 @@ class ExternalStim
 {
 private:
     Serial HM10;
-    char bleBuffer[BLE_BUFFER_DEPTH];
-    char cache;
-    int intRC;
-    uint8_t i;
+    char dataBuffer;
+    float KP;
+    float KD;
+    float KI;
+    char bleToData;
+    int index;
+    uint32_t intRC;
+    // Ticker blePollTicker;
 
 public:
     ExternalStim(PinName TX, PinName RX);
     bool serialConfigReady();
     bool pullHM10();
     int getIntRC();
+    float getKP();
+    float getKD();
+    float getKI();
 };
 
 #endif // EXTERNAL_STIMULUS_H

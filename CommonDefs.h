@@ -5,7 +5,8 @@
 #define SENSOR_AMOUNT 5
 #define SENSOR_BUFFER 10
 #define SENSOR_POLL_FREQ 10000 // Hz
-#define BLE_BUFFER_DEPTH 20   // bytes
+#define BLE_BYTE_LENGTH 16     //Bytes being sent to the HM10 (4-byte int, 4-byte PID KP, 4-byte PID KI, 4-byte PID KD)
+#define BLE_POLL_RATE 20      // Hz
 #define TVG 1.5f
 #define TVE 2.8f
 
@@ -24,6 +25,7 @@
 
 #define PWM_FREQUENCY 20000 // Hz
 #define SYS_OUTPUT_RATE 1000  // Hz
+#define SYS_LCD_STEPDOWN 100  //Step down multiplier for LCD output
 
 #define WHEEL_DIAMETER 0.083     // meters
 #define GEAR_RATIO (1.0 / 15.0) // Gear ratio (GB1)

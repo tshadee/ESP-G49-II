@@ -29,7 +29,7 @@ int main(void)
     PWMGen toMDB(PA_15, PB_7, PA_14, PC_2, PC_3);         // pwm1, pwm2, mdbe, be1, be2 
     C12832 lcd(D11, D13, D12, D7, D10);                   // LCD screen arduino pins
     // PB_5 PB_3 PA_10 PA_2 PA_3 for darlington output pin
-/* ----------------------Underneath are subsystems. IO config should be done up here.------------------------------------- */
+/* .-------------------------------------Underneath are subsystems. IO config should be done up here.------------------------------------- */
 
     Encoder leftWheel(&leftEnc);                        // from QEI above
     Encoder rightWheel(&rightEnc);                      // from QEI above
@@ -53,14 +53,13 @@ int main(void)
     Timer BLEtimer;
     BLEtimer.start();
     int timedelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); // in ms
-    int BLEdelay = (static_cast<int>(100 / SYS_OUTPUT_RATE)); //in ms
+    int BLEdelay = (static_cast<int>(500 / SYS_OUTPUT_RATE)); //in ms
 
     toMDB.begin();
-    volatile int RCstate = 0;
     ExStim.serialConfigReady();
 
-    volatile int count50 = 0;
-    volatile int countTurn = 0;
+    volatile int RCstate = 0;
+    volatile int LCDstepdown = 0;
     bool lineFollowingMode = false;
     bool RCmode = true;
     bool enterLineFollowing = false;
@@ -68,7 +67,6 @@ int main(void)
 
     while (true)
     {
-        //uncomment this if you want to be switchable between BLE and auto (will use more memory)
         if(BLEtimer.read_ms() >= BLEdelay)
         {
             BLEtimer.reset();
@@ -80,9 +78,9 @@ int main(void)
                 else if(RCstate == 3){RCmode = true;lineFollowingMode = false;ProgramState = RCbackwards;}
                 else if(RCstate == 4){RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}
                 else if(RCstate == 5){RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}
-                else if(RCstate == 8){RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}
+                else if(RCstate == 6){RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}
                 else if(RCstate == 7){RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}
-                else if(RCstate == 6) //this turns on the TDB code
+                else if(RCstate == 8) //this turns on the TDB code
                 {
                     RCmode = false;
                     lineFollowingMode = true;
@@ -90,6 +88,27 @@ int main(void)
                 };
             };
         };
+
+        // if(BLEtimer.read_ms() >= BLEdelay)
+        // {
+        //     BLEtimer.reset();
+        //     if(ExStim.pullHM10())
+        //     {
+        //         RCstate = ExStim.getIntRC();
+        //         switch(RCstate)
+        //         {
+        //             case(1): {RCmode = true;lineFollowingMode = false;turnAroundEnter = false;ProgramState = RCstop;}   break;
+        //             case(2): {RCmode = true;lineFollowingMode = false;ProgramState = RCforward;}                        break;
+        //             case(3): {RCmode = true;lineFollowingMode = false;ProgramState = RCbackwards;}                      break;
+        //             case(4): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}                       break;
+        //             case(5): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}                      break;
+        //             case(6): {RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}                          break;
+        //             case(7): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
+        //             case(8): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
+        //             default:                                                                                            break;
+        //         };
+        //     };
+        // };
 
         //TDB MODE
         if (lineFollowingMode)
@@ -118,7 +137,13 @@ int main(void)
                     speedReg.updateTargetSpeed(0.0f, 0.0f);
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                 }
-                LCD.toScreen("LF                ", "                  ", "                  ");
+
+                if(LCDstepdown > SYS_LCD_STEPDOWN)
+                {
+                    LCD.toScreen("LF                ", "                  ", "                  ");
+                    LCDstepdown = 0;
+                };
+                LCDstepdown++;
             };
         }
 

@@ -21,26 +21,14 @@ void PIDSys::calculatePID(bool toggleAggressive)
     error[2] = error[1];
     error[1] = error[0];
     error[0] = ((S5->getSensorVoltage(true)*3) + S4->getSensorVoltage(true) - S2->getSensorVoltage(true) - (S1->getSensorVoltage(true)*3));
-    output = output + (((GAIN_PROPORTIONAL * error[0]) + (GAIN_DERIVATIVE * (error[0] - error[1])*SYS_OUTPUT_RATE) + (GAIN_INTEGRAL * (error[0]/2 + error[1]/2) / SYS_OUTPUT_RATE)) / GAIN_SCALE_DOWN);
+    output = (((GAIN_PROPORTIONAL * error[0]) + (GAIN_DERIVATIVE * (error[0] - error[1])*SYS_OUTPUT_RATE) + (GAIN_INTEGRAL * (error[0]/2 + error[1]/2) / SYS_OUTPUT_RATE)) / GAIN_SCALE_DOWN);
     outputPWM();
 };
 
 void PIDSys::outputPWM()
 {
-    if (output > 0)
-    {
-        leftSpeed = BASE_SPEED + output;
-        rightSpeed = BASE_SPEED - output;
-    }
-    else if (output < 0)
-    {
-        leftSpeed = BASE_SPEED - output;
-        rightSpeed = BASE_SPEED + output;
-    }
-    else
-    {
-        leftSpeed = rightSpeed = 0.0f; // stop in case anything goes wrong
-    };
+    leftSpeed = BASE_SPEED + output;
+    rightSpeed = BASE_SPEED - output;
 };
 
 float PIDSys::getLeftSpeed() const
