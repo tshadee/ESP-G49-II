@@ -3,7 +3,7 @@
 #include "C12832.h"
 
 // Our own libraries
-#include "CommonDefs.h" //contains parameters for the buggy and the main state
+#include "CommonDefs.h"         //contains parameters for the buggy and the main state
 #include "TCRT.h"
 #include "encoder.h"
 #include "PWMGen.h"
@@ -13,10 +13,17 @@
 #include "ExternalStimulus.h"
 #include "LCDManager.h"
 
+extern "C" {                    //Including HAL code
+#include "PLL84.h" 
+}
+
 pstate ProgramState = init;
 
 int main(void)
 {
+    // SystemClock_Config_init();
+
+
     QEI leftEnc(PB_14, PB_15, NC, CPR, QEI::X2_ENCODING); // left encoder left channel, right channel
     QEI rightEnc(PB_1, PB_2, NC, CPR, QEI::X2_ENCODING);  // right encoder left channel, right channel
     ExternalStim ExStim(PA_11, PA_12);                    // RXD -> TX (PIN), TXD -> RX (PIN)
@@ -53,7 +60,7 @@ int main(void)
     Timer BLEtimer;
     BLEtimer.start();
     int timedelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); // in ms
-    int BLEdelay = (static_cast<int>(500 / SYS_OUTPUT_RATE)); //in ms
+    int BLEdelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); //in ms
 
     toMDB.begin();
     ExStim.serialConfigReady();
@@ -73,42 +80,20 @@ int main(void)
             if(ExStim.pullHM10())
             {
                 RCstate = ExStim.getIntRC();
-                if     (RCstate == 1){RCmode = true;lineFollowingMode = false;turnAroundEnter = false;ProgramState = RCstop;}
-                else if(RCstate == 2){RCmode = true;lineFollowingMode = false;ProgramState = RCforward;}
-                else if(RCstate == 3){RCmode = true;lineFollowingMode = false;ProgramState = RCbackwards;}
-                else if(RCstate == 4){RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}
-                else if(RCstate == 5){RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}
-                else if(RCstate == 6){RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}
-                else if(RCstate == 7){RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}
-                else if(RCstate == 8) //this turns on the TDB code
+                switch(RCstate)
                 {
-                    RCmode = false;
-                    lineFollowingMode = true;
-                    turnAroundEnter = false;
+                    case(1): {RCmode = true;lineFollowingMode = false;turnAroundEnter = false;ProgramState = RCstop;}   break;
+                    case(2): {RCmode = true;lineFollowingMode = false;ProgramState = RCforward;}                        break;
+                    case(3): {RCmode = true;lineFollowingMode = false;ProgramState = RCbackwards;}                      break;
+                    case(4): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}                       break;
+                    case(5): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}                      break;
+                    case(6): {RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}                          break;
+                    case(7): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
+                    case(8): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
+                    default:                                                                                            break;
                 };
             };
         };
-
-        // if(BLEtimer.read_ms() >= BLEdelay)
-        // {
-        //     BLEtimer.reset();
-        //     if(ExStim.pullHM10())
-        //     {
-        //         RCstate = ExStim.getIntRC();
-        //         switch(RCstate)
-        //         {
-        //             case(1): {RCmode = true;lineFollowingMode = false;turnAroundEnter = false;ProgramState = RCstop;}   break;
-        //             case(2): {RCmode = true;lineFollowingMode = false;ProgramState = RCforward;}                        break;
-        //             case(3): {RCmode = true;lineFollowingMode = false;ProgramState = RCbackwards;}                      break;
-        //             case(4): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}                       break;
-        //             case(5): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}                      break;
-        //             case(6): {RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}                          break;
-        //             case(7): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
-        //             case(8): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
-        //             default:                                                                                            break;
-        //         };
-        //     };
-        // };
 
         //TDB MODE
         if (lineFollowingMode)
