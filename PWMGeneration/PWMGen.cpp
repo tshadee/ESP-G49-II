@@ -4,8 +4,6 @@
 PWMGen::PWMGen(PinName leftPWMPin, PinName rightPWMPin, PinName MDBE, PinName Bipolar1E, PinName Bipolar2E) : PWM_LEFT(leftPWMPin), PWM_RIGHT(rightPWMPin), MDBEnable(MDBE), BPE1(Bipolar1E), BPE2(Bipolar2E) { reset(); };
 void PWMGen::reset()
 {
-    // PWM_LEFT.period(0.0f);
-    // PWM_RIGHT.period(0.0f);
     PWM_LEFT.write(DEFAULT_PWM);
     PWM_RIGHT.write(DEFAULT_PWM);
 };

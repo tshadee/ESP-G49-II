@@ -27,18 +27,17 @@
 
 #define PWM_FREQUENCY 20000 // Hz
 #define SYS_OUTPUT_RATE 1000  // Hz
-#define SYS_LCD_STEPDOWN 100  //Step down multiplier for LCD output
 
 #define WHEEL_DIAMETER 0.083     // meters
-#define GEAR_RATIO (1.0 / 15 +.0) // Gear ratio (GB1)
+#define GEAR_RATIO (1.0 / 12)    // Gear ratio (GB1)
 #define PI 3.1415
-#define CPR 512          // Counts per revolution for the encoder
+#define CPR 1024         // Counts per revolution for the encoder
 #define TCRT_MAX_VDD 5.0 // Max voltage for TCRT sensors
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
 
-#define Kp 0.01
-#define Ki 0.001
-#define Kd 0.01
+// #define Kp 0.01
+// #define Ki 0.001
+// #define Kd 0.01
 
 
 typedef enum

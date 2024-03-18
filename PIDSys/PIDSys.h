@@ -24,7 +24,7 @@ private:
 public:
     PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5);
     void reset();
-    void calculatePID(bool toggleAggressive);
+    void calculatePID();
     float getLeftSpeed() const;
     float getRightSpeed() const;
     float getOutput() const;

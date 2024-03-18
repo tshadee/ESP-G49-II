@@ -16,7 +16,7 @@ void PIDSys::reset()
     rightSpeed = 0.0f;
 };
 
-void PIDSys::calculatePID(bool toggleAggressive)
+void PIDSys::calculatePID()
 {
     error[2] = error[1];
     error[1] = error[0];

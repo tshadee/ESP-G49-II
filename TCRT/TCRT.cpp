@@ -1,7 +1,7 @@
 #include "TCRT.h"
 
-TCRT *TCRT::sensors[SENSOR_AMOUNT] = {NULL}; // static member declaration (must be outside class)
-int TCRT::sensorCount = 0;                   // static member declaration (must be outside class)
+TCRT *TCRT::sensors[SENSOR_AMOUNT] = {NULL}; // static member declaration 
+int TCRT::sensorCount = 0;                   // static member declaration 
 
 TCRT::TCRT(PinName Pin, PinName DarlingPin, float v) : sensorPin(Pin), DarlingtonPin(DarlingPin), VDD(v), rIndex(0), senseNorm(0)
 {
