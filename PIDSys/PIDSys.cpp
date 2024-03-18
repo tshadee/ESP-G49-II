@@ -20,7 +20,7 @@ void PIDSys::calculatePID(bool toggleAggressive)
 {
     error[2] = error[1];
     error[1] = error[0];
-    error[0] = ((S5->getSensorVoltage(true)*3) + S4->getSensorVoltage(true) - S2->getSensorVoltage(true) - (S1->getSensorVoltage(true)*3));
+    error[0] = ((S5->getSensorVoltage(true)*GUARD_SCALING) + S4->getSensorVoltage(true)*EDGE_SCALING - S2->getSensorVoltage(true)*EDGE_SCALING - (S1->getSensorVoltage(true)*GUARD_SCALING));
     output = (((GAIN_PROPORTIONAL * error[0]) + (GAIN_DERIVATIVE * (error[0] - error[1])*SYS_OUTPUT_RATE) + (GAIN_INTEGRAL * (error[0]/2 + error[1]/2) / SYS_OUTPUT_RATE)) / GAIN_SCALE_DOWN);
     outputPWM();
 };

@@ -31,7 +31,7 @@ void TCRT::pollSensors(void)
 
 float TCRT::getSensorVoltage(bool Volt)
 {
-    return (Volt ? (1-senseNorm) * VDD : sensorPin.read());
+    return (Volt ? (senseNorm) * VDD : sensorPin.read());
 };
 
 void TCRT::turnSensorOn(void)

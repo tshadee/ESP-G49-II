@@ -163,7 +163,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                        speedReg.updateTargetSpeed(1.5f,1.5f);
+                        speedReg.updateTargetSpeed(1.8f,1.8f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     };
                     break;
@@ -174,7 +174,7 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                        speedReg.updateTargetSpeed(-0.7f,-0.7f);
+                        speedReg.updateTargetSpeed(-1.0f,-1.0f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                     };
                     break;
