@@ -10,15 +10,15 @@
 #define TVG 1.5f
 #define TVE 2.8f
 
-#define GAIN_PROPORTIONAL 4.5f //scale in the single digits now
-#define GAIN_INTEGRAL 0.0f
-#define GAIN_DERIVATIVE 0.0f
+#define GAIN_PROPORTIONAL 4.0f //scale in the single digits now
+#define GAIN_INTEGRAL 0.22f
+#define GAIN_DERIVATIVE 0.68f
 #define GAIN_AGGRESSIVE 1.2
-#define GAIN_SCALE_DOWN 200.0f //used to scale down gain values 
-#define EDGE_SCALING 1.0f
-#define GUARD_SCALING 1.0f
+#define GAIN_SCALE_DOWN 150.0f //used to scale down gain values 
+#define EDGE_SCALING 0.6f
+#define GUARD_SCALING 3.0f
 
-#define BASE_SPEED 0.3f
+#define BASE_SPEED 0.7f
 #define SYS_LCD_STEPDOWN 10
 
 #define EASING_FACTOR 3.0            // For initial PWM ease between PID output and internal PWM output
