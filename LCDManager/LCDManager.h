@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 #include "C12832.h"
-#include "BatteryMonitor.h"
+// #include "BatteryMonitor.h"
 #include "TCRT.h"
 #include "encoder.h"
 
@@ -17,7 +17,7 @@ private:
 public:
     LCDManager(C12832 *c); // Constructor might not be necessary if no initialization is needed
     void toScreen(const char *line1, const char *line2, const char *line3);
-    char *batteryMonitorBuffer(BatteryMonitor *Batt);
+    // char *batteryMonitorBuffer(BatteryMonitor *Batt);
     char *encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel);
     char *SVB1(TCRT *S3);
     char *SVB2(TCRT *S1, TCRT *S2, TCRT *S4, TCRT *S5);

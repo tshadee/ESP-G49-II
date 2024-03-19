@@ -15,10 +15,11 @@
 #define GAIN_DERIVATIVE 0.0f
 #define GAIN_AGGRESSIVE 1.2
 #define GAIN_SCALE_DOWN 200.0f //used to scale down gain values 
-#define EDGE_SCALING 0.7f
-#define GUARD_SCALING 3.5f
+#define EDGE_SCALING 1.0f
+#define GUARD_SCALING 1.0f
 
-#define BASE_SPEED 0.5f
+#define BASE_SPEED 0.3f
+#define SYS_LCD_STEPDOWN 10
 
 #define EASING_FACTOR 3.0            // For initial PWM ease between PID output and internal PWM output
 #define S_EASING_FACTOR 0.05         // For secondary correction between internal PWM (takes into account wheel speed)
@@ -29,9 +30,9 @@
 #define SYS_OUTPUT_RATE 1000  // Hz
 
 #define WHEEL_DIAMETER 0.083     // meters
-#define GEAR_RATIO (1.0 / 12)    // Gear ratio (GB1)
+#define GEAR_RATIO (1.0 / 15.0)    // Gear ratio (GB1)
 #define PI 3.1415
-#define CPR 1024         // Counts per revolution for the encoder
+#define CPR 512         // Counts per revolution for the encoder
 #define TCRT_MAX_VDD 5.0 // Max voltage for TCRT sensors
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
 
