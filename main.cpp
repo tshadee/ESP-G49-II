@@ -207,19 +207,25 @@ int main(void)
                     {
                         leftWheel.resetDistance();
                         rightWheel.resetDistance();
+                        S1.turnSensorOn();
+                        S2.turnSensorOn();
+                        S3.turnSensorOn();
+                        S4.turnSensorOn();
+                        S5.turnSensorOn();
                         turnAroundEnter = true;
                     };
 
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                        if((leftWheel.getDist() > -0.3) && (rightWheel.getDist() < 0.3))
+                        if((leftWheel.getDist() > -0.28) && (rightWheel.getDist() < 0.28))
                         {
                             speedReg.updateTargetSpeed(-0.2f,0.2f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());   
                         } else 
                         {
-                            speedReg.updateTargetSpeed(0.0f,0.0f);
+                            PID.calculatePID();
+                            speedReg.updateTargetSpeed(((PID.getLeftSpeed() - BASE_SPEED))*1.2, ((PID.getRightSpeed() - BASE_SPEED))*1.2);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
                         };
                     };
