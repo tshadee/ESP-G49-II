@@ -33,7 +33,7 @@ int main(void)
     Encoder rightWheel(&rightEnc);                      // from QEI above
     LCDManager LCD(&lcd);                               // from C12832 above
     speedRegulator speedReg(&leftWheel, &rightWheel);   // from Encoder class above
-    PIDSys PID(&S1, &S2, &S4, &S5);                     // from sensor array above
+    PIDSys PID(&S1, &S2, &S4, &S5, &leftWheel, &rightWheel);                     // from sensor array above
 
     S1.turnSensorOff();
     S2.turnSensorOff();
@@ -78,8 +78,8 @@ int main(void)
                     case(4): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}                       break;
                     case(5): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}                      break;
                     case(6): {RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}                          break;
-                    case(7): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
-                    case(8): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
+                    case(48): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
+                    case(49): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
                     default:                                                                                            break;
                 };
             };
@@ -205,22 +205,22 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                        if((leftWheel.getDist() > -0.2) && (rightWheel.getDist() < 0.2))
+                        if((leftWheel.getDist() > -0.1) && (rightWheel.getDist() < 0.1))
                         {
                             speedReg.updateTargetSpeed(-0.2f,0.2f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());   
                         } 
                         else 
                         {  
-                            if((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) < 3.0f)
+                            if((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) < 2.5f)
                             {
                                 speedReg.updateTargetSpeed(-0.1f, 0.1f);
                                 toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
                             } 
-                            else if ((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) >= 3.0f)
+                            else if ((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) >= 2.5f)
                             {
                                 PID.calculatePID();
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*2.5, (PID.getRightSpeed() - BASE_SPEED)*2.5);
+                                speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*3.5, (PID.getRightSpeed() - BASE_SPEED)*3.5);
                                 toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
                             } 
                             else

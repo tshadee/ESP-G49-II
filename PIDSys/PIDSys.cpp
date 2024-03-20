@@ -1,7 +1,7 @@
 #include "PIDSys.h"
 
-PIDSys::PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5)
-    : S1(s1), S2(s2), S4(s4), S5(s5), output(0), leftSpeed(0.0f), rightSpeed(0.0f)
+PIDSys::PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5, Encoder *LWC, Encoder *RWC)
+    : S1(s1), S2(s2), S4(s4), S5(s5), output(0), leftSpeed(0.0f), rightSpeed(0.0f),leftWheelEncoder(LWC), rightWheelEncoder(RWC)
 {
     // A0 = GAIN_PROPORTIONAL + GAIN_INTEGRAL / SYS_OUTPUT_RATE + GAIN_DERIVATIVE * SYS_OUTPUT_RATE;
     // A1 = -GAIN_PROPORTIONAL - 2 * GAIN_DERIVATIVE * SYS_OUTPUT_RATE;
@@ -18,6 +18,7 @@ void PIDSys::reset()
 
 void PIDSys::calculatePID()
 {
+
     error[2] = error[1];
     error[1] = error[0];
 

@@ -3,6 +3,7 @@
 
 #include "TCRT.h"
 #include "CommonDefs.h"
+#include "encoder.h"
 
 /**
 This class is for calculating PID error as two PWM outputs. This is unfiltered output, btw, so we will have to pass this through a speed regulator that takes into account current wheel speed and other buggy params.
@@ -20,6 +21,8 @@ private:
     TCRT *S2;
     TCRT *S4;
     TCRT *S5;
+    Encoder *leftWheelEncoder;
+    Encoder *rightWheelEncoder;
 
 public:
     /**
@@ -35,7 +38,7 @@ public:
     @param s4 Pointer to TCRT class sensor 4 (right-middle sensor)
     @param s5 Pointer to TCRT class sensor 5 (right-most sensor)
     **/
-    PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5);
+    PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5, Encoder *LWC, Encoder *RWC);
 
     //Use to forcefully reset error history and set speed to 0.0f
     void reset();
