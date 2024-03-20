@@ -9,11 +9,11 @@ void PWMGen::reset()
 };
 void PWMGen::begin()
 {
-    PWM_LEFT.period(1.0 / PWM_FREQUENCY);
-    PWM_RIGHT.period(1.0 / PWM_FREQUENCY);
-    MDBEnable.write(1);
-    BPE1.write(1);
-    BPE2.write(1);
+    PWM_LEFT.period(1.0 / PWM_FREQUENCY);       //sets PWM period for both PWM outputs
+    PWM_RIGHT.period(1.0 / PWM_FREQUENCY);      //""
+    MDBEnable.write(1);                         //enables motor drive board
+    BPE1.write(1);                              //sets left motor to bipolar
+    BPE2.write(1);                              //sets right motor to bipolar
 };
 void PWMGen::setPWMDuty(float leftPWM, float rightPWM)
 {

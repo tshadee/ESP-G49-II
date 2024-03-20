@@ -20,13 +20,17 @@ void PIDSys::calculatePID()
 {
     error[2] = error[1];
     error[1] = error[0];
-    error[0] = ((S5->getSensorVoltage(true)*GUARD_SCALING) + S4->getSensorVoltage(true)*EDGE_SCALING - S2->getSensorVoltage(true)*EDGE_SCALING - (S1->getSensorVoltage(true)*GUARD_SCALING));
-    output = (((GAIN_PROPORTIONAL * error[0]) + (GAIN_DERIVATIVE * (error[0] - error[1])*SYS_OUTPUT_RATE) + (GAIN_INTEGRAL * (error[0]/2 + error[1]/2) / SYS_OUTPUT_RATE)) / GAIN_SCALE_DOWN);
-    outputPWM();
-};
 
-void PIDSys::outputPWM()
-{
+    error[0] = (S5->getSensorVoltage(true)*GUARD_SCALING + 
+                S4->getSensorVoltage(true)*EDGE_SCALING - 
+                S2->getSensorVoltage(true)*EDGE_SCALING - 
+                S1->getSensorVoltage(true)*GUARD_SCALING);
+
+    output = (((GAIN_PROPORTIONAL * error[0]) + 
+               (GAIN_DERIVATIVE * (error[0] - error[1]) * SYS_OUTPUT_RATE) + 
+               (GAIN_INTEGRAL * (error[0]/2 + error[1]/2) / SYS_OUTPUT_RATE)) 
+               / GAIN_SCALE_DOWN);
+               
     leftSpeed = BASE_SPEED + output;
     rightSpeed = BASE_SPEED - output;
 };
