@@ -205,15 +205,29 @@ int main(void)
                     if(outputUpdateTimer.read_ms() >= timedelay)
                     {
                         outputUpdateTimer.reset();
-                        if((leftWheel.getDist() > -0.28) && (rightWheel.getDist() < 0.28))
+                        if((leftWheel.getDist() > -0.2) && (rightWheel.getDist() < 0.2))
                         {
                             speedReg.updateTargetSpeed(-0.2f,0.2f);
                             toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());   
-                        } else 
-                        {
-                            PID.calculatePID();
-                            speedReg.updateTargetSpeed(((PID.getLeftSpeed() - BASE_SPEED))*1.2, ((PID.getRightSpeed() - BASE_SPEED))*1.2);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                        } 
+                        else 
+                        {  
+                            if((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) < 3.0f)
+                            {
+                                speedReg.updateTargetSpeed(-0.1f, 0.1f);
+                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                            } 
+                            else if ((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) >= 3.0f)
+                            {
+                                PID.calculatePID();
+                                speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*2.5, (PID.getRightSpeed() - BASE_SPEED)*2.5);
+                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                            } 
+                            else
+                            {
+                                speedReg.updateTargetSpeed(0.0f, 0.0f);
+                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                            };
                         };
                     };
                     break;
