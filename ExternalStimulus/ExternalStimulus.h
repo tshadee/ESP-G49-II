@@ -28,27 +28,3 @@ public:
 };
 
 #endif // EXTERNAL_STIMULUS_H
-
-/*
-#include "mbed.h"
-
-Serial hm10(PA_11, PA_12);
-DigitalOut led(LED2);
-
-char c;
-
-int main() {
-    hm10.baud(9600);
-    while(1) {
-        if(hm10.readable()){
-        c = hm10.getc(); //read a single character
-            if(c == 'A'){
-                led = 1;
-            }
-            else if(c == 'B'){
-                led = 0;
-            };
-        };
-    };
-};
-*/

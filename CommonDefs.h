@@ -3,7 +3,7 @@
 #define COMMON_DEFS_H
 
 #define SENSOR_AMOUNT 5
-#define SENSOR_BUFFER 10
+#define SENSOR_BUFFER 5
 #define SENSOR_POLL_FREQ 10000 // Hz
 #define BLE_BYTE_LENGTH 16     //Bytes being sent to the HM10 (4-byte int, 4-byte PID KP, 4-byte PID KI, 4-byte PID KD)
 #define BLE_POLL_RATE 20      // Hz
@@ -15,9 +15,9 @@
 #define GAIN_DERIVATIVE 0.75f
 #define GAIN_SCALE_DOWN 150.0f //used to scale down gain values 
 #define EDGE_SCALING 1.2f
-#define GUARD_SCALING 0.0f
+#define GUARD_SCALING 2.70f
 
-#define BASE_SPEED 0.4f
+#define BASE_SPEED 0.7f
 #define SYS_LCD_STEPDOWN 10
 
 #define EASING_FACTOR 3.0            // For initial PWM ease between PID output and internal PWM output

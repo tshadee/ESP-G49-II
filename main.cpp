@@ -35,11 +35,11 @@ int main(void)
     speedRegulator speedReg(&leftWheel, &rightWheel);   // from Encoder class above
     PIDSys PID(&S1, &S2, &S4, &S5, &leftWheel, &rightWheel);                     // from sensor array above
 
-    S1.turnSensorOff();
-    S2.turnSensorOff();
+    S1.turnSensorOn();
+    S2.turnSensorOn();
     S3.turnSensorOff();
-    S4.turnSensorOff();
-    S5.turnSensorOff();
+    S4.turnSensorOn();
+    S5.turnSensorOn();
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0 / SENSOR_POLL_FREQ;
@@ -88,17 +88,7 @@ int main(void)
         //TDB MODE
         if (lineFollowingMode)
 
-        {
-            if(enterLineFollowing == false)
-            {
-                enterLineFollowing = true;
-                S1.turnSensorOn();
-                S2.turnSensorOn();
-                S3.turnSensorOn();
-                S4.turnSensorOn();
-                S5.turnSensorOn();
-            };
-            
+        {   
             if(outputUpdateTimer.read_ms() >= timedelay)
             {
                 outputUpdateTimer.reset();
@@ -113,16 +103,6 @@ int main(void)
         else if (RCmode)   
 
         {
-            if(enterLineFollowing == true)
-            {
-                enterLineFollowing = false;
-                S1.turnSensorOff();
-                S2.turnSensorOff();
-                S3.turnSensorOff();
-                S4.turnSensorOff();
-                S5.turnSensorOff();
-            };
-            
             switch(ProgramState)
             {
                 case(RCforward):
@@ -192,13 +172,10 @@ int main(void)
 
                 case(turnAround):
                 {
-
-
                     if(!turnAroundEnter)
                     {
                         leftWheel.resetDistance();
                         rightWheel.resetDistance();
-                        S3.turnSensorOn();
                         turnAroundEnter = true;
                     };
 
@@ -212,15 +189,15 @@ int main(void)
                         } 
                         else 
                         {  
-                            if((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) < 2.5f)
+                            if((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) < 3.5f)
                             {
-                                speedReg.updateTargetSpeed(-0.1f, 0.1f);
+                                speedReg.updateTargetSpeed(-0.15f, 0.15f);
                                 toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
                             } 
-                            else if ((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) >= 2.5f)
+                            else if ((S2.getSensorVoltage(true) + S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) >= 3.5f)
                             {
                                 PID.calculatePID();
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*3.5, (PID.getRightSpeed() - BASE_SPEED)*3.5);
+                                speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED), (PID.getRightSpeed() - BASE_SPEED));
                                 toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
                             } 
                             else
