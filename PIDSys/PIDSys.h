@@ -12,15 +12,15 @@ The PID output value assume that the error is RIGHT - LEFT (looking from buggy t
 class PIDSys
 {
 private:
-    float error[3];
-    float errorOuter[3];
+    float error[2];
     float output;
     float leftSpeed, rightSpeed;
-    float A0, A1, A2;
     TCRT *S1;
     TCRT *S2;
+    TCRT *S3;
     TCRT *S4;
     TCRT *S5;
+    TCRT *S6;
     Encoder *leftWheelEncoder;
     Encoder *rightWheelEncoder;
 
@@ -38,7 +38,7 @@ public:
     @param s4 Pointer to TCRT class sensor 4 (right-middle sensor)
     @param s5 Pointer to TCRT class sensor 5 (right-most sensor)
     **/
-    PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5, Encoder *LWC, Encoder *RWC);
+    PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5, TCRT *s6, Encoder *LWC, Encoder *RWC);
 
     //Use to forcefully reset error history and set speed to 0.0f
     void reset();

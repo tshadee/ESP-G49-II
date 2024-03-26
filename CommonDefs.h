@@ -2,20 +2,17 @@
 #ifndef COMMON_DEFS_H
 #define COMMON_DEFS_H
 
-#define SENSOR_AMOUNT 5
+#define SENSOR_AMOUNT 6
 #define SENSOR_BUFFER 5
-#define SENSOR_POLL_FREQ 10000 // Hz
-#define BLE_BYTE_LENGTH 16     //Bytes being sent to the HM10 (4-byte int, 4-byte PID KP, 4-byte PID KI, 4-byte PID KD)
-#define BLE_POLL_RATE 20      // Hz
-#define TVG 1.5f
-#define TVE 2.8f
+#define SENSOR_POLL_FREQ 5000 // Hz
 
 #define GAIN_PROPORTIONAL 4.0f //scale in the single digits now
 #define GAIN_INTEGRAL 0.22f
 #define GAIN_DERIVATIVE 0.75f
 #define GAIN_SCALE_DOWN 150.0f //used to scale down gain values 
-#define EDGE_SCALING 1.2f
-#define GUARD_SCALING 2.70f
+#define EDGE_SCALING 1.20f
+#define GUARD1_SCALING 2.70f
+#define GUARD2_SCALING 5.00f
 
 #define BASE_SPEED 0.7f
 #define SYS_LCD_STEPDOWN 10
@@ -26,7 +23,7 @@
 #define BRAKING_FACTOR 0.035
 
 #define PWM_FREQUENCY 20000 // Hz
-#define SYS_OUTPUT_RATE 1000  // Hz
+#define SYS_OUTPUT_RATE 800  // Hz
 
 #define WHEEL_DIAMETER 0.083     // meters
 #define GEAR_RATIO (1.0 / 15.0)    // Gear ratio (GB1)
@@ -34,11 +31,6 @@
 #define CPR 512         // Counts per revolution for the encoder
 #define TCRT_MAX_VDD 5.0 // Max voltage for TCRT sensors
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
-
-// #define Kp 0.01
-// #define Ki 0.001
-// #define Kd 0.01
-
 
 typedef enum
 {
