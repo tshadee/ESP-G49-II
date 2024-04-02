@@ -12,9 +12,11 @@ The PID output value assume that the error is RIGHT - LEFT (looking from buggy t
 class PIDSys
 {
 private:
-    float error[2];
-    float output;
-    float leftSpeed, rightSpeed;
+    double error[3];
+    double output;
+    double leftSpeed, rightSpeed;
+    double A0, A1, A2;
+    double S6V,S5V,S4V,S3V,S2V,S1V;
     TCRT *S1;
     TCRT *S2;
     TCRT *S3;
@@ -35,10 +37,12 @@ public:
 
     @param s1 Pointer to TCRT class sensor 1 (left-most sensor)
     @param s2 Pointer to TCRT class sensor 2 (left-middle sensor)
+    @param s3 Pointer to TCRT class sensor 2 (left-middle sensor)
     @param s4 Pointer to TCRT class sensor 4 (right-middle sensor)
     @param s5 Pointer to TCRT class sensor 5 (right-most sensor)
+    @param s6 Pointer to TCRT class sensor 5 (right-most sensor)
     **/
-    PIDSys(TCRT *s1, TCRT *s2, TCRT *s4, TCRT *s5, TCRT *s6, Encoder *LWC, Encoder *RWC);
+    PIDSys(TCRT *s1, TCRT *s2, TCRT *s3, TCRT *s4, TCRT *s5, TCRT *s6, Encoder *LWC, Encoder *RWC);
 
     //Use to forcefully reset error history and set speed to 0.0f
     void reset();
@@ -51,13 +55,13 @@ public:
     void calculatePID();
 
     //Gets the left speed of PID output. Make sure to call calculatePID() before this.
-    float getLeftSpeed() const;
+    double getLeftSpeed() const;
 
     //Gets the right speed of PID output. Make sure to call calculatePID() before this.
-    float getRightSpeed() const;
+    double getRightSpeed() const;
 
     //Gets intermediate PID output before conversion to left/right speed.
-    float getOutput() const;
+    double getOutput() const;
     
 };
 

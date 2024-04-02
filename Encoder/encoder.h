@@ -3,6 +3,7 @@
 
 #include "mbed.h"
 #include "QEI.h"
+#include <cstdint>
 
 /*
 Records QEI inputs and returns speed and distance for wheel. Use getDist() and getSpeed().
@@ -16,16 +17,16 @@ class Encoder
 private:
     QEI *encode;
     int count, countPrev;
-    float distance;
-    float speed;
+    double distance;
+    double speed;
     int countBuffer;
 
 public:
     Encoder(QEI *q);
     void updateValues(void);
     void resetAllValues(void);
-    float getDist(void);  // returns distance from last reset() call
-    float getSpeed(void); // returns speed in m/s
+    double getDist(void);  // returns distance from last reset() call
+    double getSpeed(void); // returns speed in m/s
     int getCount(void);   // returns count of encoder
     void resetDistance(void);
 };

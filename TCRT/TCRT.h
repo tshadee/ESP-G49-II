@@ -13,8 +13,8 @@ class TCRT
 private:
     AnalogIn sensorPin;
     DigitalOut DarlingtonPin;
-    float VDD, senseNorm;
-    float senseNormRolled[SENSOR_BUFFER];
+    double VDD, senseNorm;
+    double senseNormRolled[SENSOR_BUFFER];
     uint32_t rIndex;
     static TCRT *sensors[SENSOR_AMOUNT]; // operating with one ticker, so we must have a pointer to all the TCRT objects (to be used for function callback)
     static int sensorCount;              // to keep count of the sensors
@@ -34,7 +34,7 @@ public:
     @param DarlingPin Pin for the darlington array specific to the sensor.
     @param v Expected maximum voltage for the sensor. Use TCRT_MAX_VDD if unsure.
     **/
-    TCRT(PinName Pin, PinName DarlingPin, float v);
+    TCRT(PinName Pin, PinName DarlingPin, double v);
 
     //Sets the Darlington Pin output to 1 to enable the sensor.
     void turnSensorOn(void);
@@ -65,7 +65,7 @@ public:
 
     @param Volt TRUE for average sensor voltage scaled to maximum sensor voltage. FALSE for ADC reading voltage without average.
     **/
-    float getSensorVoltage(bool Volt = false);
+    double getSensorVoltage(bool Volt = false);
 };
 
 #endif
