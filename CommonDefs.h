@@ -37,12 +37,4 @@
 #define TCRT_MAX_VDD 5.0 // Max voltage for TCRT sensors
 #define DEFAULT_PWM 0.5f // Default PWM duty cycle
 
-typedef enum
-{
-    turnAround,
-    init,
-    RCstop,
-} pstate;
-extern pstate ProgramState;
-
 #endif // COMMON_DEFS_H
