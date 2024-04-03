@@ -44,119 +44,19 @@ int main(void)
 
     Timer outputUpdateTimer;
     outputUpdateTimer.start();
-    Timer BLEtimer;
-    BLEtimer.start();
     int timedelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); // in ms
-    int BLEdelay = (static_cast<int>(2000 / SYS_OUTPUT_RATE)); //in ms
 
     toMDB.begin();
-    ExStim.serialConfigReady();
-
-    volatile int RCstate = 0;
-    bool lineFollowingMode = false;
-    bool RCmode = true;
-    bool enterLineFollowing = false;
-    bool turnAroundEnter = false;
 
     while (true)
     {
-        if(BLEtimer.read_ms() >= BLEdelay)
+        if(outputUpdateTimer.read_ms() >= timedelay)
         {
-            BLEtimer.reset();
-            if(ExStim.pullHM10())
-            {
-                RCstate = ExStim.getIntRC();
-                switch(RCstate)
-                {
-                    case(1): {RCmode = true;lineFollowingMode = false;turnAroundEnter = false;ProgramState = RCstop;}   break;
-                    case(2): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
-                    case(3): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
-                    default:                                                                                            break;
-                };
-            };
-        };
+            outputUpdateTimer.reset();
 
-        //TDB MODE
-        if (lineFollowingMode)
-
-        {
-            if(enterLineFollowing == false)
-            {
-                enterLineFollowing = true;
-            };
-            
-            if(outputUpdateTimer.read_ms() >= timedelay)
-            {
-                outputUpdateTimer.reset();
-
-                PID.calculatePID();
-                speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
-                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-            };
-        }
-
-        //RC MODE
-        else if (RCmode)   
-
-        {  
-            switch(ProgramState)
-            {
-                case(RCstop):
-                {
-                    if(outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        speedReg.updateTargetSpeed(0.0f,0.0f);
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
-                    };
-                    break;
-                };
-
-                case(turnAround):
-                {
-                    if(!turnAroundEnter)
-                    {
-                        leftWheel.resetDistance();
-                        rightWheel.resetDistance();
-                        turnAroundEnter = true;
-                    };
-
-                    if(outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        if((leftWheel.getDist() > -0.1) && (rightWheel.getDist() < 0.1))
-                        {
-                            speedReg.updateTargetSpeed(-0.2f,0.2f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());   
-                        } 
-                        else 
-                        {  
-                            if((S3.getSensorVoltage(true) + S4.getSensorVoltage(true)) < 3.0f)
-                            {
-                                speedReg.updateTargetSpeed(-0.1f, 0.1f);
-                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
-                            } 
-                            else
-                            {
-                                PID.calculatePID();
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*0.2, (PID.getRightSpeed() - BASE_SPEED)*0.2);
-                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
-                            };
-                        };
-                    };
-                    break;
-                };
-
-                default:
-                {
-                    if(outputUpdateTimer.read_ms() >= timedelay)
-                    { 
-                        outputUpdateTimer.reset();
-                        speedReg.updateTargetSpeed(0.0f,0.0f);
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    };
-                };
-            };
+            PID.calculatePID();
+            speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
+            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
         };
     };
 };
