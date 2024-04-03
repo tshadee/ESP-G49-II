@@ -9,18 +9,24 @@
 #define BLE_POLL_RATE 20      // Hz
 
 #define GAIN_PROPORTIONAL 4.0f //scale in the single digits now
-#define GAIN_INTEGRAL 0.30f
-#define GAIN_DERIVATIVE 1.15f
-#define GAIN_SCALE_DOWN 140.0f //used to scale down gain values 
-#define EDGE_SCALING 1.2f
-#define GUARD1_SCALING 3.0f
-#define GUARD2_SCALING 5.0f
+#define GAIN_INTEGRAL 0.3f
+#define GAIN_DERIVATIVE 1.30f
+#define GAIN_SCALE_DOWN 100.0f //used to scale down gain values 
+#define EDGE_SCALING 0.8f
+#define GUARD1_SCALING 4.0f
+#define GUARD2_SCALING 7.0f
 
-#define BASE_SPEED 1.00f
-#define SYS_LCD_STEPDOWN 10
+#define S6_SCALE 1.0f       //Right (S6) to Left (S1)
+#define S5_SCALE 1.0f
+#define S4_SCALE 1.0f
+#define S3_SCALE 1.0f
+#define S2_SCALE 1.1f
+#define S1_SCALE 1.1f
 
-#define EASING_FACTOR 10.0f          // For initial PWM ease between PID output and internal PWM output
-#define S_EASING_FACTOR 0.05         // For secondary correction between internal PWM (takes into account wheel speed)
+
+#define BASE_SPEED 1.2f
+
+#define EASING_FACTOR 20.0f          // For initial PWM ease between PID output and internal PWM output
 
 #define PWM_FREQUENCY 20000   // Hz
 #define SYS_OUTPUT_RATE 1000  // Hz
