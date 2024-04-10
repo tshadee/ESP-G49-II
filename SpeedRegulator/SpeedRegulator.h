@@ -7,6 +7,7 @@
 class speedRegulator
 {
 private:
+
     double currentLeftPWM, currentRightPWM;
     double currentLeftSpeed, currentRightSpeed;
     double targetLeftSpeed, targetRightSpeed;
@@ -21,6 +22,7 @@ private:
     void adjustPWMOutputOnSpeed();
 
 public:
+
     /**
     Constructor.
 
@@ -49,6 +51,7 @@ public:
 
     //Get current RIGHT PWM from within adjustPWMOutputOnSpeed()
     double getCurrentRightPWM(void);
+    
 };
 
 #endif

@@ -4,7 +4,6 @@
 ExternalStim::ExternalStim(PinName TX, PinName RX) : HM10(TX, RX)
 {
     intRC = 0;
-    KP = KD = KI = 0.0f;
 };
 
 bool ExternalStim::serialConfigReady()
@@ -25,44 +24,6 @@ bool ExternalStim::pullHM10()
     {
         return false;
     };
-};
-
-// bool ExternalStim::pullHM10()
-// {
-//     if (HM10.readable())
-//     {
-//         bleToData = HM10.getc();            //read one byte
-//         dataBuffer[index++] = bleToData;    //store byte in data buffer
-
-//         if(index == BLE_BYTE_LENGTH)
-//         {
-//             memcpy(&intRC, dataBuffer, 4);
-//             memcpy(&KP, dataBuffer + 4, 4);
-//             memcpy(&KD, dataBuffer + 8, 4);
-//             memcpy(&KI, dataBuffer + 12, 4);
-//             index = 0;
-//         };
-//         return true;
-//     }
-//     else
-//     {
-//         return false;
-//     };
-// };
-
-float ExternalStim::getKP()
-{
-    return KP;
-};
-
-float ExternalStim::getKD()
-{
-    return KD;
-};
-
-float ExternalStim::getKI()
-{
-    return KI;
 };
 
 int ExternalStim::getIntRC()

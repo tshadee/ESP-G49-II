@@ -11,6 +11,7 @@
 class TCRT
 {
 private:
+
     AnalogIn sensorPin;
     DigitalOut DarlingtonPin;
     double VDD, senseNorm;
@@ -18,7 +19,9 @@ private:
     uint32_t rIndex;
     static TCRT *sensors[SENSOR_AMOUNT]; // operating with one ticker, so we must have a pointer to all the TCRT objects (to be used for function callback)
     static int sensorCount;              // to keep count of the sensors
+
 public:
+
     /**
     Constructor.
 
@@ -66,6 +69,7 @@ public:
     @param Volt TRUE for average sensor voltage scaled to maximum sensor voltage. FALSE for ADC reading voltage without average.
     **/
     double getSensorVoltage(bool Volt = false);
+    
 };
 
 #endif

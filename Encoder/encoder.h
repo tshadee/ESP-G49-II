@@ -22,12 +22,33 @@ private:
     int countBuffer;
 
 public:
+
+    /**
+    Constructor.
+
+    Polls QEI output to update internal functions. Calculates speed and distance for each wheel from QEI count.
+    Dependent on SYS_OUTPUT_RATE, CPR, and WHEEL_DIAMETER (CommonDefs.h)
+    @param q QEI object pointer.
+
+    **/
     Encoder(QEI *q);
+
+    //Updates all values, calculates speed and distance, and resets QEI pulses count.
     void updateValues(void);
+
+    //Forces reset all values
     void resetAllValues(void);
-    double getDist(void);  // returns distance from last reset() call
-    double getSpeed(void); // returns speed in m/s
-    int getCount(void);   // returns count of encoder
+
+    // returns distance (m)
+    double getDist(void);  
+
+    //returns speed (m/s)
+    double getSpeed(void); 
+
+    //returns encoder count for debugging
+    int getCount(void); 
+
+    //resets distance only
     void resetDistance(void);
 };
 
