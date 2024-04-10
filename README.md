@@ -1,18 +1,22 @@
-### University of Manchester ESP Buggy Project Group 49 - Academic Year 2023-2024
+### heat_race
 
-We aim to make a buggy that:
+Code optimised specifically for the heat race, without any other functionality than is needed to complete the track as fast as possible. 
+This is as efficient and minimal as needed, so beware when loading code from *heat_race* as there will be **no** control over the buggy when it starts.
 
-1. Works.
-2. Wins (optional).
+Classes included:
+- TCRT
+- SpeedRegulator
+- PWMGeneration
+- PIDSys
+- Encoder
 
-You will need to import your own Mbed libraries: [QEI](https://os.mbed.com/users/aberk/code/QEI/), [C12832](https://os.mbed.com/teams/components/code/C12832/), [BLE API](https://os.mbed.com/teams/Bluetooth-Low-Energy/code/BLE_API/), into the project.
-Remember to set the build target to the STM32.
+Current Configuration:
+- 6 sensors
+- X2 encoding
+- No LCD
+- No BLE
+- No states
+- Fast polling (10 kHz)
+- Fast update (2 kHz)
 
-Other Resources:
-
-- Git and Mbed integration for [source control](https://os.mbed.com/docs/mbed-studio/current/source-control/index.html).
-- [Lower Layer Library and HAL documentation](https://www.st.com/en/embedded-software/stm32cubef4.html) by ST Electronics for those who want to change the Cortex M4's operation.
-- [STM32F401RE documentation](https://www.st.com/en/microcontrollers-microprocessors/stm32f401re.html) for interfacing with the STM32F401RE provided by ST Electronics.
-- [Mbed Shield](https://os.mbed.com/components/mbed-Application-Shield/) that sits on top of the STM32.
-- The Bluetooth module([HM-10](https://os.mbed.com/users/alexsaadfalcon/notebook/hm10-guide/)).
-- Quadrature sensor([AEAT-601B-F06](https://www.broadcom.com/products/motion-control-encoders/incremental-encoders/magnetic-encoders/aeat-601bf06)).
+Required external libraries (import these into Keil Studio): [QEI](https://os.mbed.com/users/aberk/code/QEI/)
