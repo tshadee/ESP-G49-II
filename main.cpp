@@ -8,7 +8,6 @@
 #include "PWMGen.h"
 #include "PIDSys.h"
 #include "SpeedRegulator.h"
-#include "ExternalStimulus.h"
 
 int main(void)
 {
