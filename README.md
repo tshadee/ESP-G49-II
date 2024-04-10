@@ -34,6 +34,9 @@ You are currently in the **master** branch.
 
 ### Master
 
+This is the base template for barebones functionality used in other branches. 
+This branch should not be used for any of the tasks as it is not specialised and can only provide basic functions.
+
 Classes included:
 - TCRT
 - SpeedRegulator
