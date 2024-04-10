@@ -51,7 +51,7 @@ int main(void)
     Timer BLEtimer;
     BLEtimer.start();
     int timedelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); // in ms
-    int BLEdelay = (static_cast<int>(2000 / SYS_OUTPUT_RATE)); //in ms
+    int BLEdelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); //in ms
 
     toMDB.begin();
     ExStim.serialConfigReady();
@@ -60,7 +60,6 @@ int main(void)
     volatile int LCDstepdown = 0;
     bool lineFollowingMode = false;
     bool RCmode = true;
-    bool enterLineFollowing = false;
     bool turnAroundEnter = false;
     bool lineFound = false;
 
@@ -91,11 +90,6 @@ int main(void)
         if (lineFollowingMode)
 
         {
-            if(enterLineFollowing == false)
-            {
-                enterLineFollowing = true;
-            };
-            
             if(outputUpdateTimer.read_ms() >= timedelay)
             {
                 outputUpdateTimer.reset();
