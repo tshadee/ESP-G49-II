@@ -29,3 +29,22 @@ Other Resources:
 - [Mbed Shield](https://os.mbed.com/components/mbed-Application-Shield/).
 - [HM-10](https://os.mbed.com/users/alexsaadfalcon/notebook/hm10-guide/).
 - [AEAT-601B-F06](https://www.broadcom.com/products/motion-control-encoders/incremental-encoders/magnetic-encoders/aeat-601bf06).
+
+You are currently in the **master** branch.
+
+### Master
+
+Classes included:
+- TCRT
+- SpeedRegulator
+- PWMGeneration
+- PIDSys
+- Encoder
+
+Current Configuration:
+- 6 sensors
+- X2 encoding
+- No LCD
+- No BLE
+- No states
+- Normal polling (5 kHz) and update (1 kHz) rate
