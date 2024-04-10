@@ -50,4 +50,5 @@ Current Configuration:
 - No LCD
 - No BLE
 - No states
-- Normal polling (5 kHz) and update (1 kHz) rate
+- Normal polling (5 kHz)
+- Normal update (1 kHz)
