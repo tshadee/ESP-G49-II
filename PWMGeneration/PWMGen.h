@@ -6,10 +6,12 @@
 class PWMGen
 {
 private:
+
     PwmOut PWM_LEFT, PWM_RIGHT;
     DigitalOut MDBEnable, BPE1, BPE2;
 
 public:
+
     /**
     Constructor.
 
