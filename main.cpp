@@ -1,5 +1,6 @@
 // external libraries
 #include "mbed.h"
+#include "C12832.h"
 
 // Our own libraries
 #include "CommonDefs.h"
@@ -9,6 +10,7 @@
 #include "PIDSys.h"
 #include "SpeedRegulator.h"
 #include "ExternalStimulus.h"
+#include "LCDManager.h"
 
 pstate ProgramState = init;
 
@@ -24,10 +26,12 @@ int main(void)
     TCRT S5(PC_1, PC_8, TCRT_MAX_VDD);                    // Right GUARD1 sensor    (INPUT PIN, DARLINGTON OUTPUT PIN, 3.3V)
     TCRT S6(PC_0, PC_5, TCRT_MAX_VDD);                    // Right GUARD2 sensor    (INPUT PIN, DARLINGTON OUTPUT PIN, 3.3V)
     PWMGen toMDB(PA_15, PB_7, PA_14, PC_2, PC_3);         // pwm1, pwm2, mdbe, be1, be2               
+    C12832 lcd(D11, D13, D12, D7, D10);                   // LCD screen arduino pins    
 /* .-------------------------------------Underneath are subsystems. IO config should be done up here.------------------------------------- */
 
     Encoder leftWheel(&leftEnc);                                            // from QEI above
     Encoder rightWheel(&rightEnc);                                          // from QEI above
+    LCDManager LCD(&lcd);                                                   // from C12832 above
     speedRegulator speedReg(&leftWheel, &rightWheel);                       // from Encoder class above
     PIDSys PID(&S1, &S2, &S3, &S4, &S5, &S6, &leftWheel, &rightWheel);      // from sensor array above
 
@@ -53,10 +57,12 @@ int main(void)
     ExStim.serialConfigReady();
 
     volatile int RCstate = 0;
+    volatile int LCDstepdown = 0;
     bool lineFollowingMode = false;
     bool RCmode = true;
     bool enterLineFollowing = false;
     bool turnAroundEnter = false;
+    bool lineFound = false;
 
     while (true)
     {
@@ -69,8 +75,13 @@ int main(void)
                 switch(RCstate)
                 {
                     case(1): {RCmode = true;lineFollowingMode = false;turnAroundEnter = false;ProgramState = RCstop;}   break;
-                    case(2): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
-                    case(3): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
+                    case(2): {RCmode = true;lineFollowingMode = false;ProgramState = RCforward;}                        break;
+                    case(3): {RCmode = true;lineFollowingMode = false;ProgramState = RCbackwards;}                      break;
+                    case(4): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}                       break;
+                    case(5): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}                      break;
+                    case(6): {RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}                          break;
+                    case(7): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
+                    case(8): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
                     default:                                                                                            break;
                 };
             };
@@ -98,9 +109,64 @@ int main(void)
         //RC MODE
         else if (RCmode)   
 
-        {  
+        {
             switch(ProgramState)
             {
+                case(RCforward):
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay)
+                    {
+                        outputUpdateTimer.reset();
+                        speedReg.updateTargetSpeed(1.0f,1.0f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    };
+                    break;
+                };
+
+                case(RCturbo):
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay)
+                    {
+                        outputUpdateTimer.reset();
+                        speedReg.updateTargetSpeed(1.8f,1.8f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    };
+                    break;
+                };
+
+                case(RCbackwards):
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay)
+                    {
+                        outputUpdateTimer.reset();
+                        speedReg.updateTargetSpeed(-1.0f,-1.0f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    };
+                    break;
+                };
+
+                case(RCturnleft):
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay)
+                    {
+                        outputUpdateTimer.reset();
+                        speedReg.updateTargetSpeed(-0.5f,0.5f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    };
+                    break;
+                };
+
+                case(RCturnright):
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay)
+                    {
+                        outputUpdateTimer.reset();
+                        speedReg.updateTargetSpeed(0.5f,-0.5f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                    };
+                    break;
+                };
+
                 case(RCstop):
                 {
                     if(outputUpdateTimer.read_ms() >= timedelay)
