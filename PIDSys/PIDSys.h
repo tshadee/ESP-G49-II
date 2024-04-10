@@ -12,6 +12,7 @@ The PID output value assume that the error is RIGHT - LEFT (looking from buggy t
 class PIDSys
 {
 private:
+
     double error[3];
     double output;
     double leftSpeed, rightSpeed;
@@ -27,6 +28,7 @@ private:
     Encoder *rightWheelEncoder;
 
 public:
+
     /**
     Constructor.
 

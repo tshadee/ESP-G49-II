@@ -6,10 +6,12 @@
 class PWMGen
 {
 private:
+
     PwmOut PWM_LEFT, PWM_RIGHT;
     DigitalOut MDBEnable, BPE1, BPE2;
 
 public:
+
     /**
     Constructor.
 
@@ -38,6 +40,7 @@ public:
     @param rightPWM set duty cycle of right motor
     **/
     void setPWMDuty(float leftPWM, float rightPWM);
+    
 };
 
 #endif
