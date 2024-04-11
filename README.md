@@ -21,7 +21,13 @@ This is as efficient and minimal as needed, so beware when loading code from *he
 Includes BLE for the turnaround and utilises states. This has the full functionality of the buggy, ranging from Remote Control to autonomous line following.
 Less efficient than *heat_race* but offers more flexibility in debugging and fine-tuning. 
 
-Required external libraries (import these into Keil Studio): [QEI](https://os.mbed.com/users/aberk/code/QEI/), [C12832](https://os.mbed.com/teams/components/code/C12832/)
+---
+
+**Note:** Class and function descriptions can be found within the header file of their respective folders.
+
+---
+
+Required external libraries: [QEI](https://os.mbed.com/users/aberk/code/QEI/), [C12832](https://os.mbed.com/teams/components/code/C12832/)
 
 Other Resources:
 
