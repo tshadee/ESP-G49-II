@@ -21,4 +21,4 @@ Current Configuration:
 - Normal polling (5 kHz)
 - Normal update (1 kHz)
 
-Required external libraries (import these into Keil Studio): [QEI](https://os.mbed.com/users/aberk/code/QEI/), [C12832](https://os.mbed.com/teams/components/code/C12832/)
+Required external libraries: [QEI](https://os.mbed.com/users/aberk/code/QEI/), [C12832](https://os.mbed.com/teams/components/code/C12832/)
