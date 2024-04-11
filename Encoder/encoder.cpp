@@ -3,7 +3,6 @@
 
 Encoder::Encoder(QEI *q) : encode(q) { resetAllValues(); };
 
-// Encoder::Encoder(PinName channel1, PinName channel2): encode(channel1,channel2,NC,CPR,QEI::X4_ENCODING), count(0), countPrev(0), distance(0.0f), speed(0.0f){ resetAllValues(); };
 void Encoder::updateValues(void)
 {
     countPrev = count;
