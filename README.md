@@ -5,7 +5,9 @@ We aim to make a buggy that:
 1. Works.
 2. Wins (optional).
 
-This repository will be split into three branches:
+---
+
+##### This repository will be split into three branches:
 
 #### master
 This is the base template for barebones functionality used in other branches. 
@@ -29,6 +31,8 @@ Other Resources:
 - [Mbed Shield](https://os.mbed.com/components/mbed-Application-Shield/).
 - [HM-10](https://os.mbed.com/users/alexsaadfalcon/notebook/hm10-guide/).
 - [AEAT-601B-F06](https://www.broadcom.com/products/motion-control-encoders/incremental-encoders/magnetic-encoders/aeat-601bf06).
+
+---
 
 You are currently in the **master** branch.
 
