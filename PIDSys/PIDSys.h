@@ -39,10 +39,12 @@ public:
 
     @param s1 Pointer to TCRT class sensor 1 (left-most sensor)
     @param s2 Pointer to TCRT class sensor 2 (left-middle sensor)
-    @param s3 Pointer to TCRT class sensor 2 (left-middle sensor)
-    @param s4 Pointer to TCRT class sensor 4 (right-middle sensor)
-    @param s5 Pointer to TCRT class sensor 5 (right-most sensor)
-    @param s6 Pointer to TCRT class sensor 5 (right-most sensor)
+    @param s3 Pointer to TCRT class sensor 3 (left-centre sensor)
+    @param s4 Pointer to TCRT class sensor 4 (right-centre sensor)
+    @param s5 Pointer to TCRT class sensor 5 (right-middle sensor)
+    @param s6 Pointer to TCRT class sensor 6 (right-most sensor)
+    @param LWC Pointer to Left Wheel Encoder
+    @param RWC Pointer to Right Wheel Encoder 
     **/
     PIDSys(TCRT *s1, TCRT *s2, TCRT *s3, TCRT *s4, TCRT *s5, TCRT *s6, Encoder *LWC, Encoder *RWC);
 
