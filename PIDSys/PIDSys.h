@@ -6,8 +6,8 @@
 #include "encoder.h"
 
 /**
-This class is for calculating PID error as two PWM outputs. This is unfiltered output, btw, so we will have to pass this through a speed regulator that takes into account current wheel speed and other buggy params.
-The PID output value assume that the error is RIGHT - LEFT (looking from buggy top view), so a situation where right > left would be when the buggy is headed left and vice versa.
+This class is for calculating PID error as two PWM outputs. Output is unfiltered and will, therefore, have to be passed through speedRegulator to take into account wheel speed. 
+The PID output value assume that the error is RIGHT - LEFT (from top view with forwards pointed towards the north), so a situation where right > left would be when the buggy is headed left and vice versa.
 **/
 class PIDSys
 {

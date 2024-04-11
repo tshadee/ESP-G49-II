@@ -18,7 +18,7 @@ public:
     Breaks down PWM input into Mbed write() and period() functions to be written to PwmOut pins, subsequently to the motor drive board.
     Configures motor drive board to work with bipolar (if Pins Bipolar1E and Bipolar2E are connected to MDB bipolar active pins).
 
-    @param leftPWMPin Pin for outputting PWM to the right motor
+    @param leftPWMPin Pin for outputting PWM to the left motor
     @param rightPWMPin Pin for outputting PWM to the right motor
     @param MDBE Motor Drive Board Enable. Set 1 to turn on MDB.
     @param Bipolar1E Bipolar 1 Enable. Set 1 to use Bipolar for left motor.
