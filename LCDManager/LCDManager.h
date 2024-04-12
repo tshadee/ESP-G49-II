@@ -50,8 +50,8 @@ public:
     **/
 
     char *encoderOutputTest(Encoder *leftWheel, Encoder *rightWheel);
-    char *SVB1(TCRT *S3);
-    char *SVB2(TCRT *S1, TCRT *S2, TCRT *S4, TCRT *S5);
+    char *SVB1(TCRT *S6, TCRT *S5, TCRT *S4);
+    char *SVB2(TCRT *S1, TCRT *S2, TCRT *S3);
     char *FloatOutput(float one, float two, float three);
     char *FloatOutput2(float one, float two, float three);
 

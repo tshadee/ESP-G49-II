@@ -38,17 +38,17 @@ void LCDManager::toScreen(const char *line1, const char *line2, const char *line
 //     return dspBuffer;
 // };
 
-char *LCDManager::SVB1(TCRT *S3)
+char *LCDManager::SVB1(TCRT *S6, TCRT *S5, TCRT *S4)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%1.02f    ", S3->getSensorVoltage(true));
+    sprintf(dspBuffer, "%1.02f %1.02f %1.02f", S6->getSensorVoltage(true), S5->getSensorVoltage(true), S4->getSensorVoltage(true));
     return dspBuffer;
 };
 
-char *LCDManager::SVB2(TCRT *S1, TCRT *S2, TCRT *S4, TCRT *S5)
+char *LCDManager::SVB2(TCRT *S1, TCRT *S2, TCRT *S3)
 {
     static char dspBuffer[20];
-    sprintf(dspBuffer, "%1.02f %1.02f %1.02f %1.02f", S1->getSensorVoltage(true), S2->getSensorVoltage(true), S4->getSensorVoltage(true), S5->getSensorVoltage(true));
+    sprintf(dspBuffer, "%1.02f %1.02f %1.02f", S1->getSensorVoltage(true), S2->getSensorVoltage(true), S3->getSensorVoltage(true));
     return dspBuffer;
 };
 
