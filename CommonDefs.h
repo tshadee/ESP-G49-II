@@ -4,7 +4,7 @@
 
 #define SENSOR_AMOUNT 6         //Number of sensors
 #define SENSOR_BUFFER 5         //Buffer depth for sensor rolling average buffer
-#define SENSOR_POLL_FREQ 2500   //Hz , Ideally 5 times that of SYS_OUTPUT_RATE
+#define SENSOR_POLL_FREQ 5000   //Hz , Ideally 5 times that of SYS_OUTPUT_RATE
 
 #define GAIN_PROPORTIONAL 3.5f  //Proportionl gain of PID
 #define GAIN_INTEGRAL 0.22f      //Integral gain of PID
@@ -27,7 +27,7 @@
 #define EASING_FACTOR 10.0f     //PWM easing based on target speed. Higher values means more reactive PWM.
 
 #define PWM_FREQUENCY 20000     //Hz , should be <50 Hz or >20000Hz (outside human hearing range).
-#define SYS_OUTPUT_RATE 500    //Hz , Ideally 1/5 that of SENSOR_POLL_FREQ and no greater than 1000 Hz.
+#define SYS_OUTPUT_RATE 1000    //Hz , Ideally 1/5 that of SENSOR_POLL_FREQ and no greater than 1000 Hz.
 
 #define WHEEL_DIAMETER 0.083    //meters
 #define PI 3.1415
@@ -43,13 +43,8 @@ typedef enum
 {
     turnAround,
     init,
-    RCforward,
-    RCbackwards,
-    RCturnleft,
-    RCturnright,
     RCstop,
     RCturbo,
-    displayingSensor
 } pstate;
 extern pstate ProgramState;
 

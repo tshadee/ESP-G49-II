@@ -58,11 +58,9 @@ int main(void)
 
     volatile int RCstate = 0;
     volatile int LCDstepdown = 10;
-    volatile int i = 0;
     bool lineFollowingMode = false;
     bool RCmode = true;
     bool turnAroundEnter = false;
-    bool lineFound = false;
 
     while (true)
     {
@@ -75,10 +73,6 @@ int main(void)
                 switch(RCstate)
                 {
                     case(1): {RCmode = true;lineFollowingMode = false;turnAroundEnter = false;ProgramState = RCstop;}   break;
-                    case(2): {RCmode = true;lineFollowingMode = false;ProgramState = RCforward;}                        break;
-                    case(3): {RCmode = true;lineFollowingMode = false;ProgramState = RCbackwards;}                      break;
-                    case(4): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnleft;}                       break;
-                    case(5): {RCmode = true;lineFollowingMode = false;ProgramState = RCturnright;}                      break;
                     case(6): {RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}                          break;
                     case(7): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
                     case(8): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
@@ -106,17 +100,6 @@ int main(void)
         {
             switch(ProgramState)
             {
-                case(RCforward):
-                {
-                    if(outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        speedReg.updateTargetSpeed(1.0f,1.0f);
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    };
-                    break;
-                };
-
                 case(RCturbo):
                 {
                     if(outputUpdateTimer.read_ms() >= timedelay)
@@ -129,39 +112,6 @@ int main(void)
                     break;
                 };
 
-                case(RCbackwards):
-                {
-                    if(outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        speedReg.updateTargetSpeed(-1.0f,-1.0f);
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    };
-                    break;
-                };
-
-                case(RCturnleft):
-                {
-                    if(outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        speedReg.updateTargetSpeed(-0.5f,0.5f);
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    };
-                    break;
-                };
-
-                case(RCturnright):
-                {
-                    if(outputUpdateTimer.read_ms() >= timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        speedReg.updateTargetSpeed(0.5f,-0.5f);
-                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    };
-                    break;
-                };
-
                 case(RCstop):
                 {
                     if(outputUpdateTimer.read_ms() >= timedelay)
@@ -169,17 +119,6 @@ int main(void)
                         outputUpdateTimer.reset();
                         speedReg.updateTargetSpeed(0.0f,0.0f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
-
-                    };
-                    break;
-                };
-
-                case(displayingSensor):
-                {
-                    if(outputUpdateTimer.read_ms() >= 10*timedelay)
-                    {
-                        outputUpdateTimer.reset();
-                        toMDB.setPWMDuty(0.5f, 0.5f); 
 
                     };
                     break;
