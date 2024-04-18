@@ -26,12 +26,10 @@ void PIDSys::calculatePID()
     S2V = S2->getSensorVoltage(true);
     S1V = S1->getSensorVoltage(true);
 
-    error[0] = (S6V*S6_SCALE*GUARD2_SCALING +
-                S5V*S5_SCALE*GUARD1_SCALING + 
+    error[0] = (S5V*S5_SCALE*GUARD1_SCALING + 
                 S4V*S4_SCALE*EDGE_SCALING - 
                 S3V*S3_SCALE*EDGE_SCALING - 
-                S2V*S2_SCALE*GUARD1_SCALING-
-                S1V*S1_SCALE*GUARD2_SCALING);
+                S2V*S2_SCALE*GUARD1_SCALING);
 
     output = (((GAIN_PROPORTIONAL * error[0]) + 
                (GAIN_DERIVATIVE * (error[0] - error[1]) * SYS_OUTPUT_RATE) + 
@@ -42,17 +40,17 @@ void PIDSys::calculatePID()
     rightSpeed = BASE_SPEED - output;
 };
 
-double PIDSys::getLeftSpeed() const
+float PIDSys::getLeftSpeed() const
 {
     return leftSpeed;
 };
 
-double PIDSys::getRightSpeed() const
+float PIDSys::getRightSpeed() const
 {
     return rightSpeed;
 };
 
-double PIDSys::getOutput() const
+float PIDSys::getOutput() const
 {
     return output;
 };

@@ -43,7 +43,7 @@ int main(void)
     S6.turnSensorOn();
 
     Ticker sensorPollTicker;
-    double sensorPollRate = 1.0 / SENSOR_POLL_FREQ;
+    float sensorPollRate = 1.0 / SENSOR_POLL_FREQ;
     sensorPollTicker.attach(callback(&TCRT::pollSensors), sensorPollRate);
 
     Timer outputUpdateTimer;
@@ -51,7 +51,7 @@ int main(void)
     Timer BLEtimer;
     BLEtimer.start();
     int timedelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); // in ms
-    int BLEdelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); //in ms
+    int BLEdelay = (static_cast<int>(10000 / SYS_OUTPUT_RATE)); //in ms
 
     toMDB.begin();
     ExStim.serialConfigReady();
@@ -172,3 +172,4 @@ int main(void)
         };
     };
 };
+   
