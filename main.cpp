@@ -35,12 +35,12 @@ int main(void)
     speedRegulator speedReg(&leftWheel, &rightWheel);                       // from Encoder class above
     PIDSys PID(&S1, &S2, &S3, &S4, &S5, &S6, &leftWheel, &rightWheel);      // from sensor array above
 
-    S1.turnSensorOn();
+    S1.turnSensorOff();
     S2.turnSensorOn();
     S3.turnSensorOn();
     S4.turnSensorOn();
     S5.turnSensorOn();
-    S6.turnSensorOn();
+    S6.turnSensorOff();
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0 / SENSOR_POLL_FREQ;
@@ -51,7 +51,7 @@ int main(void)
     Timer BLEtimer;
     BLEtimer.start();
     int timedelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); // in ms
-    int BLEdelay = (static_cast<int>(10000 / SYS_OUTPUT_RATE)); //in ms
+    int BLEdelay = (static_cast<int>(2000 / SYS_OUTPUT_RATE));  //in ms
 
     toMDB.begin();
     ExStim.serialConfigReady();

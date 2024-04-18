@@ -19,12 +19,10 @@ void PIDSys::calculatePID()
     error[2] = error[1];
     error[1] = error[0];
 
-    S6V = S6->getSensorVoltage(true);
     S5V = S5->getSensorVoltage(true);
     S4V = S4->getSensorVoltage(true);
     S3V = S3->getSensorVoltage(true);
     S2V = S2->getSensorVoltage(true);
-    S1V = S1->getSensorVoltage(true);
 
     error[0] = (S5V*S5_SCALE*GUARD1_SCALING + 
                 S4V*S4_SCALE*EDGE_SCALING - 
