@@ -10,7 +10,7 @@ void Encoder::updateValues(void)
     count -= encode->getPulses();
     distance = count * WHEEL_DIAMETER * PI / CPR;
     countBuffer = count - countPrev; // difference in count
-    speed = ((static_cast<double>(countBuffer) / CPR) * SYS_OUTPUT_RATE) * WHEEL_DIAMETER * PI;
+    speed = ((static_cast<float>(countBuffer) / CPR) * SYS_OUTPUT_RATE) * WHEEL_DIAMETER * PI;
     encode->reset();
 };
 
@@ -27,6 +27,6 @@ void Encoder::resetDistance(void)
     distance = count = 0.0f;
 };
 
-double Encoder::getDist(void) { return distance; }; // returns distance from last reset() call
-double Encoder::getSpeed(void) { return speed; };   // returns speed in m/s
+float Encoder::getDist(void) { return distance; }; // returns distance from last reset() call
+float Encoder::getSpeed(void) { return speed; };   // returns speed in m/s
 int Encoder::getCount(void) { return count; };

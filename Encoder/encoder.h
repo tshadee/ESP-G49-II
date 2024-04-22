@@ -17,8 +17,8 @@ class Encoder
 private:
     QEI *encode;
     int count, countPrev;
-    double distance;
-    double speed;
+    float distance;
+    float speed;
     int countBuffer;
 
 public:
@@ -40,10 +40,10 @@ public:
     void resetAllValues(void);
 
     // returns distance (m)
-    double getDist(void);  
+    float getDist(void);  
 
     //returns speed (m/s)
-    double getSpeed(void); 
+    float getSpeed(void); 
 
     //returns encoder count for debugging
     int getCount(void); 

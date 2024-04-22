@@ -42,17 +42,17 @@ void PIDSys::calculatePID()
     rightSpeed = BASE_SPEED - output;
 };
 
-double PIDSys::getLeftSpeed() const
+float PIDSys::getLeftSpeed() const
 {
     return leftSpeed;
 };
 
-double PIDSys::getRightSpeed() const
+float PIDSys::getRightSpeed() const
 {
     return rightSpeed;
 };
 
-double PIDSys::getOutput() const
+float PIDSys::getOutput() const
 {
     return output;
 };

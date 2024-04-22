@@ -12,7 +12,7 @@ class ExternalStim
 private:
 
     Serial HM10;
-    uint32_t intRC;
+    int intRC;
 
 public:
 
