@@ -13,11 +13,11 @@ class PIDSys
 {
 private:
 
-    float error[3];
-    float output;
-    float leftSpeed, rightSpeed;
-    float A0, A1, A2;
-    float S6V,S5V,S4V,S3V,S2V,S1V;
+    double error[3];
+    double output;
+    double leftSpeed, rightSpeed;
+    double A0, A1, A2;
+    double S6V,S5V,S4V,S3V,S2V,S1V;
     TCRT *S1;
     TCRT *S2;
     TCRT *S3;
@@ -59,13 +59,13 @@ public:
     void calculatePID();
 
     //Gets the left speed of PID output. Make sure to call calculatePID() before this.
-    float getLeftSpeed() const;
+    double getLeftSpeed() const;
 
     //Gets the right speed of PID output. Make sure to call calculatePID() before this.
-    float getRightSpeed() const;
+    double getRightSpeed() const;
 
     //Gets intermediate PID output before conversion to left/right speed.
-    float getOutput() const;
+    double getOutput() const;
     
 };
 

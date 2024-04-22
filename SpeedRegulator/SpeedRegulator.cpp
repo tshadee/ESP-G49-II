@@ -8,7 +8,7 @@ speedRegulator::speedRegulator(Encoder *LWC, Encoder *RWC) : leftWheelEncoder(LW
     targetLeftSpeed = targetRightSpeed = 0.0f;
 };
 
-void speedRegulator::updateTargetSpeed(float leftSpeed, float rightSpeed)
+void speedRegulator::updateTargetSpeed(double leftSpeed, double rightSpeed)
 {
     targetLeftSpeed = leftSpeed;
     targetRightSpeed = rightSpeed;
@@ -21,13 +21,13 @@ void speedRegulator::adjustPWMOutputOnSpeed()
     rightWheelEncoder->updateValues();                                      //""
     currentLeftSpeed = leftWheelEncoder->getSpeed();                        //gets speed from encoder. 
     currentRightSpeed = rightWheelEncoder->getSpeed();                      //""
-    float leftSpeedDiff = targetLeftSpeed - currentLeftSpeed;               //calculates left speed difference
-    float rightSpeedDiff = targetRightSpeed - currentRightSpeed;            //calculates right speed difference
+    double leftSpeedDiff = targetLeftSpeed - currentLeftSpeed;               //calculates left speed difference
+    double rightSpeedDiff = targetRightSpeed - currentRightSpeed;            //calculates right speed difference
 
     currentLeftPWM += leftSpeedDiff * EASING_FACTOR / SYS_OUTPUT_RATE;      //adjusts PWM output based on speed difference and EASING_FACTOR (higher ease is faster adjustment)
     currentRightPWM += rightSpeedDiff * EASING_FACTOR / SYS_OUTPUT_RATE;    //""
 };
 
-float speedRegulator::getCurrentLeftPWM(void) { return currentLeftPWM; };
+double speedRegulator::getCurrentLeftPWM(void) { return currentLeftPWM; };
 
-float speedRegulator::getCurrentRightPWM(void) { return currentRightPWM; };
+double speedRegulator::getCurrentRightPWM(void) { return currentRightPWM; };
