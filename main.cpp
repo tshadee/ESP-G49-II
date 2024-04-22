@@ -35,12 +35,12 @@ int main(void)
     speedRegulator speedReg(&leftWheel, &rightWheel);                       // from Encoder class above
     PIDSys PID(&S1, &S2, &S3, &S4, &S5, &S6, &leftWheel, &rightWheel);      // from sensor array above
 
-    S1.turnSensorOn();
+    S1.turnSensorOff();
     S2.turnSensorOn();
     S3.turnSensorOn();
     S4.turnSensorOn();
     S5.turnSensorOn();
-    S6.turnSensorOn();
+    S6.turnSensorOff();
 
     Ticker sensorPollTicker;
     float sensorPollRate = 1.0 / SENSOR_POLL_FREQ;
@@ -52,18 +52,16 @@ int main(void)
     BLEtimer.start();
 
     int timedelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); // in ms
-    int BLEdelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); //in ms
+    int BLEdelay = (static_cast<int>(2000 / SYS_OUTPUT_RATE));  //in ms
 
     toMDB.begin();
     ExStim.serialConfigReady();
 
     volatile int RCstate = 0;
     volatile int LCDstepdown = 10;
-    volatile int i = 0;
     bool lineFollowingMode = false;
     bool RCmode = true;
     bool turnAroundEnter = false;
-    bool lineFound = false;
 
     while (true)
     {
@@ -76,6 +74,10 @@ int main(void)
                 switch(RCstate)
                 {
                     case(1): {RCmode = true;lineFollowingMode = false;turnAroundEnter = false;ProgramState = RCstop;}   break;
+<<<<<<< HEAD
+=======
+                    case(6): {RCmode = true;lineFollowingMode = false;ProgramState = RCturbo;}                          break;
+>>>>>>> fe3e6dcbfdc925a8ddb5a4faf8f3458082720f1f
                     case(7): {RCmode = true;lineFollowingMode = false;ProgramState = turnAround;}                       break;
                     case(8): {RCmode = false;lineFollowingMode = true;turnAroundEnter = false;}                         break;
                     default:                                                                                            break;
@@ -99,18 +101,47 @@ int main(void)
             else if (RCmode)   
 
             {
+<<<<<<< HEAD
                 switch(ProgramState)
                 {
 
                     case(RCstop):
+=======
+                case(RCturbo):
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay)
+                    {
+                        outputUpdateTimer.reset();
+                        speedReg.updateTargetSpeed(0.0f,0.0f);
+                        toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                        LCD.toScreen(LCD.SVB1(&S6, &S5, &S4), LCD.SVB2(&S1, &S2, &S3), "");
+                    };
+                    break;
+                };
+
+                case(RCstop):
+                {
+                    if(outputUpdateTimer.read_ms() >= timedelay)
+>>>>>>> fe3e6dcbfdc925a8ddb5a4faf8f3458082720f1f
                     {
                         outputUpdateTimer.reset();
                         speedReg.updateTargetSpeed(0.0f,0.0f);
                         toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+<<<<<<< HEAD
                         break;
                     };
 
                     case(turnAround):
+=======
+
+                    };
+                    break;
+                };
+
+                case(turnAround):
+                {
+                    if(!turnAroundEnter)
+>>>>>>> fe3e6dcbfdc925a8ddb5a4faf8f3458082720f1f
                     {
                         if(!turnAroundEnter)
                         {
@@ -152,3 +183,4 @@ int main(void)
         };
     };
 };
+   

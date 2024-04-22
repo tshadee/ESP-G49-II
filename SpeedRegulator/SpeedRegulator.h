@@ -8,9 +8,9 @@ class speedRegulator
 {
 private:
 
-    double currentLeftPWM, currentRightPWM;
-    double currentLeftSpeed, currentRightSpeed;
-    double targetLeftSpeed, targetRightSpeed;
+    float currentLeftPWM, currentRightPWM;
+    float currentLeftSpeed, currentRightSpeed;
+    float targetLeftSpeed, targetRightSpeed;
     Encoder *leftWheelEncoder;
     Encoder *rightWheelEncoder;
 
@@ -44,13 +44,13 @@ public:
     @param leftspeed Speed of left wheel (should be output from PIDSys Class)
     @param rightspeed Speed of right wheel (should be output from PIDSys Class)
     **/
-    void updateTargetSpeed(double leftspeed, double rightspeed);
+    void updateTargetSpeed(float leftspeed, float rightspeed);
 
     //Get current LEFT PWM from within adjustPWMOutputOnSpeed()
-    double getCurrentLeftPWM(void);
+    float getCurrentLeftPWM(void);
 
     //Get current RIGHT PWM from within adjustPWMOutputOnSpeed()
-    double getCurrentRightPWM(void);
+    float getCurrentRightPWM(void);
     
 };
 
