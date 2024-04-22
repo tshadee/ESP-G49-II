@@ -9,14 +9,22 @@ Classes included:
 - PWMGeneration
 - PIDSys
 - Encoder
+- ExternalStimulus
 
 Current Configuration:
 - 6 sensors
 - X2 encoding
 - No LCD
-- No BLE
+- BLE
 - No states
-- Fast polling (10 kHz)
-- Fast update (2 kHz)
+- Fast polling (5 kHz)
+- Fast update (1 kHz)
 
 Required external libraries (import these into Keil Studio): [QEI](https://os.mbed.com/users/aberk/code/QEI/)
+- LCD 
+- BLE 
+- All states (All RC States, turnAround, lineFollowing, etc.)
+- Normal polling (5 kHz)
+- Normal update (1 kHz)
+
+Required external libraries: [QEI](https://os.mbed.com/users/aberk/code/QEI/), [C12832](https://os.mbed.com/teams/components/code/C12832/)
