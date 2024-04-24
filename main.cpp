@@ -10,7 +10,6 @@
 #include "PIDSys.h"
 #include "SpeedRegulator.h"
 #include "ExternalStimulus.h"
-// #include "LCDManager.h"
 
 pstate ProgramState = init;
 
@@ -25,13 +24,11 @@ int main(void)
     TCRT S4(PB_0, PC_6, TCRT_MAX_VDD);                    // Right EDGE sensor      (INPUT PIN, DARLINGTON OUTPUT PIN, 3.3V)
     TCRT S5(PC_1, PC_8, TCRT_MAX_VDD);                    // Right GUARD1 sensor    (INPUT PIN, DARLINGTON OUTPUT PIN, 3.3V)
     TCRT S6(PC_0, PC_5, TCRT_MAX_VDD);                    // Right GUARD2 sensor    (INPUT PIN, DARLINGTON OUTPUT PIN, 3.3V)
-    PWMGen toMDB(PA_15, PB_7, PA_14, PC_2, PC_3);         // pwm1, pwm2, mdbe, be1, be2               
-    // C12832 lcd(D11, D13, D12, D7, D10);                   // LCD screen arduino pins    
+    PWMGen toMDB(PA_15, PB_7, PA_14, PC_2, PC_3);         // pwm1, pwm2, mdbe, be1, be2                  
 /* .-------------------------------------Underneath are subsystems. IO config should be done up here.------------------------------------- */
 
     Encoder leftWheel(&leftEnc);                                            // from QEI above
     Encoder rightWheel(&rightEnc);                                          // from QEI above
-    // LCDManager LCD(&lcd);                                                   // from C12832 above
     speedRegulator speedReg(&leftWheel, &rightWheel);                       // from Encoder class above
     PIDSys PID(&S1, &S2, &S3, &S4, &S5, &S6, &leftWheel, &rightWheel);      // from sensor array above
 
@@ -52,7 +49,7 @@ int main(void)
     BLEtimer.start();
 
     float timedelay = (static_cast<float>(1000.f / SYS_OUTPUT_RATE)); // in ms
-    float BLEdelay = (static_cast<float>(2000.f / SYS_OUTPUT_RATE));  //in ms
+    float BLEdelay = (static_cast<float>(1000.f / SYS_OUTPUT_RATE));  //in ms
 
     toMDB.begin();
     ExStim.serialConfigReady();

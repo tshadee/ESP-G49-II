@@ -8,19 +8,12 @@
 
 #define GAIN_PROPORTIONAL 4.5f  //Proportionl gain of PID
 #define GAIN_INTEGRAL 0.11f      //Integral gain of PID
-#define GAIN_DERIVATIVE 0.35f   //Derivative gain of PID
+#define GAIN_DERIVATIVE 0.33f   //Derivative gain of PID
 
 #define GAIN_SCALE_DOWN 130.0f  //scales down every scaling value. Divided at the end of output calculation.
 #define EDGE_SCALING 1.0f       //Overall scaling for EDGE sensors (S4,S3)
 #define GUARD1_SCALING 3.0f     //Overall scaling for GUARD1 sensors (S5,S2)
 #define GUARD2_SCALING 5.0f     //Overall scaling for GUARD2 sensors (S6,S1)
-
-#define S6_SCALE 1.0f           //Individual scaling for sensors Right (S6) to Left (S1)
-#define S5_SCALE 1.0f
-#define S4_SCALE 1.0f
-#define S3_SCALE 1.0f
-#define S2_SCALE 1.0f
-#define S1_SCALE 1.0f
 
 #define GAIN_P_WHEEL 40.0f
 #define GAIN_I_WHEEL 0.2f
