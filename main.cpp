@@ -87,9 +87,15 @@ int main(void)
 
             if (lineFollowingMode)
             {
+                if (S2.getSensorVoltage(true) > 1.3f || S3.getSensorVoltage(true) > 1.3f || S4.getSensorVoltage(true) > 1.3f || S5.getSensorVoltage(true) > 1.3f || S6.getSensorVoltage(true) > 1.3f){
                 PID.calculatePID();
                 speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
                 toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                }
+                else{
+                speedReg.updateTargetSpeed(0.0f, 0.0f);
+                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                }
             }
 
             //RC MODE
