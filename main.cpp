@@ -51,8 +51,8 @@ int main(void)
     outputUpdateTimer.start();
     BLEtimer.start();
 
-    int timedelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); // in ms
-    int BLEdelay = (static_cast<int>(1000 / SYS_OUTPUT_RATE)); //in ms
+    float timedelay = (static_cast<float>(1000.f / SYS_OUTPUT_RATE)); // in ms
+    float BLEdelay = (static_cast<float>(2000.f / SYS_OUTPUT_RATE));  //in ms
 
     toMDB.begin();
     ExStim.serialConfigReady();

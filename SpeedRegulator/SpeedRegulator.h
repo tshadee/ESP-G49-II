@@ -11,6 +11,7 @@ private:
     float currentLeftPWM, currentRightPWM;
     float currentLeftSpeed, currentRightSpeed;
     float targetLeftSpeed, targetRightSpeed;
+    float errorArr[2][2];
     Encoder *leftWheelEncoder;
     Encoder *rightWheelEncoder;
 
