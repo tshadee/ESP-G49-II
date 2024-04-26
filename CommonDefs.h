@@ -18,7 +18,7 @@
 #define GAIN_P_WHEEL 30.0f
 #define GAIN_I_WHEEL 0.2f
 
-#define BASE_SPEED 1.0f         //m/s. Base speed at which the buggy runs. With current tuning, stable until ~1.1 m/s
+#define BASE_SPEED 0.8f         //m/s. Base speed at which the buggy runs. With current tuning, stable until ~1.1 m/s
 
 #define EASING_FACTOR 20.0f     //PWM easing based on target speed. Higher values means more reactive PWM.
 
