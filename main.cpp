@@ -96,17 +96,11 @@ int main(void)
 
                 case(1):
                 {
-                    if(S2.getSensorVoltage(true) > 0.9f || S6.getSensorVoltage(true) > 0.9f || S3.getSensorVoltage(true) > 1.2f || S5.getSensorVoltage(true) > 1.2f ){
-                    PID.calculateslowPID();
-                    speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
-                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    }
-
-                    else{
+                    
                     PID.calculatePID();
                     speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    }
+                    
                 }
                 break;
 
