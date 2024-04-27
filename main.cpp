@@ -57,6 +57,7 @@ int main(void)
     volatile int RCstate = 0;
     volatile int s = 0;
     volatile int turnDelay = 0;
+    volatile int stopTick = 0;
     bool turnDone = false;
     bool turnAroundEnter = false;
 
@@ -144,16 +145,22 @@ int main(void)
                     else
                     
                     {
-                        if(S1.getSensorVoltage(true) > 1.0f || S2.getSensorVoltage(true) > 1.0f || S3.getSensorVoltage(true) > 1.0f || S4.getSensorVoltage(true) > 1.0f || S5.getSensorVoltage(true) > 1.0f || S6.getSensorVoltage(true) > 1.0f)
+                        if(S3.getSensorVoltage(true) > 1.5f || S4.getSensorVoltage(true) > 1.5f)
                         {
                                 PID.calculatePID();
                                 speedReg.updateTargetSpeed((PID.getLeftSpeed()), (PID.getRightSpeed()));
                                 toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                                stopTick = 0;
                         }
                         else
                         {
-                            speedReg.updateTargetSpeed(0.0f, 0.0f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                            stopTick++;
+                            if(stopTick >= 1000)
+                            {
+                                speedReg.updateTargetSpeed(0.0f, 0.0f);
+                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                                stopTick = 1000;
+                            };
                         };
                     };
                 };
