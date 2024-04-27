@@ -122,7 +122,7 @@ int main(void)
                         } 
                         else 
                         {  
-                            if((S3.getSensorVoltage(true) + S4.getSensorVoltage(true) + S5.getSensorVoltage(true)) < 1.0f)
+                            if((S3.getSensorVoltage(true) + S4.getSensorVoltage(true) ) < 1.0f)
                             {
                                 speedReg.updateTargetSpeed(-0.3f, 0.3f);
                                 toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
@@ -144,7 +144,7 @@ int main(void)
                     else
                     
                     {
-                        if(S2.getSensorVoltage(true) > 1.5f || S3.getSensorVoltage(true) > 1.5f || S4.getSensorVoltage(true) > 1.5f || S5.getSensorVoltage(true) > 1.5f || S6.getSensorVoltage(true) > 1.5f)
+                        if(S1.getSensorVoltage(true) > 1.0f || S2.getSensorVoltage(true) > 1.0f || S3.getSensorVoltage(true) > 1.0f || S4.getSensorVoltage(true) > 1.0f || S5.getSensorVoltage(true) > 1.0f || S6.getSensorVoltage(true) > 1.0f)
                         {
                                 PID.calculatePID();
                                 speedReg.updateTargetSpeed((PID.getLeftSpeed()), (PID.getRightSpeed()));
