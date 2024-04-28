@@ -13,8 +13,6 @@
 
 pstate ProgramState = init;
 
-int main(void)
-{
 /* .------------------------------------- IO Config ------------------------------------- */
     QEI leftEnc(PB_3, PB_5, NC, CPR, QEI::X2_ENCODING);   // left encoder left channel, right channel
     QEI rightEnc(PB_10, PB_4, NC, CPR, QEI::X2_ENCODING); // right encoder left channel, right channel
@@ -33,27 +31,9 @@ int main(void)
     speedRegulator speedReg(&leftWheel, &rightWheel);                       // from Encoder class above
     PIDSys PID(&S1, &S2, &S3, &S4, &S5, &S6, &leftWheel, &rightWheel);      // from sensor array above
 
-    S1.turnSensorOn();
-    S2.turnSensorOn();
-    S3.turnSensorOn();
-    S4.turnSensorOn();
-    S5.turnSensorOn();
-    S6.turnSensorOn();
-
-    Ticker sensorPollTicker;
-    float sensorPollRate = 1.0 / SENSOR_POLL_FREQ;
-    sensorPollTicker.attach(callback(&TCRT::pollSensors), sensorPollRate);
-
     Timer outputUpdateTimer;
     Timer BLEtimer;
-    outputUpdateTimer.start();
-    BLEtimer.start();
-
-    float timedelay = (static_cast<float>(1000.f / SYS_OUTPUT_RATE)); // in ms
-    float BLEdelay = (static_cast<float>(1000.f / SYS_OUTPUT_RATE));  //in ms
-
-    toMDB.begin();
-    ExStim.serialConfigReady();
+    Ticker systemoutput;
 
     volatile int RCstate = 0;
     volatile int s = 0;
@@ -62,13 +42,23 @@ int main(void)
     bool turnDone = false;
     bool turnAroundEnter = false;
 
-/* .------------------------------------- Main Loop ------------------------------------- */
+    Ticker sensorPollTicker;
+    float sensorPollRate = 1.0 / SENSOR_POLL_FREQ;
 
-    while (true)
-    {
-        // if(BLEtimer.read_ms() >= BLEdelay)
-        // {
-            BLEtimer.reset();
+    float timedelay = (static_cast<float>(1000.f / SYS_OUTPUT_RATE)); // in ms
+    float BLEdelay = (static_cast<float>(1000.f / SYS_OUTPUT_RATE));  //in ms
+    float systemticker = 1.0f / SYS_OUTPUT_RATE;
+
+void TDC(){
+
+    S1.turnSensorOn();
+    S2.turnSensorOn();
+    S3.turnSensorOn();
+    S4.turnSensorOn();
+    S5.turnSensorOn();
+    S6.turnSensorOn();
+    
+
             if(ExStim.pullHM10())
             {
                 RCstate = ExStim.getIntRC();
@@ -80,7 +70,7 @@ int main(void)
                     default:          break;
                 };
             };
-        };
+        
 
         //TDB MODE
         if(outputUpdateTimer.read_ms() >= timedelay)
@@ -119,9 +109,9 @@ int main(void)
 
                     if(!turnDone)
                     {
-                        if((leftWheel.getDist() > -0.1) && (rightWheel.getDist() < 0.1))
+                        if((leftWheel.getDist() > -0.25) && (rightWheel.getDist() < 0.25))
                         {
-                            speedReg.updateTargetSpeed(-0.5f,0.5f);
+                            speedReg.updateTargetSpeed(-0.7f,0.7f);
                         } 
                         else 
                         {  
@@ -142,21 +132,21 @@ int main(void)
                     }
                     else
                     {
-                        if(S3.getSensorVoltage(true) > 1.5f || S4.getSensorVoltage(true) > 1.5f)
+                        if(S1.getSensorVoltage(true) > 0.9f || S2.getSensorVoltage(true) > 0.9f || S3.getSensorVoltage(true) > 0.9f || S4.getSensorVoltage(true) > 0.9f || S5.getSensorVoltage(true) > 0.9f || S6.getSensorVoltage(true) > 0.9f)
                         {
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed())+0.2f, (PID.getRightSpeed())+0.2f);
+                                speedReg.updateTargetSpeed((PID.getLeftSpeed()), (PID.getRightSpeed()));
                                 stopTick = 0;
                         }
                         else
                         {
-                            if(stopTick >= 1000)
+                            if(stopTick >= 300)
                             {
                                 speedReg.updateTargetSpeed(0.0f, 0.0f);
                             } 
                             else 
                             {
                                 stopTick++;
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed()), (PID.getRightSpeed()));
+                                speedReg.updateTargetSpeed((PID.getLeftSpeed()-0.1f), (PID.getRightSpeed()-0.1f));
                             };
                         };
                     };
@@ -172,5 +162,28 @@ int main(void)
                 break;
             };
         };
-    // };
+
+};    
+
+int main(void)
+{
+
+    
+    sensorPollTicker.attach(callback(&TCRT::pollSensors), sensorPollRate);
+
+    outputUpdateTimer.start();
+    BLEtimer.start();
+
+    toMDB.begin();
+    ExStim.serialConfigReady();
+    BLEtimer.reset();
+
+
+    systemoutput.attach(&TDC, systemticker);
+/* .------------------------------------- Main Loop ------------------------------------- */
+
+            
+    
 };
+
+
