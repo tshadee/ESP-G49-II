@@ -6,8 +6,7 @@ int TCRT::sensorCount = 0;                   // static member declaration
 TCRT::TCRT(PinName Pin, PinName DarlingPin, float v) : sensorPin(Pin), DarlingtonPin(DarlingPin), VDD(v), rIndex(0), senseNorm(0)
 {
     senseNormRolled[0] = 
-    senseNormRolled[1] = 
-    senseNormRolled[2] = 0;
+    senseNormRolled[1] =  0;
 
     if (sensorCount < SENSOR_AMOUNT)
     {
@@ -21,8 +20,7 @@ void TCRT::rollingPollAverage()
     rIndex++;
 
     senseNorm = senseNormRolled[0] + 
-                senseNormRolled[1] + 
-                senseNormRolled[2];
+                senseNormRolled[1];
 }; 
 
 // runs through all the polling once called. This is for synchronous polling between sensors since static is shared between all objects derived from TCRT

@@ -10,7 +10,7 @@ void Encoder::updateValues(void)
     count -= encode->getPulses();
     distance = count * WHEEL_DIAMETER * PI / CPR;
     countBuffer = count - countPrev; // difference in count
-    speed = ((static_cast<float>(countBuffer) / CPR) * SYS_OUTPUT_RATE/4) * WHEEL_DIAMETER * PI;
+    speed = ((static_cast<float>(countBuffer) / CPR) * SYS_OUTPUT_RATE/8) * WHEEL_DIAMETER * PI;
     encode->reset();
 };
 

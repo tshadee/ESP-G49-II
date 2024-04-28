@@ -66,8 +66,8 @@ int main(void)
 
     while (true)
     {
-        if(BLEtimer.read_ms() >= BLEdelay)
-        {
+        // if(BLEtimer.read_ms() >= BLEdelay)
+        // {
             BLEtimer.reset();
             if(ExStim.pullHM10())
             {
@@ -172,5 +172,5 @@ int main(void)
                 break;
             };
         };
-    };
+    // };
 };
