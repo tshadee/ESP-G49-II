@@ -15,7 +15,7 @@
 #define GUARD1_SCALING 5.5f     //Overall scaling for GUARD1 sensors (S5,S2)
 #define GUARD2_SCALING 20.0f     //Overall scaling for GUARD2 sensors (S6,S1)
 
-#define GAIN_P_WHEEL 60.0f
+#define GAIN_P_WHEEL 100.0f
 #define GAIN_I_WHEEL 0.05f
 
 #define BASE_SPEED 1.0f         //m/s. Base speed at which the buggy runs. With current tuning, stable until ~1.1 m/s

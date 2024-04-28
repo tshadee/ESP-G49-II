@@ -109,21 +109,21 @@ void TDC(){
 
                     if(!turnDone)
                     {
-                        if((leftWheel.getDist() > -0.25) && (rightWheel.getDist() < 0.25))
+                        if((leftWheel.getDist() > -0.3) && (rightWheel.getDist() < 0.3))
                         {
                             speedReg.updateTargetSpeed(-0.7f,0.7f);
                         } 
                         else 
                         {  
-                            if((S3.getSensorVoltage(true) + S4.getSensorVoltage(true) ) < 1.0f)
+                            if((S3.getSensorVoltage(true) + S4.getSensorVoltage(true) + S2.getSensorVoltage(true) + S5.getSensorVoltage(true) ) < 0.8f)
                             {
-                                speedReg.updateTargetSpeed(-0.3f, 0.3f);
+                                speedReg.updateTargetSpeed(-0.4f, 0.4f);
                             } 
                             else
                             {
                                 speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*0.2, (PID.getRightSpeed() - BASE_SPEED)*0.2);
                                 turnDelay++;
-                                if(turnDelay >= 200)
+                                if(turnDelay >= 100)
                                 {
                                     turnDone = true;
                                 };
@@ -146,7 +146,7 @@ void TDC(){
                             else 
                             {
                                 stopTick++;
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed()-0.1f), (PID.getRightSpeed()-0.1f));
+                                speedReg.updateTargetSpeed((PID.getLeftSpeed()-0.2f), (PID.getRightSpeed()-0.2f));
                             };
                         };
                     };
