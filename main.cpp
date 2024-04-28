@@ -26,6 +26,7 @@ pstate ProgramState = init;
     PWMGen toMDB(PA_15, PB_7, PA_14, PC_2, PC_3);         // pwm1, pwm2, mdbe, be1, be2                  
 /* .------------------------------------- Subsystems ------------------------------------ */
 
+
     Encoder leftWheel(&leftEnc);                                            // from QEI above
     Encoder rightWheel(&rightEnc);                                          // from QEI above
     speedRegulator speedReg(&leftWheel, &rightWheel);                       // from Encoder class above
@@ -164,26 +165,14 @@ void TDC(){
         };
 
 };    
-
-int main(void)
+/* .------------------------------------- Main Loop ------------------------------------- */
+int main(void) 
 {
-
-    
     sensorPollTicker.attach(callback(&TCRT::pollSensors), sensorPollRate);
-
     outputUpdateTimer.start();
     BLEtimer.start();
-
     toMDB.begin();
     ExStim.serialConfigReady();
     BLEtimer.reset();
-
-
     systemoutput.attach(&TDC, systemticker);
-/* .------------------------------------- Main Loop ------------------------------------- */
-
-            
-    
 };
-
-
