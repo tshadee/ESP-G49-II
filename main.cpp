@@ -15,6 +15,7 @@ pstate ProgramState = init;
 
 int main(void)
 {
+/* .------------------------------------- IO Config ------------------------------------- */
     QEI leftEnc(PB_3, PB_5, NC, CPR, QEI::X2_ENCODING);   // left encoder left channel, right channel
     QEI rightEnc(PB_10, PB_4, NC, CPR, QEI::X2_ENCODING); // right encoder left channel, right channel
     ExternalStim ExStim(PA_11, PA_12);                    // RXD -> TX (PIN), TXD -> RX (PIN)
@@ -25,7 +26,7 @@ int main(void)
     TCRT S5(PC_1, PC_8, TCRT_MAX_VDD);                    // Right GUARD1 sensor    (INPUT PIN, DARLINGTON OUTPUT PIN, 3.3V)
     TCRT S6(PC_0, PC_5, TCRT_MAX_VDD);                    // Right GUARD2 sensor    (INPUT PIN, DARLINGTON OUTPUT PIN, 3.3V)
     PWMGen toMDB(PA_15, PB_7, PA_14, PC_2, PC_3);         // pwm1, pwm2, mdbe, be1, be2                  
-/* .-------------------------------------Underneath are subsystems. IO config should be done up here.------------------------------------- */
+/* .------------------------------------- Subsystems ------------------------------------ */
 
     Encoder leftWheel(&leftEnc);                                            // from QEI above
     Encoder rightWheel(&rightEnc);                                          // from QEI above
@@ -60,6 +61,8 @@ int main(void)
     volatile int stopTick = 0;
     bool turnDone = false;
     bool turnAroundEnter = false;
+
+/* .------------------------------------- Main Loop ------------------------------------- */
 
     while (true)
     {
