@@ -4,7 +4,7 @@
 
 #define SENSOR_AMOUNT 6         //Number of sensors
 #define SENSOR_BUFFER 3         //Buffer depth for sensor rolling average buffer
-#define SENSOR_POLL_FREQ 12000   //Hz , Ideally 5 times that of SYS_OUTPUT_RATE
+#define SENSOR_POLL_FREQ 12000  //Hz , Ideally 5 times that of SYS_OUTPUT_RATE
 
 #define GAIN_PROPORTIONAL 5.0f  //Proportionl gain of PID
 #define GAIN_INTEGRAL 0.35f      //Integral gain of PID

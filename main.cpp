@@ -101,12 +101,12 @@ int main(void)
                     PID.calculatePID();
                     speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
                     toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                    
                 }
                 break;
 
                 case(2):
                 {
+                    PID.calculatePID();
                     if(!turnAroundEnter)
                     {
                         leftWheel.resetDistance();
@@ -118,21 +118,17 @@ int main(void)
                     {
                         if((leftWheel.getDist() > -0.1) && (rightWheel.getDist() < 0.1))
                         {
-                            speedReg.updateTargetSpeed(-0.4f,0.4f);
-                            toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());   
+                            speedReg.updateTargetSpeed(-0.5f,0.5f);
                         } 
                         else 
                         {  
                             if((S3.getSensorVoltage(true) + S4.getSensorVoltage(true) ) < 1.0f)
                             {
                                 speedReg.updateTargetSpeed(-0.3f, 0.3f);
-                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
                             } 
                             else
                             {
-                                PID.calculatePID();
                                 speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*0.2, (PID.getRightSpeed() - BASE_SPEED)*0.2);
-                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
                                 turnDelay++;
                                 if(turnDelay >= 200)
                                 {
@@ -141,28 +137,27 @@ int main(void)
                             };
                         };
                     }
-
                     else
-                    
                     {
                         if(S3.getSensorVoltage(true) > 1.5f || S4.getSensorVoltage(true) > 1.5f)
                         {
-                                PID.calculatePID();
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed()), (PID.getRightSpeed()));
-                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+                                speedReg.updateTargetSpeed((PID.getLeftSpeed())+0.2f, (PID.getRightSpeed())+0.2f);
                                 stopTick = 0;
                         }
                         else
                         {
-                            stopTick++;
                             if(stopTick >= 1000)
                             {
                                 speedReg.updateTargetSpeed(0.0f, 0.0f);
-                                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
-                                stopTick = 1000;
+                            } 
+                            else 
+                            {
+                                stopTick++;
+                                speedReg.updateTargetSpeed((PID.getLeftSpeed()), (PID.getRightSpeed()));
                             };
                         };
                     };
+                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
                 };
                 break;
 
