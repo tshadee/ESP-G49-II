@@ -11,8 +11,6 @@
 #include "SpeedRegulator.h"
 #include "ExternalStimulus.h"
 
-pstate ProgramState = init;
-
 /* .------------------------------------- IO Config ------------------------------------- */
     QEI leftEnc(PB_3, PB_5, NC, CPR, QEI::X2_ENCODING);   // left encoder left channel, right channel
     QEI rightEnc(PB_10, PB_4, NC, CPR, QEI::X2_ENCODING); // right encoder left channel, right channel
@@ -50,7 +48,112 @@ pstate ProgramState = init;
     float systemticker = 1.0f / SYS_OUTPUT_RATE;
 
 void TDC(){
+    if(ExStim.pullHM10())
+    {
+        RCstate = ExStim.getIntRC();
+        switch(RCstate)
+        {
+            case(1): {s = 0;} break;
+            case(2): {s = 1;} break;
+            case(3): {s = 2;} break;
+            default:          break;
+        };
+    };
+        
+    //TDB MODE
+    if(outputUpdateTimer.read_ms() >= timedelay)
+    {
+        outputUpdateTimer.reset();
 
+        switch(s)
+        {
+            case(0):
+            {
+                speedReg.updateTargetSpeed(0.0f,0.0f);
+                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+                turnDelay = 0;
+                turnDone = false;
+            }
+            break;
+
+            case(1):
+            {
+                PID.calculatePID();
+                speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
+                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+            }
+            break;
+
+            case(2):
+            {
+                PID.calculatePID();
+                if(!turnAroundEnter)
+                {
+                    leftWheel.resetDistance();
+                    rightWheel.resetDistance();
+                    turnAroundEnter = true;
+                };
+
+                if(!turnDone)
+                {
+                    if((leftWheel.getDist() > -0.3) && (rightWheel.getDist() < 0.3))
+                    {
+                        speedReg.updateTargetSpeed(-0.9f,0.9f);
+                    } 
+                    else 
+                    {  
+                        if((S3.getSensorVoltage(true) + S4.getSensorVoltage(true) + S2.getSensorVoltage(true) + S5.getSensorVoltage(true) ) < 0.8f)
+                        {
+                            speedReg.updateTargetSpeed(-0.4f, 0.4f);
+                        } 
+                        else
+                        {
+                            speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*0.2, (PID.getRightSpeed() - BASE_SPEED)*0.2);
+                            turnDelay++;
+                            if(turnDelay >= 100)
+                            {
+                                turnDone = true;
+                            };
+                        };
+                    };
+                }
+                else
+                {
+                    if(S1.getSensorVoltage(true) > 0.35f || S2.getSensorVoltage(true) > 0.35f || S3.getSensorVoltage(true) > 0.30f || S4.getSensorVoltage(true) > 0.30f || S5.getSensorVoltage(true) > 0.35f || S6.getSensorVoltage(true) > 0.35f)
+                    {
+                            speedReg.updateTargetSpeed((PID.getLeftSpeed()), (PID.getRightSpeed()));
+                            stopTick = 0;
+                    }
+                    else
+                    {
+                        if(stopTick >= 75)
+                        {
+                            speedReg.updateTargetSpeed(0.0f, 0.0f);
+                        } 
+                        else 
+                        {
+                            stopTick++;
+                            speedReg.updateTargetSpeed((PID.getLeftSpeed()-0.2f), (PID.getRightSpeed()-0.2f));
+                        };
+                    };
+                };
+                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
+            };
+            break;
+
+            default:
+            {
+                speedReg.updateTargetSpeed(0.0f,0.0f);
+                toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
+            }
+            break;
+        };
+    };
+
+};    
+
+int main(void)
+{
     S1.turnSensorOn();
     S2.turnSensorOn();
     S3.turnSensorOn();
@@ -58,132 +161,13 @@ void TDC(){
     S5.turnSensorOn();
     S6.turnSensorOn();
     
-
-            if(ExStim.pullHM10())
-            {
-                RCstate = ExStim.getIntRC();
-                switch(RCstate)
-                {
-                    case(1): {s = 0;} break;
-                    case(2): {s = 1;} break;
-                    case(3): {s = 2;} break;
-                    default:          break;
-                };
-            };
-        
-
-        //TDB MODE
-        if(outputUpdateTimer.read_ms() >= timedelay)
-        {
-            outputUpdateTimer.reset();
-
-            switch(s)
-            {
-                case(0):
-                {
-                    speedReg.updateTargetSpeed(0.0f,0.0f);
-                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
-                    turnDelay = 0;
-                    turnDone = false;
-                }
-                break;
-
-                case(1):
-                {
-                    
-                    PID.calculatePID();
-                    speedReg.updateTargetSpeed(PID.getLeftSpeed(), PID.getRightSpeed());
-                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                }
-                break;
-
-                case(2):
-                {
-                    PID.calculatePID();
-                    if(!turnAroundEnter)
-                    {
-                        leftWheel.resetDistance();
-                        rightWheel.resetDistance();
-                        turnAroundEnter = true;
-                    };
-
-                    if(!turnDone)
-                    {
-                        if((leftWheel.getDist() > -0.3) && (rightWheel.getDist() < 0.3))
-                        {
-                            speedReg.updateTargetSpeed(-0.7f,0.7f);
-                        } 
-                        else 
-                        {  
-                            if((S3.getSensorVoltage(true) + S4.getSensorVoltage(true) + S2.getSensorVoltage(true) + S5.getSensorVoltage(true) ) < 0.8f)
-                            {
-                                speedReg.updateTargetSpeed(-0.4f, 0.4f);
-                            } 
-                            else
-                            {
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed() - BASE_SPEED)*0.2, (PID.getRightSpeed() - BASE_SPEED)*0.2);
-                                turnDelay++;
-                                if(turnDelay >= 100)
-                                {
-                                    turnDone = true;
-                                };
-                            };
-                        };
-                    }
-                    else
-                    {
-                        if(S1.getSensorVoltage(true) > 0.9f || S2.getSensorVoltage(true) > 0.9f || S3.getSensorVoltage(true) > 0.9f || S4.getSensorVoltage(true) > 0.9f || S5.getSensorVoltage(true) > 0.9f || S6.getSensorVoltage(true) > 0.9f)
-                        {
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed()), (PID.getRightSpeed()));
-                                stopTick = 0;
-                        }
-                        else
-                        {
-                            if(stopTick >= 300)
-                            {
-                                speedReg.updateTargetSpeed(0.0f, 0.0f);
-                            } 
-                            else 
-                            {
-                                stopTick++;
-                                speedReg.updateTargetSpeed((PID.getLeftSpeed()-0.2f), (PID.getRightSpeed()-0.2f));
-                            };
-                        };
-                    };
-                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());
-                };
-                break;
-
-                default:
-                {
-                    speedReg.updateTargetSpeed(0.0f,0.0f);
-                    toMDB.setPWMDuty(speedReg.getCurrentLeftPWM(), speedReg.getCurrentRightPWM());  
-                }
-                break;
-            };
-        };
-
-};    
-
-int main(void)
-{
-
-    
     sensorPollTicker.attach(callback(&TCRT::pollSensors), sensorPollRate);
-
     outputUpdateTimer.start();
     BLEtimer.start();
-
     toMDB.begin();
     ExStim.serialConfigReady();
     BLEtimer.reset();
 
-
     systemoutput.attach(&TDC, systemticker);
 /* .------------------------------------- Main Loop ------------------------------------- */
-
-            
-    
 };
-
-

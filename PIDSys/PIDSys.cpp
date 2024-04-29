@@ -8,7 +8,7 @@ PIDSys::PIDSys(TCRT *s1, TCRT *s2, TCRT *s3, TCRT *s4, TCRT *s5, TCRT *s6, Encod
 
 void PIDSys::reset()
 {
-    error[2] = error[1] = error[0] = output = 0;
+    error[1] = error[0] = output = 0;
     leftSpeed = 0.0f;
     rightSpeed = 0.0f;
 };
@@ -16,23 +16,21 @@ void PIDSys::reset()
 void PIDSys::calculatePID()
 {
 
-    error[2] = error[1];
     error[1] = error[0];
 
-    S6V = S6->getSensorVoltage(true);
+    S6V = S6->getSensorVoltage(true)*S6S;
     S5V = S5->getSensorVoltage(true);
     S4V = S4->getSensorVoltage(true);
     S3V = S3->getSensorVoltage(true);
     S2V = S2->getSensorVoltage(true);
-    S1V = S1->getSensorVoltage(true);
+    S1V = S1->getSensorVoltage(true)*S1S;
 
     error[0] = (S6V*GUARD2_SCALING + 
                 S5V*GUARD1_SCALING +
                 S4V*EDGE_SCALING -
                 S3V*EDGE_SCALING - 
                 S2V*GUARD1_SCALING -
-                S1V*GUARD2_SCALING
-                );
+                S1V*GUARD2_SCALING);
 
     output = (((GAIN_PROPORTIONAL * error[0]) + 
                (GAIN_DERIVATIVE * (error[0] - error[1]) * SYS_OUTPUT_RATE) + 

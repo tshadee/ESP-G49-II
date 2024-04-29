@@ -29,11 +29,8 @@ void speedRegulator::adjustPWMOutputOnSpeed()
     errorArr[0][0] = leftSpeedDiff;
     errorArr[1][0] = rightSpeedDiff; 
 
-    currentLeftPWM += (errorArr[0][0]*GAIN_P_WHEEL  + (errorArr[0][0] + errorArr[1][1])*GAIN_I_WHEEL/SYS_OUTPUT_RATE)/SYS_OUTPUT_RATE;
-    currentRightPWM += (errorArr[1][0]*GAIN_P_WHEEL + (errorArr[1][0] + errorArr[1][1])*GAIN_I_WHEEL/SYS_OUTPUT_RATE)/SYS_OUTPUT_RATE;
-
-    // currentLeftPWM += leftSpeedDiff * EASING_FACTOR / SYS_OUTPUT_RATE;      //adjusts PWM output based on speed difference and EASING_FACTOR (higher ease is faster adjustment)
-    // currentRightPWM += rightSpeedDiff * EASING_FACTOR / SYS_OUTPUT_RATE;    //""
+    currentLeftPWM += (errorArr[0][0]*GAIN_P_WHEEL  + (errorArr[0][0]/2 + errorArr[1][1]/2)*GAIN_I_WHEEL/SYS_OUTPUT_RATE)/SYS_OUTPUT_RATE;
+    currentRightPWM += (errorArr[1][0]*GAIN_P_WHEEL + (errorArr[1][0]/2 + errorArr[1][1]/2)*GAIN_I_WHEEL/SYS_OUTPUT_RATE)/SYS_OUTPUT_RATE;
 };
 
 float speedRegulator::getCurrentLeftPWM(void) { return currentLeftPWM; };
