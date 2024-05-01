@@ -98,7 +98,7 @@ void TDC(){
                 {
                     if((leftWheel.getDist() > -0.3) && (rightWheel.getDist() < 0.3))
                     {
-                        speedReg.updateTargetSpeed(-0.9f,0.9f);
+                        speedReg.updateTargetSpeed(-1.0f,1.0f);
                     } 
                     else 
                     {  
